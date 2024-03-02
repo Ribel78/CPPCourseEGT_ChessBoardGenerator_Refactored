@@ -13,18 +13,19 @@
 
 #include "Utilities.h"
 #include "Timer.h"
+#include "TextureFactory.h"
 
 class Game {
 public:
 	Game();
 	~Game();
 	bool init(const char* title, int xpos, int ypos, int width, int height, int flags);
-	bool ttf_init();
-	void update();
-	void handleEvents();
-	void clean();
-	bool isRunning();
-	bool isSimulating(); //chess 
+    bool prep_textures();
+    void update();
+    void handleEvents();
+    void clean();
+    bool isRunning();
+    bool isSimulating(); //chess 
 	void setSimulating(bool); //chess
 	bool isClickableTextureClicked(SDL_Texture* t, SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp);
 	bool buttonClicked(SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp);
@@ -51,18 +52,14 @@ public:
 	friend std::string attackSquares(	std::string boardDescription, 
 										int x, int y, 
 										char piece);
-	//Return simulation data in readable format for display
-	//REFACTOR
-	std::string simulationTimeToString();
-	//REFACTOR
+
 private:
 
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
 	bool running;
 	bool simulating;
-	SDL_Texture		*textTitleTexture;
-	SDL_Rect 		textTitleRect;
+
 	SDL_Rect 		clickableRect;
 	int mouseDownX, mouseDownY;
 
@@ -71,9 +68,9 @@ private:
     SDL_Rect* chess_square[64];
     SDL_Color chess_color[3];	
 	SDL_Texture* chessPieces[12];
-	SDL_Texture* buttonStartTex;
+
+	SDL_Rect textTitleRect;
 	SDL_Rect buttonStartRect;
-	SDL_Texture* buttonStopTex;
 	SDL_Rect buttonStopRect;
 
 	//Seek trough the last 20 simulations using Down Arrow
@@ -88,13 +85,8 @@ private:
 	SDL_Texture *textTimeTexture;
 	SDL_Rect timeTextRect;
 
-
 	//Simulation Time
 	Timer timer;
-	// int numberOfSimulations; //REFACTOR
-	// double totalSimulationTime; //REFACTOR
-	// double averageSimulationTime; //REFACTOR
-	// double simulationTime; //REFACTOR
 
 	//Used in drawing the Board Overlay
 	int chessPieceIdx;

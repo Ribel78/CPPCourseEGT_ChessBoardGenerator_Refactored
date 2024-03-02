@@ -1,6 +1,6 @@
 //Game.cpp
 #include "Game.h"
-
+//Initialize SDL library
 bool Game::init(const char* title, int xpos, int ypos, int width, int height, int flags) {
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -31,6 +31,10 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 		std::cout << "SDL init fail\n";
 		return false;
 	}
+	//Init TTF library
+	if(TTF_Init() == -1){
+		return false;
+	}	
 	std::cout << "init success\n";
 	running = true;
 	simulating = false;
@@ -40,59 +44,51 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 //chess pieces in uinicode white to black in order King, Queen, Rook, Bishop, Knight, Pawn 
 //std::string cp_unicode[12] = {"\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 //only black chess characters
-
 std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 //chess pieces lookup reference according to FEN abbreviations
-//chess piece look up reference
-
 std::string cp_lookupRef = "KQRBNPkqrbnp";
 
-bool Game::ttf_init(){
-	if(TTF_Init() == -1){
-		return false;
-	}
+//Initialize SDL TTF library - rename the function to texture load or init
+bool Game::prep_textures(){
+
 	// loading fonts into pointer variables
-	TTF_Font* font1 = TTF_OpenFont("fonts/DejaVuSans.ttf", 48); //chess pieces
-	TTF_Font* font2 = TTF_OpenFont("fonts/segoepr.ttf", 72); // Text
+	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
+	TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
+	// formerly textTitleTexture
+	TextureFactory::Instance()->textureFromFont(	"textTitleTexture","Segoe",
+													"Chess Board Generator",
+													{0, 0, 0, 255}, 0, renderer, 0);
+	//formerly buttonStartTex
+	TextureFactory::Instance()->textureFromFont(	"buttonStartTex","DejaVu",
+													"     Start\n Simulation",
+													{235 ,235 ,255 ,255}, 0, renderer, 0);
+	//formerly buttonStopTex
+	TextureFactory::Instance()->textureFromFont(	"buttonStopTex","DejaVu",
+													"     Stop\n Simulation",
+													{235 ,235 ,255 ,255}, 0, renderer, 0);
 
-	if(font1 == NULL || font2 == NULL){
-		return false;
-	}
-	//creating temp surface
+	//Create textures from font chess characters - only the black pieces (6)	
+	TTF_Font* DejaVu = TextureFactory::Instance()->fonts["DejaVu"];
 	SDL_Surface* tempSurfaceText = NULL;
-
-	//Create textures from font chess characters - only the black pieces (6)
 	for (int i = 0; i < 12; i++){
 		if (i / 6 == 0){ //white first - K, Q, R, B, N, P
 
-			tempSurfaceText = TTF_RenderUTF8_Blended(font1, cpb_unicode[i%6].c_str(), {254, 237, 211, 255});
+			tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i%6].c_str(), {254, 237, 211, 255});
 			chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
 
 		} else { //black second - k, q, r, b, n, p
 			
-			tempSurfaceText = TTF_RenderUTF8_Blended(font1, cpb_unicode[i%6].c_str(), {0 , 0, 0, 255});
+			tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i%6].c_str(), {0 , 0, 0, 255});
 			chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
 
 		}
 	}
-	int tw, th; //variables to store dimensions data
-	//use the same temp surface for the next iterrations
-	tempSurfaceText = TTF_RenderText_Blended(font2, "Chess Board Generator", {0,0,0,255});
-	textTitleTexture = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
-	//SDL_QueryTexture(textTextureFont2, 0, 0, &tw, &th);
+	SDL_FreeSurface(tempSurfaceText);
+
+	//Position destination rectangles
 	textTitleRect = {680, 20, 560, 64};	
-
-	tempSurfaceText = TTF_RenderText_Blended_Wrapped(font1, "     Start\n Simulation", {235,235,255,255}, 0);
-	buttonStartTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
 	buttonStartRect = {680, 560, 256, 64};
-
-	tempSurfaceText = TTF_RenderText_Blended_Wrapped(font1, "     Stop\n Simulation", {235,235,255,255}, 0);
-	buttonStopTex = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
 	buttonStopRect = {980, 560, 256, 64};
-
-	SDL_FreeSurface(tempSurfaceText); // delete the temp surface
-	TTF_CloseFont(font1); //deleting font pointers
-	TTF_CloseFont(font2); //..
 
 	//dynamic text KJFKKF
 	infoFont = TTF_OpenFont("fonts/segoepr.ttf", 28); // try updating the text content
@@ -309,10 +305,17 @@ void Game::drawBoardOverlay(){
 }
 
 void Game::drawStaticText(){
+	// Static Draw
 	// Title
-	SDL_RenderCopy(renderer, textTitleTexture, NULL, &textTitleRect);
-	
-	//Dynamic text
+	TextureFactory::Instance()->drawTexture(renderer,"textTitleTexture",NULL,&textTitleRect);
+	// Buttons
+	SDL_SetRenderDrawColor(renderer, 50,50,110,255); //Button BG 
+	SDL_RenderFillRect(renderer,&buttonStartRect);
+	TextureFactory::Instance()->drawTexture(renderer,"buttonStartTex",NULL, &buttonStartRect);
+	SDL_RenderFillRect(renderer,&buttonStopRect);
+	TextureFactory::Instance()->drawTexture(renderer,"buttonStopTex",NULL, &buttonStopRect);
+
+	//Dynamic Draw / Text
 	//FEN Chess Board Notation - click to copy to clipboard
 	tempSurfaceDynamicText = TTF_RenderText_Blended(infoFont, 
 	queueFENSetDescription.back().c_str(), {0,0,0,255});
@@ -330,11 +333,10 @@ void Game::drawStaticText(){
 	infoTextRect = {(ww-tw)/2, 650, tw, th}; // for the textInfoTexture
 	SDL_RenderCopy(renderer, textInfoTexture, NULL, &infoTextRect);
 
-	//REFACTORED
+
 	//Statistics for the simulation time
 	tempSurfaceDynamicText = TTF_RenderText_Blended_Wrapped(infoFont, 
 	timer.simulationTimeToString().c_str(), {255,255,255,255}, 0);
-	//REFACTORED
 
 	textTimeTexture = SDL_CreateTextureFromSurface(renderer, tempSurfaceDynamicText);
 	//query info from a texture and write to variables
@@ -343,13 +345,6 @@ void Game::drawStaticText(){
 	SDL_RenderCopy(renderer, textTimeTexture, NULL, &timeTextRect);	
 	
 	SDL_FreeSurface(tempSurfaceDynamicText);
-
-	// Buttons
-	SDL_SetRenderDrawColor(renderer, 50,50,110,255);
-	SDL_RenderFillRect(renderer,&buttonStartRect);
-	SDL_RenderCopy(renderer, buttonStartTex, NULL, &buttonStartRect);
-	SDL_RenderFillRect(renderer,&buttonStopRect);
-	SDL_RenderCopy(renderer, buttonStopTex, NULL, &buttonStopRect);
 
 }
 
