@@ -1,5 +1,6 @@
 //Game.cpp
 #include "Game.h"
+
 //Initialize SDL library
 bool Game::init(const char* title, int xpos, int ypos, int width, int height, int flags) {
 
@@ -41,13 +42,6 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 	return true;
 }
 
-//chess pieces in uinicode white to black in order King, Queen, Rook, Bishop, Knight, Pawn 
-//std::string cp_unicode[12] = {"\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
-//only black chess characters
-std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
-//chess pieces lookup reference according to FEN abbreviations
-std::string cp_lookupRef = "KQRBNPkqrbnp";
-
 //Initialize SDL TTF library - rename the function to texture load or init
 bool Game::prep_textures(){
 
@@ -80,9 +74,18 @@ bool Game::prep_textures(){
 	return true;
 }
 
+// //chess pieces lookup reference according to FEN abbreviations
+// std::string cp_lookupRef = "KQRBNPkqrbnp";
+
 void Game::prep_chess_piece_textures()
 {
     //TODO See if Texture factory can be used here or move to new class - ChessBoard?
+
+	//chess pieces in uinicode white to black in order King, Queen, Rook, Bishop, Knight, Pawn 
+	//std::string cp_unicode[12] = {"\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
+	//only black chess characters
+	std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
+
 	// Create textures from font chess characters - only the black pieces (6)
     TTF_Font *DejaVu = TextureFactory::Instance()->fonts["DejaVu"];
     SDL_Surface *tempSurfaceText = NULL;
@@ -324,6 +327,8 @@ void Game::drawDynamicElements()
 }
 
 void Game::drawPieces(){
+	//chess pieces lookup reference according to FEN abbreviations
+	std::string cp_lookupRef = "KQRBNPkqrbnp";
 
 	//Example FEN chess board description - Rp5k/4pqpb/1R4P1/r1p1Pp1n/1r2PQ1P/3NN3/1BPpP2p/bP1BKpnP
 	//init string descriptions
@@ -354,15 +359,10 @@ _&fenDescription - string reference to write the FEN notation of the chess board
 */
 void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &fenDescription){
 
-
 	//Timer object mark start of simulation
 	timer.markStart();
 
 	char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
-
-	//https://www.chess.com/terms/fen-chess
-	char tempFEN[71]; //char array to hold the positions including separators '/' (64+7)
-	char FEN[71] = {'0',}; //char array to hold the pieces including separators in FEN Format
 
 	if (shuff){
 		//goto label
@@ -404,7 +404,7 @@ void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &
 		}
 
 		//Remove all pawns if foud on end rows - keep count of removed pieces
-		int pieces_to_remove = 8;	
+		int pieces_to_remove = 8; // !!! this variable controls how many pieces to see on the board
 		while(pieces_to_remove > 0){
 			for(int i = 0; i < 64; i++){
 				if(i < 8 || i > (64 - 9)){
@@ -435,7 +435,6 @@ void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &
 		}
 		
 		// Reintroduce Kings
-		//std::string cp_lookupRef = "KQRBNPkqrbnp";
 		char blackPieces[6] = {'k','q','r','b','n','p'};
 		char whitePieces[6] = {'K','Q','R','B','N','P'}; 
 
@@ -449,7 +448,8 @@ void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &
 			}
 			for (int b_p = 0; b_p < 6; b_p++){ //test each black piece
 				std::string attackedPieces = attackSquares(		emptySquaresLookup, 
-															rand_index % 8, rand_index / 8, blackPieces[b_p]);				
+																rand_index % 8, rand_index / 8, 
+																blackPieces[b_p]);				
 				for (char piece : attackedPieces){ //for cell in attack board
 					if (piece == whitePieces[b_p]){ //if white piece is oposite of current black piece
 						isSafeSquare = false;
@@ -502,52 +502,24 @@ void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &
 				chess_set[rand_index] = 'K';
 			}
 		}
-		
 
 		//End simulation - caclulate simulation duration in ns
 		timer.markEnd();
 		timer.setDurationInNanoseconds();
 		timer.updateStats();
 
+		/*Parsing the randomized custom chess board description to FEN notation
+		More info here: //https://www.chess.com/terms/fen-chess */
+
+		char FEN[71] = {'0',}; //char array to hold the pieces including separators in FEN Format
+        parseFEN(chess_set, FEN);
+
+		//converting chess_set to string and push to queue
 		std::string temp(chess_set);
 		custDescription = temp;
 		queueCustomSetDescription.push(custDescription);
 
-		//parse custom description to FEN notation for dispaly
-		int j = 0;
-		for (int i = 0; i < 64; i++){
-			tempFEN[j] = chess_set[i];
-			if( (i+1) % 8 == 0 && (( i+1 ) > 0 && ( i+1 ) < 64)){
-				j+=1;
-				tempFEN[j] = '/';
-			}
-			j+=1;
-		}
-
-		int empty_space = 0;
-		j=0;
-		int count = 0;
-		while(count < 71)
-		{
-			if (tempFEN[count] != '-' && empty_space==0){
-
-				FEN[j] = tempFEN[count];
-				count += 1;
-				j += 1;
-
-			} else if(tempFEN[count] == '-'){
-
-				empty_space += 1;
-				FEN[j] = ('0' + empty_space);
-				count += 1;
-
-			} else{
-				j += 1;
-				empty_space = 0;
-			}
-		}
-
-		temp = std::string(FEN);
+        temp = std::string(FEN);
 		fenDescription = temp;
 		queueFENSetDescription.push(fenDescription);
 
@@ -556,11 +528,61 @@ void Game::shufflePieces(bool shuff, std::string &custDescription, std::string &
 			queueCustomSetDescription.pop();
 			queueFENSetDescription.pop();
 		}
+
+	} else{
+		// custDescription = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
+		// fenDescription = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+		custDescription = queueCustomSetDescription.back();
+		fenDescription = queueFENSetDescription.back();
 	}
-		 else{
-			// custDescription = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
-			// fenDescription = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-			custDescription = queueCustomSetDescription.back();
-			fenDescription = queueFENSetDescription.back();
-		}
+}
+
+/*
+Parse custom chess board description to FEN notation
+Not Important but fun to have. Click on the notation in the window to copy it in the clipboard
+Takes char array pointers to the custom chess board description and 
+char array with 71 chars for the notation (the longest FEN notation is 71 characters).
+Both arrays must be already initialized outside the function.
+*/
+void Game::parseFEN(char chess_set[65], char FEN[71])
+{
+
+   	char tempFEN[71]; //char array to hold the positions including separators '/' (64+7)
+    int j = 0;
+    for (int i = 0; i < 64; i++)
+    {
+        tempFEN[j] = chess_set[i];
+        if ((i + 1) % 8 == 0 && ((i + 1) > 0 && (i + 1) < 64))
+        {
+            j += 1;
+            tempFEN[j] = '/';
+        }
+        j += 1;
+    }
+
+    int empty_space = 0;
+    j = 0;
+    int count = 0;
+    while (count < 71)
+    {
+        if (tempFEN[count] != '-' && empty_space == 0)
+        {
+
+            FEN[j] = tempFEN[count];
+            count += 1;
+            j += 1;
+        }
+        else if (tempFEN[count] == '-')
+        {
+
+            empty_space += 1;
+            FEN[j] = ('0' + empty_space);
+            count += 1;
+        }
+        else
+        {
+            j += 1;
+            empty_space = 0;
+        }
+    }
 }

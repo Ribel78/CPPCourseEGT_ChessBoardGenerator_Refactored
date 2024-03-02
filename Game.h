@@ -41,14 +41,16 @@ public:
     /*
     Used to generate random chess board with 75% (24 pieces)
     */
-    void shufflePieces(bool, std::string&, std::string&);
+    void shufflePieces(bool, std::string &, std::string &);
 
-	/*
-	Utility function to find the allowed (attack) squares of given chess piece
-	Taking into account of the rules of chess pieces moves.
-	Used in drawBoardOverlay and chess board generation
-	*/
-	friend std::string attackSquares(	std::string boardDescription, 
+    void parseFEN(char chess_set[65], char FEN[71]);
+
+    /*
+    Utility function to find the allowed (attack) squares of given chess piece
+    Taking into account of the rules of chess pieces moves.
+    Used in drawBoardOverlay and chess board generation
+    */
+    friend std::string attackSquares(	std::string boardDescription, 
 										int x, int y, 
 										char piece);
 
