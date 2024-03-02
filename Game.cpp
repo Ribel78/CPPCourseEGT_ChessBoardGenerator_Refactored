@@ -54,7 +54,8 @@ bool Game::prep_textures(){
 	// loading fonts into pointer variables
 	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
 	TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
-	// formerly textTitleTexture
+
+	// Load textures
 	TextureFactory::Instance()->textureFromFont(	"textTitleTexture","Segoe",
 													"Chess Board Generator",
 													{0, 0, 0, 255}, 0, renderer, 0);
@@ -67,66 +68,55 @@ bool Game::prep_textures(){
 													"     Stop\n Simulation",
 													{235 ,235 ,255 ,255}, 0, renderer, 0);
 
-	//Create textures from font chess characters - only the black pieces (6)	
-	TTF_Font* DejaVu = TextureFactory::Instance()->fonts["DejaVu"];
-	SDL_Surface* tempSurfaceText = NULL;
-	for (int i = 0; i < 12; i++){
-		if (i / 6 == 0){ //white first - K, Q, R, B, N, P
+    // prep_chess_piece_textures();
 
-			tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i%6].c_str(), {254, 237, 211, 255});
-			chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
-
-		} else { //black second - k, q, r, b, n, p
-			
-			tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i%6].c_str(), {0 , 0, 0, 255});
-			chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
-
-		}
-	}
-	SDL_FreeSurface(tempSurfaceText);
-
-	//Position destination rectangles
+    //Position destination rectangles - needs refactoring
 	textTitleRect = {680, 20, 560, 64};	
 	buttonStartRect = {680, 560, 256, 64};
 	buttonStopRect = {980, 560, 256, 64};
-
-	//dynamic text KJFKKF
-	infoFont = TTF_OpenFont("fonts/segoepr.ttf", 28); // try updating the text content
-	if(infoFont == NULL){
-		std::cout << "infoFont not loaded" << std::endl;
-	}	
+    infoTextRect = {30, 650, 550, 50};
+	timeTextRect = {680, 200, 550, 300};
 
 	return true;
 }
 
-bool Game::isClickableTextureClicked(SDL_Texture* t, SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp){
-	int tw, th;
-	// get info about texture dimensions and assign it to variables
-	SDL_QueryTexture(t, 0, 0, &tw, &th);
+void Game::prep_chess_piece_textures()
+{
+    //TODO See if Texture factory can be used here or move to new class - ChessBoard?
+	// Create textures from font chess characters - only the black pieces (6)
+    TTF_Font *DejaVu = TextureFactory::Instance()->fonts["DejaVu"];
+    SDL_Surface *tempSurfaceText = NULL;
+    for (int i = 0; i < 12; i++)
+    {
+        if (i / 6 == 0)
+        { // white first - K, Q, R, B, N, P
 
-	// checks positions of the mouse when down and up separately and compare against the SDL_Rect positions
-	if(((xDown > r->x) && (xDown < r->x +tw)) && ((xUp > r->x) && (xUp < r->x +tw))&&
-		((yDown > r->y) && (yDown < r->y +th)) && ((yUp > r->y) && (yUp < r->y +th))){
-			//click coordinates inside  SDL_Rect rectangle
-			return true;
-	}
-	//try logic directly with SDL_Rect instead of Texture width and height
-	return false;
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {254, 237, 211, 255});
+            chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
+        }
+        else
+        { // black second - k, q, r, b, n, p
+
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {0, 0, 0, 255});
+            chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
+        }
+    }
+    SDL_FreeSurface(tempSurfaceText);
 }
 
+/*
+Checks positions of the mousedown / mouseup separately 
+and compare against 
+given SDL_Rect coordinates and dimensions
+*/
 bool Game::buttonClicked(SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp){
-	//int tw, th;
-	// get info about texture dimensions and assign it to variables
-	//SDL_QueryTexture(t, 0, 0, &tw, &th);
 
-	// checks positions of the mouse when down and up separately and compare against the SDL_Rect positions
 	if(((xDown > r->x) && (xDown < r->x +r->w)) && ((xUp > r->x) && (xUp < r->x +r->w))&&
 		((yDown > r->y) && (yDown < r->y +r->h)) && ((yUp > r->y) && (yUp < r->y +r->h))){
-			//click coordinates inside  SDL_Rect rectangle
-			return true;
+			
+			return true; //click coordinates inside  SDL_Rect r
 	}
-	//try logic directly with SDL_Rect instead of Texture width and height
-	return false;
+	return false; //click coordinates outside inside  SDL_Rect r
 }
 
 void Game::handleEvents() {
@@ -193,10 +183,6 @@ void Game::update() {
 	//Render All
 	SDL_RenderPresent(renderer);
 
-	//Destroy all Dynamic Text textures after Rendering to free memory
-	SDL_DestroyTexture(textTimeTexture);
-	SDL_DestroyTexture(textInfoTexture);
-
 	//To show some visual shuffling wait 50 ms
 	SDL_Delay(50);
 }
@@ -241,10 +227,6 @@ Game::~Game() {
     for (int i = 0; i < 64; i++){
         delete chess_square[i];
     }	
-
-	//dynamic text textures
-	SDL_FreeSurface(tempSurfaceDynamicText); //closing surface for dynamic text
-	TTF_CloseFont(infoFont); // closing font for dynamic text
 }
 
 //Chess
@@ -255,11 +237,6 @@ bool Game::isSimulating() {
 
 void Game::setSimulating(bool state){
 	Game::simulating = state;
-}
-
-void Game::initBackground(){
-	SDL_SetRenderDrawColor(renderer, 23,138,207, 255);
-	SDL_RenderClear(renderer);
 }
 
 //Positions all 64 SDL_Rect-s on a chess board
@@ -304,7 +281,11 @@ void Game::drawBoardOverlay(){
 	}
 }
 
-void Game::drawStaticText(){
+void Game::drawStaticElements(){
+	//Background color
+	SDL_SetRenderDrawColor(renderer, 23,138,207, 255);
+	SDL_RenderClear(renderer);	
+
 	// Static Draw
 	// Title
 	TextureFactory::Instance()->drawTexture(renderer,"textTitleTexture",NULL,&textTitleRect);
@@ -315,36 +296,30 @@ void Game::drawStaticText(){
 	SDL_RenderFillRect(renderer,&buttonStopRect);
 	TextureFactory::Instance()->drawTexture(renderer,"buttonStopTex",NULL, &buttonStopRect);
 
-	//Dynamic Draw / Text
-	//FEN Chess Board Notation - click to copy to clipboard
-	tempSurfaceDynamicText = TTF_RenderText_Blended(infoFont, 
-	queueFENSetDescription.back().c_str(), {0,0,0,255});
+}
+
+void Game::drawDynamicElements()
+{
+    // Dynamic Draw / Text
+    // FEN Chess Board Notation - click to copy to clipboard
+	const char* dynamic_text_FEN = queueFENSetDescription.back().c_str();
+	TextureFactory::Instance()->textureFromFont(	"textInfoTexture", 
+													"Segoe", 
+													dynamic_text_FEN, 
+													{0, 0, 0, 255}, 0, renderer, 28);
+
+	TextureFactory::Instance()->drawTexture(renderer, "textInfoTexture", NULL, &infoTextRect);
+	TextureFactory::Instance()->destroyTexture("textInfoTexture");
+
+    // Statistics for the simulation time
+	const char* dynamic_text_Times = timer.simulationTimeToString().c_str();
+	TextureFactory::Instance()->textureFromFont(	"textTimeTexture", 
+													"Segoe", 
+													dynamic_text_Times, 
+													{255, 255, 255, 255}, 0, renderer, 28);
 	
-	if(tempSurfaceDynamicText == NULL){
-		std::cout << "Surface, not created" << std::endl;
-	}
-	textInfoTexture = SDL_CreateTextureFromSurface(renderer, tempSurfaceDynamicText);
-	//query info from a texture and write to variables 
-	int tw, th;
-	SDL_QueryTexture(textInfoTexture, 0, 0, &tw, &th);
-	int ww, wh;
-	SDL_GetWindowSize(window, &ww, &wh);
-	// Game object SDL_Rect - gets the dimensions from the texture for filling later
-	infoTextRect = {(ww-tw)/2, 650, tw, th}; // for the textInfoTexture
-	SDL_RenderCopy(renderer, textInfoTexture, NULL, &infoTextRect);
-
-
-	//Statistics for the simulation time
-	tempSurfaceDynamicText = TTF_RenderText_Blended_Wrapped(infoFont, 
-	timer.simulationTimeToString().c_str(), {255,255,255,255}, 0);
-
-	textTimeTexture = SDL_CreateTextureFromSurface(renderer, tempSurfaceDynamicText);
-	//query info from a texture and write to variables
-	SDL_QueryTexture(textTimeTexture, 0, 0, &tw, &th);
-	timeTextRect = {ww/2 + 20, 200, tw, th}; // for the textInfoTexture
-	SDL_RenderCopy(renderer, textTimeTexture, NULL, &timeTextRect);	
-	
-	SDL_FreeSurface(tempSurfaceDynamicText);
+	TextureFactory::Instance()->drawTexture(renderer, "textTimeTexture", NULL, &timeTextRect);
+	TextureFactory::Instance()->destroyTexture("textTimeTexture");
 
 }
 

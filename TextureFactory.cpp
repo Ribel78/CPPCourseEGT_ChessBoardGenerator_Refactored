@@ -95,6 +95,13 @@ void TextureFactory::drawTexture(   SDL_Renderer* ren,
 	SDL_RenderCopy(ren, textures[tex_id], NULL, dstrect);	   
 }
 
+//Individual call to destroy a texture by id usually used in the dynamic elements
+void TextureFactory::destroyTexture(std::string tex_id){
+    
+    SDL_DestroyTexture(textures[tex_id]);
+
+}
+
 //Call static instance of the Texture Factory
 TextureFactory* TextureFactory::Instance(){
     if(instance == 0){

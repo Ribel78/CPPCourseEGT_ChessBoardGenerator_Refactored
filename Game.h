@@ -21,28 +21,27 @@ public:
 	~Game();
 	bool init(const char* title, int xpos, int ypos, int width, int height, int flags);
     bool prep_textures();
+    void prep_chess_piece_textures();
     void update();
     void handleEvents();
     void clean();
     bool isRunning();
     bool isSimulating(); //chess 
 	void setSimulating(bool); //chess
-	bool isClickableTextureClicked(SDL_Texture* t, SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp);
 	bool buttonClicked(SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp);
 	
 	//Chess drawing functions
-	void initBackground();
 	void initBoard();
 	void drawBoard();
-	void drawBoardOverlay();	
-	void drawStaticText();
+	void drawBoardOverlay();
+    void drawStaticElements();
+    void drawDynamicElements();
+    void drawPieces();
 
-	void drawPieces();
-
-	/*
-	Used to generate random chess board with 75% (24 pieces)
-	*/
-	void shufflePieces(bool, std::string&, std::string&);
+    /*
+    Used to generate random chess board with 75% (24 pieces)
+    */
+    void shufflePieces(bool, std::string&, std::string&);
 
 	/*
 	Utility function to find the allowed (attack) squares of given chess piece
@@ -60,7 +59,6 @@ private:
 	bool running;
 	bool simulating;
 
-	SDL_Rect 		clickableRect;
 	int mouseDownX, mouseDownY;
 
 	//Chess Related fields
@@ -69,21 +67,16 @@ private:
     SDL_Color chess_color[3];	
 	SDL_Texture* chessPieces[12];
 
+	//Drawing Rectangles - currently hardcoded
 	SDL_Rect textTitleRect;
 	SDL_Rect buttonStartRect;
 	SDL_Rect buttonStopRect;
+	SDL_Rect infoTextRect;
+	SDL_Rect timeTextRect;	
 
 	//Seek trough the last 20 simulations using Down Arrow
 	std::queue<std::string> queueCustomSetDescription;
 	std::queue<std::string> queueFENSetDescription;
-
-	//Dynamic text - needs memory managment
-	TTF_Font* infoFont; 
-	SDL_Surface* tempSurfaceDynamicText = NULL; 
-	SDL_Texture *textInfoTexture;
-	SDL_Rect infoTextRect;
-	SDL_Texture *textTimeTexture;
-	SDL_Rect timeTextRect;
 
 	//Simulation Time
 	Timer timer;
