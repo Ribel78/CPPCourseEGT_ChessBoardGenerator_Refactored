@@ -43,7 +43,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 }
 
 //Initialize SDL TTF library - rename the function to texture load or init
-bool Game::prep_textures(){
+void Game::prep_textures(){
 
 	// loading fonts into pointer variables
 	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
@@ -62,20 +62,20 @@ bool Game::prep_textures(){
 													"     Stop\n Simulation",
 													{235 ,235 ,255 ,255}, 0, renderer, 0);
 
-    // prep_chess_piece_textures();
 
-    //Position destination rectangles - needs refactoring
-	textTitleRect = {680, 20, 560, 64};	
-	buttonStartRect = {680, 560, 256, 64};
-	buttonStopRect = {980, 560, 256, 64};
-    infoTextRect = {30, 650, 550, 50};
-	timeTextRect = {680, 200, 550, 300};
+    // Parametrizing the layout of the destination rectangles
+	int ww, wh;
+	SDL_GetWindowSize(window, &ww, &wh);
+	int padding = 40;
+	int chess_sq = (ww / 2) / 8;
 
-	return true;
+	textTitleRect = {ww / 2 + padding, padding / 2, ww / 2 - 2*padding, chess_sq};  
+	buttonStartRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq}; 
+	buttonStopRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq}; 
+    textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
+	textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
+
 }
-
-// //chess pieces lookup reference according to FEN abbreviations
-// std::string cp_lookupRef = "KQRBNPkqrbnp";
 
 void Game::prep_chess_piece_textures()
 {
@@ -165,7 +165,7 @@ void Game::handleEvents() {
 				if(buttonClicked(&buttonStopRect,mouseDownX,mouseDownY, msx, msy)){
 					setSimulating(false);
 				}
-				if(buttonClicked(&infoTextRect,mouseDownX,mouseDownY, msx, msy) && !isSimulating()){ // Copy FEN code to clipboard
+				if(buttonClicked(&textFENRect,mouseDownX,mouseDownY, msx, msy) && !isSimulating()){ // Copy FEN code to clipboard
 					SDL_SetClipboardText(queueFENSetDescription.back().c_str());
 				}	
 				for (int i = 0; i < 64; i++){
@@ -293,7 +293,7 @@ void Game::drawStaticElements(){
 	// Title
 	TextureFactory::Instance()->drawTexture(renderer,"textTitleTexture",NULL,&textTitleRect);
 	// Buttons
-	SDL_SetRenderDrawColor(renderer, 50,50,110,255); //Button BG 
+	SDL_SetRenderDrawColor(renderer, 50, 50, 110, 255); //Button BG 
 	SDL_RenderFillRect(renderer,&buttonStartRect);
 	TextureFactory::Instance()->drawTexture(renderer,"buttonStartTex",NULL, &buttonStartRect);
 	SDL_RenderFillRect(renderer,&buttonStopRect);
@@ -311,7 +311,7 @@ void Game::drawDynamicElements()
 													dynamic_text_FEN, 
 													{0, 0, 0, 255}, 0, renderer, 28);
 
-	TextureFactory::Instance()->drawTexture(renderer, "textInfoTexture", NULL, &infoTextRect);
+	TextureFactory::Instance()->drawTexture(renderer, "textInfoTexture", NULL, &textFENRect);
 	TextureFactory::Instance()->destroyTexture("textInfoTexture");
 
     // Statistics for the simulation time
@@ -321,20 +321,21 @@ void Game::drawDynamicElements()
 													dynamic_text_Times, 
 													{255, 255, 255, 255}, 0, renderer, 28);
 	
-	TextureFactory::Instance()->drawTexture(renderer, "textTimeTexture", NULL, &timeTextRect);
+	TextureFactory::Instance()->drawTexture(renderer, "textTimeTexture", NULL, &textTimeRect);
 	TextureFactory::Instance()->destroyTexture("textTimeTexture");
 
 }
 
 void Game::drawPieces(){
-	//chess pieces lookup reference according to FEN abbreviations
+	//chess pieces lookup string - capitals are white
 	std::string cp_lookupRef = "KQRBNPkqrbnp";
 
 	//Example FEN chess board description - Rp5k/4pqpb/1R4P1/r1p1Pp1n/1r2PQ1P/3NN3/1BPpP2p/bP1BKpnP
-	//init string descriptions
+	//declare string descriptions
 	std::string chessBoardShuffle;
 	std::string fenChessBoard;
 
+	//init string descriptions
 	shufflePieces(isSimulating(), chessBoardShuffle, fenChessBoard);
 
 	for (int i = 0; i < 64; i++){

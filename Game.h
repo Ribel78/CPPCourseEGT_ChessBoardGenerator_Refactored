@@ -20,7 +20,7 @@ public:
 	Game();
 	~Game();
 	bool init(const char* title, int xpos, int ypos, int width, int height, int flags);
-    bool prep_textures();
+    void prep_textures();
     void prep_chess_piece_textures();
     void update();
     void handleEvents();
@@ -73,8 +73,8 @@ private:
 	SDL_Rect textTitleRect;
 	SDL_Rect buttonStartRect;
 	SDL_Rect buttonStopRect;
-	SDL_Rect infoTextRect;
-	SDL_Rect timeTextRect;	
+	SDL_Rect textFENRect;
+	SDL_Rect textTimeRect;	
 
 	//Seek trough the last 20 simulations using Down Arrow
 	std::queue<std::string> queueCustomSetDescription;
