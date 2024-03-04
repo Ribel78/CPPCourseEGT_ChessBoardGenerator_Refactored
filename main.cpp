@@ -15,19 +15,20 @@ int main(int argc, char* argv[]) {
 		SDL_WINDOWPOS_CENTERED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 	game->prep_textures();
-	game->prep_chess_piece_textures();
-	game->initBoard();
+	//game->prep_chess_piece_textures();
+	game->cb.prep_chess_piece_textures();
+	game->cb.initBoard();
 	while (game->isRunning()) {
 		game->handleEvents();
 		
 		//Static Parts
 		game->drawStaticElements();
-		game->drawBoard();	
+		game->cb.drawBoard();	
 			
 		//Dynamic parts	
 		game->drawDynamicElements();
-		game->drawBoardOverlay();
-		game->drawPieces();
+		game->cb.drawBoardOverlay();
+		game->cb.drawPieces();
 	
 		//Update Data	
 		game->update();
