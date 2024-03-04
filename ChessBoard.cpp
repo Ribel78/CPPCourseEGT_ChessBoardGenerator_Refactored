@@ -1,8 +1,13 @@
 #include "ChessBoard.h"
 
 ChessBoard::ChessBoard(){
+
     this->renderer = renderer;
-	ChessBoard::simulating = false; //simulate chessboard   
+
+    setPiecesToRemove(22);
+
+	ChessBoard::simulating = false; //simulate chessboard 
+
 	//Chess Board Size and Color
 	chess_board_size = 640;
     chess_board_color[0] = {214, 187, 141, 255}; //"white" square
@@ -155,6 +160,14 @@ void ChessBoard::drawPieces(){
 	}
 }
 
+void ChessBoard::setPiecesToRemove(int amount){
+    if (amount < 0 || amount > 30){
+        piecesToRemove = 8; //default
+    } else {
+        piecesToRemove = amount;
+    }
+    
+}
 
 /*
 Randomize a char string of 64 chars of modified FEN chess board description
@@ -210,7 +223,7 @@ void ChessBoard::shufflePieces(bool shuff, std::string &custDescription, std::st
 		}
 
 		//Remove all pawns if foud on end rows - keep count of removed pieces
-		int pieces_to_remove = 8; // !!! this variable controls how many pieces to see on the board
+		int pieces_to_remove = piecesToRemove; // !!! this variable controls how many pieces to see on the board
 		while(pieces_to_remove > 0){
 			for(int i = 0; i < 64; i++){
 				if(i < 8 || i > (64 - 9)){
@@ -224,7 +237,7 @@ void ChessBoard::shufflePieces(bool shuff, std::string &custDescription, std::st
 						chess_set[i] = '-';
 				}
 			}
-			//check if pieces_to_remove is negative (in case more than 8 pawns on end rows) - cancel this simulation
+			//check if pieces_to_remove is negative (in case pawns on end rows exceeds the set amount) - cancel this simulation
 			if (pieces_to_remove < 0){
 				goto repeatSimulation;
 			}
