@@ -1,13 +1,9 @@
 #pragma once
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <string>
+
 #include <queue>
-#include <iostream>
 #include <algorithm>
 #include <array>
 #include <random>
-#include <chrono>
 #include <cstring>
 
 #include "Timer.h"
@@ -15,7 +11,6 @@
 #include "Utilities.h"
 
 class ChessBoard{
-
 
 public:
     ChessBoard();
@@ -31,8 +26,8 @@ public:
     void setPiecesToRemove(int);
 
     /*
-    Generate random chess board with given amount of pieces to remove
-    set by pieces_to_remove variable. Use setPiecesToRemove method to change.
+    Generate random chess board with given amount of removed pieces
+    Use setPiecesToRemove method to set amount of removed pieces.
     */
     void shufflePieces(bool, std::string &, std::string &);
 

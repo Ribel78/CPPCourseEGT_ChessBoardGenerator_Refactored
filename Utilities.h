@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 /*
 _boardDescription - chess board description in custom format 
 _boardOverlay - chess board description to update attack positions of the rook piece

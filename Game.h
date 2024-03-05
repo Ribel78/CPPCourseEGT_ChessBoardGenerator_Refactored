@@ -1,18 +1,5 @@
-//Game.h
 #pragma once
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <string>
-#include <queue>
-#include <iostream>
-#include <algorithm>
-#include <array>
-#include <random>
-#include <chrono>
-#include <cstring>
 
-//#include "Timer.h"
-#include "TextureFactory.h"
 #include "ChessBoard.h"
 
 class Game {

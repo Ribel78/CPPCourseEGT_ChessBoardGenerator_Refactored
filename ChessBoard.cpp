@@ -4,7 +4,7 @@ ChessBoard::ChessBoard(){
 
     this->renderer = renderer;
 
-    setPiecesToRemove(22);
+    setPiecesToRemove(8);
 
 	ChessBoard::simulating = false; //simulate chessboard 
 
@@ -171,14 +171,14 @@ void ChessBoard::setPiecesToRemove(int amount){
 
 /*
 Randomize a char string of 64 chars of modified FEN chess board description
-and update references of custom and correct annotation variables
+and update references to custom and FEN annotation string variables
 _shuff - bool to shuffle (1) or keep ordered chess set
 _&custDescription - string reference to write the chess board description to
 _&fenDescription - string reference to write the FEN notation of the chess board description
 */
 void ChessBoard::shufflePieces(bool shuff, std::string &custDescription, std::string &fenDescription){
 
-	//Timer object mark start of simulation
+	//Mark start of simulation
 	timer.markStart();
 
 	char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
