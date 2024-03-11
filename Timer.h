@@ -13,13 +13,12 @@ public:
     std::string simulationTimeToString();
 
 private:
-
-std::chrono::time_point<std::chrono::steady_clock> startTime;
-std::chrono::time_point<std::chrono::steady_clock> endTime;
-std::chrono::duration<double> simTime;
-int numberOfSimulations;
-double totalSimulationTime;
-double averageSimulationTime;
-double simulationTime;
+    std::chrono::time_point<std::chrono::steady_clock> startTime;
+    std::chrono::time_point<std::chrono::steady_clock> endTime;
+    std::chrono::duration<double> simTime;
+    int numberOfSimulations;
+    double totalSimulationTime;
+    double averageSimulationTime;
+    double simulationTime;
 
 };

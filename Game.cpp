@@ -2,38 +2,48 @@
 #include "Game.h"
 
 //Initialize SDL library
-bool Game::init(const char* title, int xpos, int ypos, int width, int height, int flags) {
-
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
+bool Game::init(const char* title,
+                int xpos, int ypos,
+                int width, int height,
+                int flags)
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
+    {
 		std::cout << "SDL init success\n";
 
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-		if (window != 0) //window init success
+        //window init success
+        if (window != 0)
 		{
 			std::cout << "window creation success\n";
 			renderer = SDL_CreateRenderer(window, -1, 0);
-			if (renderer != 0) //renderer init success
+            //renderer init success
+            if (renderer != 0)
 			{
 				std::cout << "renderer creation success\n";
-				//SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);//not needed
 				cb.setRenderer(renderer);
 			}
-			else {
+            else
+            {
 				std::cout << "renderer init failed\n";
 				return false;
 			}
 		}
-		else {
+        else
+        {
 			std::cout << "window init failed\n";
 			return false;
 		}
 	}
-	else {
+    else
+    {
 		std::cout << "SDL init fail\n";
 		return false;
 	}
+
 	//Init TTF library
-	if(TTF_Init() == -1){
+    if(TTF_Init() == -1)
+    {
 		return false;
 	}	
 	std::cout << "init success\n";
@@ -43,26 +53,28 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, in
 }
 
 //Initialize SDL TTF library - rename the function to texture load or init
-void Game::prep_textures(){
-
+void Game::prep_textures()
+{
 	// loading fonts into pointer variables
 	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
 	TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
     TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
 
-	// Load textures
-	TextureFactory::Instance()->textureFromFont(	"textTitleTexture","Segoe",
-													"Chess Board Generator",
-                                                    {0, 0, 0, 255}, 1280, renderer, 0);
-	//formerly buttonStartTex
-	TextureFactory::Instance()->textureFromFont(	"buttonStartTex","DejaVu",
-													"     Start\n Simulation",
-                                                    {235 ,235 ,255 ,255}, 300, renderer, 0);
-	//formerly buttonStopTex
-	TextureFactory::Instance()->textureFromFont(	"buttonStopTex","DejaVu",
-													"     Stop\n Simulation",
-                                                    {235 ,235 ,255 ,255}, 300, renderer, 0);
-
+    // title
+    TextureFactory::Instance()->textureFromFont("textTitleTexture","Segoe",
+                                                "Chess Board Generator",
+                                                {0, 0, 0, 255},
+                                                1280, renderer, 0);
+    //button buttonStartTex
+    TextureFactory::Instance()->textureFromFont("buttonStartTex","DejaVu",
+                                                "     Start\n Simulation",
+                                                {235 ,235 ,255 ,255},
+                                                300, renderer, 0);
+    //button buttonStopTex
+    TextureFactory::Instance()->textureFromFont("buttonStopTex","DejaVu",
+                                                "     Stop\n Simulation",
+                                                {235 ,235 ,255 ,255},
+                                                300, renderer, 0);
 
     // Parametrizing the layout of the destination rectangles
 	int ww, wh;

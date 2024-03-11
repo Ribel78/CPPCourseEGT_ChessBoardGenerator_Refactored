@@ -6,23 +6,42 @@
 #include <map>
 #include <string>
 
-class TextureFactory{
+class TextureFactory
+{
 
 public:
-TextureFactory();
-~TextureFactory();
-bool loadFont(const char*, std::string, int);
-bool textureFromImage(const char*, std::string, SDL_Renderer*);
-bool textureFromFont(std::string, std::string, const char*, SDL_Color, Uint32 wrap_length, SDL_Renderer*, int);
-void drawTexture(SDL_Renderer*, std::string, SDL_Rect* , SDL_Rect*);
-void destroyTexture(std::string);
+    TextureFactory();
+    ~TextureFactory();
 
-static TextureFactory* Instance();
-std:: map <std::string, TTF_Font*> fonts;
+    bool loadFont(const char* fileName,
+                  std::string id,
+                  int font_size);
+
+    bool textureFromImage(const char* fileName,
+                          std::string id,
+                          SDL_Renderer* ren);
+
+    bool textureFromFont(std::string id,
+                          std::string font_id,
+                          const char* text,
+                          SDL_Color fg,
+                          Uint32 wrap_length,
+                          SDL_Renderer* ren,
+                          int font_size);
+
+    void drawTexture(SDL_Renderer* ren,
+                     std::string tex_id,
+                     SDL_Rect* srcrect,
+                     SDL_Rect* dstrect);
+
+    void destroyTexture(std::string tex_id);
+
+    static TextureFactory* Instance();
+
+    std::map<std::string, TTF_Font*> fonts;
+
 private:
 
-static TextureFactory* instance;
-std:: map <std::string, SDL_Texture*> textures;
-
-
+    static TextureFactory* instance;
+    std::map<std::string, SDL_Texture*> textures;
 };
