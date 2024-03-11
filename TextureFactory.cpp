@@ -67,9 +67,8 @@ bool TextureFactory::textureFromFont(   std::string id,
 	SDL_Surface* tempSurfaceText = NULL;
 
     TTF_Font* font = fonts[font_id];
-    if (font_size > 0)
-        TTF_SetFontSize(font, font_size);
-	tempSurfaceText = TTF_RenderText_Blended_Wrapped(font, text, fg, 0);
+
+    tempSurfaceText = TTF_RenderText_Blended_Wrapped(font, text, fg, wrap_length);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(ren, tempSurfaceText);
 
     //free temporaary surface

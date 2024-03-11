@@ -48,19 +48,20 @@ void Game::prep_textures(){
 	// loading fonts into pointer variables
 	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
 	TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
+    TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
 
 	// Load textures
 	TextureFactory::Instance()->textureFromFont(	"textTitleTexture","Segoe",
 													"Chess Board Generator",
-													{0, 0, 0, 255}, 0, renderer, 0);
+                                                    {0, 0, 0, 255}, 1280, renderer, 0);
 	//formerly buttonStartTex
 	TextureFactory::Instance()->textureFromFont(	"buttonStartTex","DejaVu",
 													"     Start\n Simulation",
-													{235 ,235 ,255 ,255}, 0, renderer, 0);
+                                                    {235 ,235 ,255 ,255}, 300, renderer, 0);
 	//formerly buttonStopTex
 	TextureFactory::Instance()->textureFromFont(	"buttonStopTex","DejaVu",
 													"     Stop\n Simulation",
-													{235 ,235 ,255 ,255}, 0, renderer, 0);
+                                                    {235 ,235 ,255 ,255}, 300, renderer, 0);
 
 
     // Parametrizing the layout of the destination rectangles
@@ -161,7 +162,7 @@ void Game::update() {
 	SDL_RenderPresent(renderer);
 
 	//To show some visual shuffling wait 50 ms
-	SDL_Delay(50);
+    SDL_Delay(6);
 }
 
 void Game::clean() {
@@ -209,19 +210,19 @@ void Game::drawDynamicElements()
     // FEN Chess Board Notation - click to copy to clipboard
 	const char* dynamic_text_FEN = cb.queueFENSetDescription.back().c_str();
 	TextureFactory::Instance()->textureFromFont(	"textInfoTexture", 
-													"Segoe", 
+                                                    "Segoe28",
 													dynamic_text_FEN, 
-													{0, 0, 0, 255}, 0, renderer, 28);
+                                                    {0, 0, 0, 255}, 1280, renderer, 0);
 
 	TextureFactory::Instance()->drawTexture(renderer, "textInfoTexture", NULL, &textFENRect);
 	TextureFactory::Instance()->destroyTexture("textInfoTexture");
 
     // Statistics for the simulation time
-	const char* dynamic_text_Times = cb.getSimulationSummary().c_str();
+    std::string dynamic_text_Times = cb.getSimulationSummary();
 	TextureFactory::Instance()->textureFromFont(	"textTimeTexture", 
-													"Segoe", 
-													dynamic_text_Times, 
-													{255, 255, 255, 255}, 0, renderer, 28);
+                                                    "Segoe28",
+                                                    dynamic_text_Times.c_str(),
+                                                    {255, 255, 255, 255}, 640, renderer, 0);
 	
 	TextureFactory::Instance()->drawTexture(renderer, "textTimeTexture", NULL, &textTimeRect);
 	TextureFactory::Instance()->destroyTexture("textTimeTexture");

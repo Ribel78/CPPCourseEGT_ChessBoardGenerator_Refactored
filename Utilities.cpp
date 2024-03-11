@@ -459,8 +459,8 @@ void pawnAttack (   std::string &boardDescription,
         }    
         //move
         pos_x = x;
-        pos_y = y;  
-        if (attackingPiece == 'p'){
+        pos_y = y;
+        if (attackingPiece == 'p' && pos_y < 7){
                 pos_y += 1;
                 if ( boardDescription[ (pos_y * 8) + pos_x ] == '-'){ //empty square on path
                         boardOverlay[ (pos_y * 8) + pos_x ] = 'X';
@@ -474,7 +474,7 @@ void pawnAttack (   std::string &boardDescription,
     
         }
         pos_y = y;
-        if (attackingPiece == 'P'){
+        if (attackingPiece == 'P' && pos_y > 0){
                 pos_y -= 1;
                 if ( boardDescription[ (pos_y * 8) + pos_x ] == '-'){ //empty square on path
                         boardOverlay[ (pos_y * 8) + pos_x ] = 'X';
