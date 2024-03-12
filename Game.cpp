@@ -49,6 +49,10 @@ bool Game::init(const char* title,
 	std::cout << "init success\n";
     m_running = true;
     m_chessBoard.setSimulating(false);
+    m_chessBoard.initBoard();
+
+    prepTextures();
+
 	return true;
 }
 
@@ -88,6 +92,7 @@ void Game::prepTextures()
     m_textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
     m_textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
 
+    m_chessBoard.prepChessPieceTextures();
 }
 
 
@@ -110,7 +115,7 @@ bool Game::buttonClicked(SDL_Rect* r,
 			
 			return true; //click coordinates inside  SDL_Rect r
 	}
-	return false; //click coordinates outside inside  SDL_Rect r
+    return false; //click coordinates outside inside  SDL_Rect r
 }
 
 void Game::handleEvents()
@@ -130,12 +135,12 @@ void Game::handleEvents()
 
                     m_chessBoard.setChessPieceIdx(-1);
 					std::string temp;
-                    temp = m_chessBoard.fenDescriptionFrontToString();
-                    m_chessBoard.popFenDescriptionQueue();
-                    m_chessBoard.pushToFenDescriptionQueue(temp);
-                    temp = m_chessBoard.customDescriptionFrontToString();
-                    m_chessBoard.popCustomDescriptionQueue();
-                    m_chessBoard.pushToCustomDescriptionQueue(temp);
+                    temp = m_chessBoard.getMutableFENDescriptionQueue().front();
+                    m_chessBoard.getMutableFENDescriptionQueue().pop();
+                    m_chessBoard.getMutableFENDescriptionQueue().push(temp);
+                    temp = m_chessBoard.getMutableCustomDescriptionQueue().front();
+                    m_chessBoard.getMutableCustomDescriptionQueue().pop();
+                    m_chessBoard.getMutableCustomDescriptionQueue().push(temp);
                     m_chessBoard.setBoardDescriptionFromQueueBack();
 				}
 			}
@@ -178,7 +183,7 @@ void Game::handleEvents()
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
                 { // Copy FEN code to clipboard
-                    SDL_SetClipboardText(m_chessBoard.fenDescriptionBackToString().c_str());
+                    SDL_SetClipboardText(m_chessBoard.getMutableFENDescriptionQueue().back().c_str());
 				}	
                 for (int i = 0; i < 64; i++)
                 {
@@ -241,7 +246,6 @@ void Game::drawStaticElements()
     SDL_SetRenderDrawColor(m_renderer, 23,138,207, 255);
     SDL_RenderClear(m_renderer);
 
-	// Static Draw
 	// Title
     TextureFactory::instance()->drawTexture(m_renderer,"textTitleTexture",NULL,&m_textTitleRect);
 	// Buttons
@@ -251,58 +255,48 @@ void Game::drawStaticElements()
     SDL_RenderFillRect(m_renderer,&m_buttonStopRect);
     TextureFactory::instance()->drawTexture(m_renderer,"buttonStopTex",NULL, &m_buttonStopRect);
 
+    m_chessBoard.drawBoard();
 }
 
 void Game::drawDynamicElements()
 {
     // Dynamic Draw / Text
     // FEN Chess Board Notation - click to copy to clipboard
-    TextureFactory::instance()->textureFromFont(	"textInfoTexture",
-                                                    "Segoe28",
-                                                    m_chessBoard.fenDescriptionBackToString().c_str(),
-                                                    {0, 0, 0, 255}, 1280, m_renderer, 0);
+    TextureFactory::instance()->textureFromFont("textInfoTexture",
+                                                "Segoe28",
+                                                m_chessBoard.getMutableFENDescriptionQueue().back().c_str(),
+                                                {0, 0, 0, 255}, 1280, m_renderer, 0);
 
-    TextureFactory::instance()->drawTexture(m_renderer, "textInfoTexture", NULL, &m_textFENRect);
+    TextureFactory::instance()->drawTexture(m_renderer,
+                                            "textInfoTexture",
+                                            NULL, &m_textFENRect);
+
     TextureFactory::instance()->destroyTexture("textInfoTexture");
 
     // Statistics for the simulation time
     std::string dynamic_text_Times = m_chessBoard.getSimulationSummary();
-    TextureFactory::instance()->textureFromFont(	"textTimeTexture",
-                                                    "Segoe28",
-                                                    dynamic_text_Times.c_str(),
-                                                    {255, 255, 255, 255}, 640, m_renderer, 0);
 
-    TextureFactory::instance()->drawTexture(m_renderer, "textTimeTexture", NULL, &m_textTimeRect);
+    TextureFactory::instance()->textureFromFont("textTimeTexture",
+                                                "Segoe28",
+                                                dynamic_text_Times.c_str(),
+                                                {255, 255, 255, 255}, 640, m_renderer, 0);
+
+    TextureFactory::instance()->drawTexture(m_renderer,
+                                            "textTimeTexture",
+                                            NULL, &m_textTimeRect);
+
     TextureFactory::instance()->destroyTexture("textTimeTexture");
 
-}
-
-ChessBoard& Game::GetChessBoard()
-{
-    return m_chessBoard;
-}
-
-void Game::prepChessPieceTextures()
-{
-    m_chessBoard.prepChessPieceTextures();
-}
-
-void Game::initBoard()
-{
-    m_chessBoard.initBoard();
-}
-
-void Game::drawBoard()
-{
-    m_chessBoard.drawBoard();
-}
-
-void Game::drawBoardOverlay()
-{
+    // Highlight allowed moves by clicking on chess piece when not simulating
     m_chessBoard.drawBoardOverlay();
+
+    // Draw the chess pieces
+    m_chessBoard.drawPieces();
+
 }
 
-void Game::drawPieces()
+void Game::draw()
 {
-    m_chessBoard.drawPieces();
+    drawStaticElements();
+    drawDynamicElements();
 }

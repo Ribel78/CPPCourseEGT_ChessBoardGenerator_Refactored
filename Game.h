@@ -20,17 +20,8 @@ public:
     bool buttonClicked(SDL_Rect* r,
                        int xDown, int yDown,
                        int xUp, int yUp) const;
-	
-	//Chess drawing functions
-    void drawStaticElements();
-    void drawDynamicElements();
-    void prepChessPieceTextures();
-    void initBoard();
-    void drawBoard();
-    void drawBoardOverlay();
-    void drawPieces();
 
-    ChessBoard& GetChessBoard();
+    void draw();
 
 
 private:
@@ -40,7 +31,12 @@ private:
     bool m_running;
 
     int m_mouseDownX, m_mouseDownY;
-	//Drawing Rectangles
+
+    //Chess drawing functions
+    void drawStaticElements();
+    void drawDynamicElements();
+
+    //Rectangles
     SDL_Rect m_textTitleRect;
     SDL_Rect m_buttonStartRect;
     SDL_Rect m_buttonStopRect;

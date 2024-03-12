@@ -22,9 +22,9 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    pushToCustomDescriptionQueue("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
+    m_queueCustomSetDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
 
-    pushToFenDescriptionQueue("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    m_queueFENSetDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
 }
 
@@ -90,44 +90,14 @@ void ChessBoard::setBoardDescriptionFromQueueBack()
     m_boardDescription = m_queueCustomSetDescription.back();
 }
 
-void ChessBoard::pushToCustomDescriptionQueue(std::string description)
+std::queue<std::string>& ChessBoard::getMutableCustomDescriptionQueue()
 {
-    m_queueCustomSetDescription.push(description);
+    return m_queueCustomSetDescription;
 }
 
-void ChessBoard::pushToFenDescriptionQueue(std::string description)
+std::queue<std::string>& ChessBoard::getMutableFENDescriptionQueue()
 {
-    m_queueFENSetDescription.push(description);
-}
-
-void ChessBoard::popCustomDescriptionQueue()
-{
-    m_queueCustomSetDescription.pop();
-}
-
-void ChessBoard::popFenDescriptionQueue()
-{
-    m_queueFENSetDescription.pop();
-}
-
-std::string ChessBoard::fenDescriptionBackToString()
-{
-    return m_queueFENSetDescription.back();
-}
-
-std::string ChessBoard::fenDescriptionFrontToString()
-{
-    return m_queueFENSetDescription.front();
-}
-
-std::string ChessBoard::customDescriptionBackToString()
-{
-    return m_queueCustomSetDescription.back();
-}
-
-std::string ChessBoard::customDescriptionFrontToString()
-{
-    return m_queueCustomSetDescription.front();
+    return m_queueFENSetDescription;
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
@@ -488,14 +458,12 @@ void ChessBoard::shufflePieces(bool shuff,
 
 		custDescription = temp;
 
-        pushToCustomDescriptionQueue(custDescription);
-
+        m_queueCustomSetDescription.push(custDescription);
         temp = std::string(FEN);
 
 		fenDescription = temp;
 
-        pushToFenDescriptionQueue(fenDescription);
-
+        m_queueFENSetDescription.push(fenDescription);
 		//if queue exceeds 20 pop one out
         if(m_queueCustomSetDescription.size()==21)
         {

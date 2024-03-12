@@ -54,14 +54,9 @@ public:
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
 
-    void pushToCustomDescriptionQueue(std::string description);
-    void pushToFenDescriptionQueue(std::string description);
-    void popCustomDescriptionQueue();
-    void popFenDescriptionQueue();
-    std::string fenDescriptionBackToString();
-    std::string fenDescriptionFrontToString();
-    std::string customDescriptionBackToString();
-    std::string customDescriptionFrontToString();
+    std::queue<std::string>& getMutableCustomDescriptionQueue();
+
+    std::queue<std::string>& getMutableFENDescriptionQueue();
 
 
     //sets the index of the currently clicked chess board square or -1
