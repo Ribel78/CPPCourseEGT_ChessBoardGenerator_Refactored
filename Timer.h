@@ -10,15 +10,15 @@ public:
     void markEnd();
     void setDurationInNanoseconds();
     void updateStats();
-    std::string simulationTimeToString();
+    std::string simulationTimeToString() const;
 
 private:
-    std::chrono::time_point<std::chrono::steady_clock> startTime;
-    std::chrono::time_point<std::chrono::steady_clock> endTime;
-    std::chrono::duration<double> simTime;
-    int numberOfSimulations;
-    double totalSimulationTime;
-    double averageSimulationTime;
-    double simulationTime;
+    std::chrono::time_point<std::chrono::steady_clock> m_startTime;
+    std::chrono::time_point<std::chrono::steady_clock> m_endTime;
+    std::chrono::duration<double> m_simTime;
+    int m_numberOfSimulations;
+    double m_totalSimulationTime;
+    double m_averageSimulationTime;
+    double m_simulationTime;
 
 };

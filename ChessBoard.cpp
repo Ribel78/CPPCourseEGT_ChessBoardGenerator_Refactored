@@ -7,24 +7,24 @@ ChessBoard::ChessBoard()
     setPiecesToRemove(8);
 
     //simulate chessboard
-    ChessBoard::simulating = false;
+    ChessBoard::m_simulating = false;
 
 	//Chess Board Size and Color
-	chess_board_size = 640;
-    chess_board_color[0] = {214, 187, 141, 255}; //"white" square
-	chess_board_color[1] = {198, 130, 66, 255}; //"black" square
-    chess_board_color[2] = {100, 255, 100, 50}; // highlight color
+    m_chessBoardSize = 640;
+    m_chessBoardColor[0] = {214, 187, 141, 255}; //"white" square
+    m_chessBoardColor[1] = {198, 130, 66, 255}; //"black" square
+    m_chessBoardColor[2] = {100, 255, 100, 50}; // highlight color
 
     for (int i = 0; i < 64; i++)
     {
-        chess_board_square[i] = new SDL_Rect{0, 0, 0, 0};
+        m_chessBoardSquare[i] = new SDL_Rect{0, 0, 0, 0};
     }
 
-	chessPieceIdx = -1;
+    m_chessPieceIdx = -1;
 
-	queueCustomSetDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
+    m_queueCustomSetDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
 
-    queueFENSetDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    m_queueFENSetDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
 }
 
@@ -33,17 +33,17 @@ ChessBoard::~ChessBoard()
     //delete chess board rectangles
     for (int i = 0; i < 64; i++)
     {
-        delete chess_board_square[i];
+        delete m_chessBoardSquare[i];
     }	
 
 }
 
 void ChessBoard::setRenderer(SDL_Renderer* renderer)
 {
-    this->renderer = renderer;
+    this->m_renderer = renderer;
 }
 
-void ChessBoard::prep_chess_piece_textures()
+void ChessBoard::prepChessPieceTextures()
 {
 	//chess pieces in uinicode white to black in order King, Queen, Rook, Bishop, Knight, Pawn 
 	//std::string cp_unicode[12] = {"\u2654", "\u2655", "\u2656", "\u2657", "\u2658", "\u2659", "\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
@@ -51,7 +51,7 @@ void ChessBoard::prep_chess_piece_textures()
 	std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 
 	// Create textures from font chess characters - only the black pieces (6)
-    TTF_Font *DejaVu = TextureFactory::Instance()->fonts["DejaVu"];
+    TTF_Font *DejaVu = TextureFactory::Instance()->m_fonts["DejaVu"];
 
     SDL_Surface *tempSurfaceText = NULL;
 
@@ -61,13 +61,13 @@ void ChessBoard::prep_chess_piece_textures()
         { // white first - K, Q, R, B, N, P
 
             tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {254, 237, 211, 255});
-            chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
+            m_chessPieces[i] = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
         }
         else
         { // black second - k, q, r, b, n, p
 
             tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {0, 0, 0, 255});
-            chessPieces[i] = SDL_CreateTextureFromSurface(renderer, tempSurfaceText);
+            m_chessPieces[i] = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
         }
     }
     SDL_FreeSurface(tempSurfaceText);
@@ -75,33 +75,33 @@ void ChessBoard::prep_chess_piece_textures()
 
 //Chess
 
-bool ChessBoard::isSimulating()
+bool ChessBoard::isSimulating() const
 {
-	return ChessBoard::simulating;
+    return ChessBoard::m_simulating;
 }
 
 void ChessBoard::setSimulating(bool state)
 {
-	ChessBoard::simulating = state;
+    ChessBoard::m_simulating = state;
 }
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
-    boardDescription = queueCustomSetDescription.back();
+    m_boardDescription = m_queueCustomSetDescription.back();
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
-    chessPieceIdx = idx;
+    m_chessPieceIdx = idx;
 }
 
-SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx)
+SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
 {
-    return chess_board_square[idx];
+    return m_chessBoardSquare[idx];
 }
 
-std::string ChessBoard::getSimulationSummary()
+std::string ChessBoard::getSimulationSummary() const
 {
-    return timer.simulationTimeToString();
+    return m_timer.simulationTimeToString();
 }
 
 //Positions all 64 SDL_Rect-s on a chess board
@@ -109,9 +109,9 @@ void ChessBoard::initBoard()
 {
     for (int i = 0; i < 64; i++)
     {
-        chess_board_square[i]->x = (i % 8)*(chess_board_size / 8);
-        chess_board_square[i]->y = (i / 8)*(chess_board_size / 8);
-        chess_board_square[i]->w = chess_board_square[i]->h = chess_board_size / 8;
+        m_chessBoardSquare[i]->x = (i % 8)*(m_chessBoardSize / 8);
+        m_chessBoardSquare[i]->y = (i / 8)*(m_chessBoardSize / 8);
+        m_chessBoardSquare[i]->w = m_chessBoardSquare[i]->h = m_chessBoardSize / 8;
     }	
 }
 
@@ -121,14 +121,14 @@ void ChessBoard::drawBoard()
     for (int i = 0; i < 64; i++)
     {
 		SDL_SetRenderDrawColor(
-			renderer,
-			chess_board_color[(i + ( i / 8 ) % 2 ) %2 ].r,
-			chess_board_color[(i + ( i / 8 ) % 2 ) %2].g,
-			chess_board_color[(i + ( i / 8 ) % 2 ) %2].b,
-			chess_board_color[(i + ( i / 8 ) % 2 ) %2].a
+            m_renderer,
+            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2 ].r,
+            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].g,
+            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].b,
+            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].a
             );
 
-		SDL_RenderFillRect(renderer,chess_board_square[i]);
+        SDL_RenderFillRect(m_renderer,m_chessBoardSquare[i]);
 	}
 }
 
@@ -136,31 +136,31 @@ void ChessBoard::drawBoard()
 void ChessBoard::drawBoardOverlay()
 {
 	//bool showOverlay = true;
-    if (!simulating && chessPieceIdx > -1)
+    if (!m_simulating && m_chessPieceIdx > -1)
     {
-		int x = chessPieceIdx % 8;
-		int y = chessPieceIdx / 8;
+        int x = m_chessPieceIdx % 8;
+        int y = m_chessPieceIdx / 8;
 
-		std::string overlay = attackSquares(boardDescription, x, y, '\0' );
+        std::string overlay = attackSquares(m_boardDescription, x, y, '\0' );
 
         for (int i = 0; i < 64; i++)
         {
-			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
 
             //hide unused rectangles with 0 alpha value
-            SDL_SetRenderDrawColor(renderer,
-                                   chess_board_color[2].r,
-                                   chess_board_color[2].g,
-                                   chess_board_color[2].b,
+            SDL_SetRenderDrawColor(m_renderer,
+                                   m_chessBoardColor[2].r,
+                                   m_chessBoardColor[2].g,
+                                   m_chessBoardColor[2].b,
                                    ((overlay[i]!='-') ? 100 : 0));
 
-			SDL_RenderFillRect(renderer,chess_board_square[i]);
+            SDL_RenderFillRect(m_renderer,m_chessBoardSquare[i]);
 		}
 
     } else
     {
 		//Board descriptions is empty - no overlay
-		boardDescription = "----------------------------------------------------------------";
+        m_boardDescription = "----------------------------------------------------------------";
 	}
 }
 
@@ -191,10 +191,10 @@ void ChessBoard::drawPieces()
         {
             if (chessBoardShuffle[i] == cp_lookupRef[j])
             {
-                SDL_RenderCopy(renderer,
-                               chessPieces[j],
+                SDL_RenderCopy(m_renderer,
+                               m_chessPieces[j],
                                NULL,
-                               chess_board_square[i]);
+                               m_chessBoardSquare[i]);
 				continue;
 			}
 		}
@@ -205,10 +205,10 @@ void ChessBoard::setPiecesToRemove(int amount)
 {
     if (amount < 0 || amount > 30)
     {
-        piecesToRemove = 8; //default
+        m_piecesToRemove = 8; //default
     } else
     {
-        piecesToRemove = amount;
+        m_piecesToRemove = amount;
     }
     
 }
@@ -226,7 +226,7 @@ void ChessBoard::shufflePieces(bool shuff,
 {
 
 	//Mark start of simulation
-	timer.markStart();
+    m_timer.markStart();
 
 	char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
 
@@ -281,7 +281,7 @@ void ChessBoard::shufflePieces(bool shuff,
 		}
 
         //remove all pawns if foud on end rows - keep count of removed pieces
-		int pieces_to_remove = piecesToRemove; // !!! this variable controls how many pieces to see on the board
+        int pieces_to_remove = m_piecesToRemove; // !!! this variable controls how many pieces to see on the board
 
         while(pieces_to_remove > 0)
         {
@@ -429,9 +429,9 @@ void ChessBoard::shufflePieces(bool shuff,
 		}
 
 		//End simulation - caclulate simulation duration in ns
-		timer.markEnd();
-		timer.setDurationInNanoseconds();
-		timer.updateStats();
+        m_timer.markEnd();
+        m_timer.setDurationInNanoseconds();
+        m_timer.updateStats();
 
 		/*Parsing the randomized custom chess board description to FEN notation
         More info here:
@@ -446,19 +446,19 @@ void ChessBoard::shufflePieces(bool shuff,
 
 		custDescription = temp;
 
-		queueCustomSetDescription.push(custDescription);
+        m_queueCustomSetDescription.push(custDescription);
 
         temp = std::string(FEN);
 
 		fenDescription = temp;
 
-		queueFENSetDescription.push(fenDescription);
+        m_queueFENSetDescription.push(fenDescription);
 
 		//if queue exceeds 20 pop one out
-        if(queueCustomSetDescription.size()==21)
+        if(m_queueCustomSetDescription.size()==21)
         {
-			queueCustomSetDescription.pop();
-			queueFENSetDescription.pop();
+            m_queueCustomSetDescription.pop();
+            m_queueFENSetDescription.pop();
 		}
 
     } else
@@ -468,8 +468,8 @@ void ChessBoard::shufflePieces(bool shuff,
          * custDescription = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
          * fenDescription = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         */
-		custDescription = queueCustomSetDescription.back();
-		fenDescription = queueFENSetDescription.back();
+        custDescription = m_queueCustomSetDescription.back();
+        fenDescription = m_queueFENSetDescription.back();
 	}
 }
 

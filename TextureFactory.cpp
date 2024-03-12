@@ -6,13 +6,13 @@ TextureFactory::TextureFactory(){}
 TextureFactory::~TextureFactory(){
     //closing fonts
     std::map<std::string, TTF_Font*>::iterator f_it;
-    for (f_it = fonts.begin(); f_it !=  fonts.end(); f_it++)
+    for (f_it = m_fonts.begin(); f_it !=  m_fonts.end(); f_it++)
     {
         TTF_CloseFont(f_it->second);
     }
     //destroying textures
     std::map<std::string, SDL_Texture*>::iterator t_it;
-    for(t_it = textures.begin(); t_it != textures.end(); t_it++)
+    for(t_it = m_textures.begin(); t_it != m_textures.end(); t_it++)
     {
         SDL_DestroyTexture(t_it->second);
     }
@@ -37,7 +37,7 @@ bool TextureFactory::loadFont(const char* fileName,
 		return false;
     } else
     {
-        fonts[id] = font; // add font into the map
+        m_fonts[id] = font; // add font into the map
         return true;
     }
 }
@@ -57,7 +57,7 @@ bool TextureFactory::textureFromImage(const char* fileName,
             << std::endl;
     } else
     {
-        textures[id] = tex; //add the created texture in the textureMap map
+        m_textures[id] = tex; //add the created texture in the textureMap map
         return true;
     }
 
@@ -85,7 +85,7 @@ bool TextureFactory::textureFromFont(std::string id,
     //create temp surface
 	SDL_Surface* tempSurfaceText = NULL;
     //choose a font
-    TTF_Font* font = fonts[font_id];
+    TTF_Font* font = m_fonts[font_id];
 
     tempSurfaceText = TTF_RenderText_Blended_Wrapped(font,
                                                      text,
@@ -98,7 +98,7 @@ bool TextureFactory::textureFromFont(std::string id,
     //free temp surface
     SDL_FreeSurface(tempSurfaceText);
 
-    textures[id] = tex;
+    m_textures[id] = tex;
     if(tex)
     {
         return true;
@@ -114,7 +114,7 @@ void TextureFactory::drawTexture(SDL_Renderer* ren,
                                  SDL_Rect* dstrect)
 {
     SDL_RenderCopy(ren,
-                   textures[tex_id],
+                   m_textures[tex_id],
                    NULL,
                    dstrect);
 }
@@ -122,7 +122,7 @@ void TextureFactory::drawTexture(SDL_Renderer* ren,
 //individual call to destroy a texture by id usually used in the dynamic elements
 void TextureFactory::destroyTexture(std::string tex_id)
 {
-    SDL_DestroyTexture(textures[tex_id]);
+    SDL_DestroyTexture(m_textures[tex_id]);
 }
 
 //call static instance of the Texture Factory

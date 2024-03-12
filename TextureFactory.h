@@ -38,10 +38,10 @@ public:
 
     static TextureFactory* Instance();
 
-    std::map<std::string, TTF_Font*> fonts;
+    std::map<std::string, TTF_Font*> m_fonts;
 
 private:
 
     static TextureFactory* instance;
-    std::map<std::string, SDL_Texture*> textures;
+    std::map<std::string, SDL_Texture*> m_textures;
 };

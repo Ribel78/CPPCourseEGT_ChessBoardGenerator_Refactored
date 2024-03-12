@@ -12,33 +12,33 @@ public:
               int xpos, int ypos,
               int width, int height,
               int flags);
-    void prep_textures();
+    void prepTextures();
     void update();
     void handleEvents();
     void clean();
-    bool isRunning();
+    bool isRunning() const;
     bool buttonClicked(SDL_Rect* r,
                        int xDown, int yDown,
-                       int xUp, int yUp);
+                       int xUp, int yUp) const;
 	
 	//Chess drawing functions
     void drawStaticElements();
     void drawDynamicElements();
 
-	ChessBoard cb;
+    ChessBoard m_chessBoard;
 
 private:
 
-	SDL_Window* window = NULL;
-	SDL_Renderer* renderer = NULL;
-	bool running;
+    SDL_Window* m_window = NULL;
+    SDL_Renderer* m_renderer = NULL;
+    bool m_running;
 
-	int mouseDownX, mouseDownY;
+    int m_mouseDownX, m_mouseDownY;
 	//Drawing Rectangles
-	SDL_Rect textTitleRect;
-	SDL_Rect buttonStartRect;
-	SDL_Rect buttonStopRect;
-	SDL_Rect textFENRect;
-	SDL_Rect textTimeRect;	
+    SDL_Rect m_textTitleRect;
+    SDL_Rect m_buttonStartRect;
+    SDL_Rect m_buttonStopRect;
+    SDL_Rect m_textFENRect;
+    SDL_Rect m_textTimeRect;
 
 };

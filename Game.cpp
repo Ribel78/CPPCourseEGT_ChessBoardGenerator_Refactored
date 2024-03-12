@@ -11,17 +11,17 @@ bool Game::init(const char* title,
     {
 		std::cout << "SDL init success\n";
 
-		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        m_window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
         //window init success
-        if (window != 0)
+        if (m_window != 0)
 		{
 			std::cout << "window creation success\n";
-			renderer = SDL_CreateRenderer(window, -1, 0);
+            m_renderer = SDL_CreateRenderer(m_window, -1, 0);
             //renderer init success
-            if (renderer != 0)
+            if (m_renderer != 0)
 			{
 				std::cout << "renderer creation success\n";
-				cb.setRenderer(renderer);
+                m_chessBoard.setRenderer(m_renderer);
 			}
             else
             {
@@ -47,13 +47,13 @@ bool Game::init(const char* title,
 		return false;
 	}	
 	std::cout << "init success\n";
-	running = true;
-	cb.setSimulating(false);
+    m_running = true;
+    m_chessBoard.setSimulating(false);
 	return true;
 }
 
 //Initialize SDL TTF library - rename the function to texture load or init
-void Game::prep_textures()
+void Game::prepTextures()
 {
 	// loading fonts into pointer variables
 	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
@@ -64,29 +64,29 @@ void Game::prep_textures()
     TextureFactory::Instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
                                                 {0, 0, 0, 255},
-                                                1280, renderer, 0);
+                                                1280, m_renderer, 0);
     //button buttonStartTex
     TextureFactory::Instance()->textureFromFont("buttonStartTex","DejaVu",
                                                 "     Start\n Simulation",
                                                 {235 ,235 ,255 ,255},
-                                                300, renderer, 0);
+                                                300, m_renderer, 0);
     //button buttonStopTex
     TextureFactory::Instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
                                                 {235 ,235 ,255 ,255},
-                                                300, renderer, 0);
+                                                300, m_renderer, 0);
 
     // Parametrizing the layout of the destination rectangles
 	int ww, wh;
-	SDL_GetWindowSize(window, &ww, &wh);
+    SDL_GetWindowSize(m_window, &ww, &wh);
 	int padding = 40;
 	int chess_sq = (ww / 2) / 8;
 
-	textTitleRect = {ww / 2 + padding, padding / 2, ww / 2 - 2*padding, chess_sq};  
-	buttonStartRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq}; 
-	buttonStopRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq}; 
-    textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
-	textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
+    m_textTitleRect = {ww / 2 + padding, padding / 2, ww / 2 - 2*padding, chess_sq};
+    m_buttonStartRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
+    m_buttonStopRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
+    m_textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
+    m_textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
 
 }
 
@@ -97,68 +97,99 @@ Checks positions of the mousedown / mouseup separately
 and compare against 
 given SDL_Rect coordinates and dimensions
 */
-bool Game::buttonClicked(SDL_Rect* r,  int xDown, int yDown, int xUp, int yUp){
+bool Game::buttonClicked(SDL_Rect* r,
+                         int xDown, int yDown,
+                         int xUp, int yUp) const
+{
 
-	if(((xDown > r->x) && (xDown < r->x +r->w)) && ((xUp > r->x) && (xUp < r->x +r->w))&&
-		((yDown > r->y) && (yDown < r->y +r->h)) && ((yUp > r->y) && (yUp < r->y +r->h))){
+    if(((xDown > r->x) && (xDown < r->x +r->w)) &&
+        ((xUp > r->x) && (xUp < r->x +r->w))&&
+        ((yDown > r->y) && (yDown < r->y +r->h)) &&
+        ((yUp > r->y) && (yUp < r->y +r->h)))
+    {
 			
 			return true; //click coordinates inside  SDL_Rect r
 	}
 	return false; //click coordinates outside inside  SDL_Rect r
 }
 
-void Game::handleEvents() {
+void Game::handleEvents()
+{
 	SDL_Event event;
-	if (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT: running = false; break;
+    if (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+        case SDL_QUIT: m_running = false; break;
 
 		case SDL_KEYUP:{ // Use down arrow to select a simulation from the past 20 stored in a queue
-			if(event.key.keysym.sym == SDLK_DOWN){
-				if(!cb.isSimulating()){
+            if(event.key.keysym.sym == SDLK_DOWN)
+            {
+                if(!m_chessBoard.isSimulating())
+                {
 
-					cb.setChessPieceIdx(-1);
+                    m_chessBoard.setChessPieceIdx(-1);
 					std::string temp;
-					temp = cb.queueFENSetDescription.front();
-					cb.queueFENSetDescription.pop();
-					cb.queueFENSetDescription.push(temp);
-					temp = cb.queueCustomSetDescription.front();
-					cb.queueCustomSetDescription.pop();
-					cb.queueCustomSetDescription.push(temp);
-					cb.setBoardDescriptionFromQueueBack();
+                    temp = m_chessBoard.m_queueFENSetDescription.front();
+                    m_chessBoard.m_queueFENSetDescription.pop();
+                    m_chessBoard.m_queueFENSetDescription.push(temp);
+                    temp = m_chessBoard.m_queueCustomSetDescription.front();
+                    m_chessBoard.m_queueCustomSetDescription.pop();
+                    m_chessBoard.m_queueCustomSetDescription.push(temp);
+                    m_chessBoard.setBoardDescriptionFromQueueBack();
 				}
 			}
 		}; break;
-		case SDL_MOUSEBUTTONDOWN: {
+        case SDL_MOUSEBUTTONDOWN:
+        {
 			int msx, msy;
-			if (event.button.button == SDL_BUTTON_LEFT) {
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
 				SDL_GetMouseState(&msx, &msy);
-				mouseDownX = msx;
-				mouseDownY = msy;
+                m_mouseDownX = msx;
+                m_mouseDownY = msy;
 			}
 		}; break;
-		case SDL_MOUSEBUTTONUP: {			
+        case SDL_MOUSEBUTTONUP:
+        {
 			int msx, msy;
-			if (event.button.button == SDL_BUTTON_RIGHT) {
+            if (event.button.button == SDL_BUTTON_RIGHT)
+            {
 				SDL_GetMouseState(&msx, &msy);
 			}
 			//int msx, msy;
-			if (event.button.button == SDL_BUTTON_LEFT) {
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
 				SDL_GetMouseState(&msx, &msy);
-				if(buttonClicked(&buttonStartRect,mouseDownX,mouseDownY, msx, msy)){
-					cb.setSimulating(true);
+                if(buttonClicked(&m_buttonStartRect,
+                                  m_mouseDownX,m_mouseDownY,
+                                  msx, msy))
+                {
+                    m_chessBoard.setSimulating(true);
 				}
-				if(buttonClicked(&buttonStopRect,mouseDownX,mouseDownY, msx, msy)){
-					cb.setSimulating(false);
+                if(buttonClicked(&m_buttonStopRect,
+                                  m_mouseDownX,m_mouseDownY,
+                                  msx, msy))
+                {
+                    m_chessBoard.setSimulating(false);
 				}
-				if(buttonClicked(&textFENRect,mouseDownX,mouseDownY, msx, msy) && !cb.isSimulating()){ // Copy FEN code to clipboard
-					SDL_SetClipboardText(cb.queueFENSetDescription.back().c_str());
+                if(buttonClicked(&m_textFENRect,
+                                  m_mouseDownX,m_mouseDownY,
+                                  msx, msy) &&
+                    !m_chessBoard.isSimulating())
+                { // Copy FEN code to clipboard
+                    SDL_SetClipboardText(m_chessBoard.m_queueFENSetDescription.back().c_str());
 				}	
-				for (int i = 0; i < 64; i++){
-					if(buttonClicked(cb.getChessBoardSquareRect(i), mouseDownX, mouseDownY, msx, msy) && !cb.isSimulating()){
-						cb.setChessPieceIdx(i);
+                for (int i = 0; i < 64; i++)
+                {
+                    if(buttonClicked(m_chessBoard.getChessBoardSquareRect(i),
+                                      m_mouseDownX, m_mouseDownY,
+                                      msx, msy) &&
+                        !m_chessBoard.isSimulating())
+                    {
+                        m_chessBoard.setChessPieceIdx(i);
 						//chessPieceIdx = i;
-						cb.setBoardDescriptionFromQueueBack();
+                        m_chessBoard.setBoardDescriptionFromQueueBack();
 						break;
 					}	
 				}		
@@ -169,50 +200,56 @@ void Game::handleEvents() {
 	}
 }
 
-void Game::update() {
+void Game::update()
+{
 	//Render All
-	SDL_RenderPresent(renderer);
+    SDL_RenderPresent(m_renderer);
 
-	//To show some visual shuffling wait 50 ms
+    //Slow down visual shuffling
     SDL_Delay(6);
 }
 
-void Game::clean() {
+void Game::clean()
+{
 	std::cout << "cleaning game\n";
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(m_window);
+    SDL_DestroyRenderer(m_renderer);
 	SDL_Quit();
 }
 
-bool Game::isRunning() {
-	return Game::running;
+bool Game::isRunning() const
+{
+    return Game::m_running;
 }
 
-Game::Game() {
-	Game::window = NULL;
-	Game::renderer = NULL;
-	Game::running = true;
+Game::Game()
+{
+    Game::m_window = NULL;
+    Game::m_renderer = NULL;
+    Game::m_running = true;
 }
 
-Game::~Game() {
+Game::~Game()
+{
 	// delete window;
 	// delete renderer;
 }
 
-void Game::drawStaticElements(){
+void Game::drawStaticElements()
+{
 	//Background color
-	SDL_SetRenderDrawColor(renderer, 23,138,207, 255);
-	SDL_RenderClear(renderer);	
+    SDL_SetRenderDrawColor(m_renderer, 23,138,207, 255);
+    SDL_RenderClear(m_renderer);
 
 	// Static Draw
 	// Title
-	TextureFactory::Instance()->drawTexture(renderer,"textTitleTexture",NULL,&textTitleRect);
+    TextureFactory::Instance()->drawTexture(m_renderer,"textTitleTexture",NULL,&m_textTitleRect);
 	// Buttons
-	SDL_SetRenderDrawColor(renderer, 50, 50, 110, 255); //Button BG 
-	SDL_RenderFillRect(renderer,&buttonStartRect);
-	TextureFactory::Instance()->drawTexture(renderer,"buttonStartTex",NULL, &buttonStartRect);
-	SDL_RenderFillRect(renderer,&buttonStopRect);
-	TextureFactory::Instance()->drawTexture(renderer,"buttonStopTex",NULL, &buttonStopRect);
+    SDL_SetRenderDrawColor(m_renderer, 50, 50, 110, 255); //Button BG
+    SDL_RenderFillRect(m_renderer,&m_buttonStartRect);
+    TextureFactory::Instance()->drawTexture(m_renderer,"buttonStartTex",NULL, &m_buttonStartRect);
+    SDL_RenderFillRect(m_renderer,&m_buttonStopRect);
+    TextureFactory::Instance()->drawTexture(m_renderer,"buttonStopTex",NULL, &m_buttonStopRect);
 
 }
 
@@ -220,23 +257,23 @@ void Game::drawDynamicElements()
 {
     // Dynamic Draw / Text
     // FEN Chess Board Notation - click to copy to clipboard
-	const char* dynamic_text_FEN = cb.queueFENSetDescription.back().c_str();
+    const char* dynamic_text_FEN = m_chessBoard.m_queueFENSetDescription.back().c_str();
 	TextureFactory::Instance()->textureFromFont(	"textInfoTexture", 
                                                     "Segoe28",
 													dynamic_text_FEN, 
-                                                    {0, 0, 0, 255}, 1280, renderer, 0);
+                                                    {0, 0, 0, 255}, 1280, m_renderer, 0);
 
-	TextureFactory::Instance()->drawTexture(renderer, "textInfoTexture", NULL, &textFENRect);
+    TextureFactory::Instance()->drawTexture(m_renderer, "textInfoTexture", NULL, &m_textFENRect);
 	TextureFactory::Instance()->destroyTexture("textInfoTexture");
 
     // Statistics for the simulation time
-    std::string dynamic_text_Times = cb.getSimulationSummary();
+    std::string dynamic_text_Times = m_chessBoard.getSimulationSummary();
 	TextureFactory::Instance()->textureFromFont(	"textTimeTexture", 
                                                     "Segoe28",
                                                     dynamic_text_Times.c_str(),
-                                                    {255, 255, 255, 255}, 640, renderer, 0);
+                                                    {255, 255, 255, 255}, 640, m_renderer, 0);
 	
-	TextureFactory::Instance()->drawTexture(renderer, "textTimeTexture", NULL, &textTimeRect);
+    TextureFactory::Instance()->drawTexture(m_renderer, "textTimeTexture", NULL, &m_textTimeRect);
 	TextureFactory::Instance()->destroyTexture("textTimeTexture");
 
 }

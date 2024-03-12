@@ -21,10 +21,10 @@ public:
     void setRenderer(SDL_Renderer* renderer);
 
     //extract chess glyphs from a font as textures
-    void prep_chess_piece_textures();
+    void prepChessPieceTextures();
 
     //check the current state of the simulation
-    bool isSimulating();
+    bool isSimulating() const;
 
     //set the current state of the simulation 
     void setSimulating(bool state);
@@ -47,9 +47,9 @@ public:
     Taking into account of the rules of chess pieces moves.
     Used in drawBoardOverlay and chess board generation
     */
-    friend std::string attackSquares(std::string boardDescription,
-                                    int x, int y,
-                                    char piece);
+    // friend std::string attackSquares(std::string boardDescription,
+    //                                 int x, int y,
+    //                                 char piece);
 
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
@@ -58,10 +58,10 @@ public:
     void setChessPieceIdx(int idx);
 
     //get a rectangle from the chess board for drawing
-    SDL_Rect* getChessBoardSquareRect(int idx);
+    SDL_Rect* getChessBoardSquareRect(int idx) const;
 
     //returns string from Time object to be passed for drawing
-    std::string getSimulationSummary();
+    std::string getSimulationSummary() const;
 
     //chess board drawing functions
 
@@ -79,38 +79,38 @@ public:
 
     //store generated chessboard descriptions - in a queue.
     //seek trough the last 20 simulations using Down Arrow Key
-	std::queue<std::string> queueCustomSetDescription;
-	std::queue<std::string> queueFENSetDescription;
+    std::queue<std::string> m_queueCustomSetDescription;
+    std::queue<std::string> m_queueFENSetDescription;
 
 private:
     //needed for the drawing functions passed from the Game object
-    SDL_Renderer* renderer = NULL;
+    SDL_Renderer* m_renderer = NULL;
 
     //check if board is currently being simulated
-	bool simulating;
+    bool m_simulating;
 
 	//size of the chess board in pixels 
-	int chess_board_size;
+    int m_chessBoardSize;
 
-    int piecesToRemove;
+    int m_piecesToRemove;
 
     //store rectangles for each chess board square
-    SDL_Rect* chess_board_square[64];
+    SDL_Rect* m_chessBoardSquare[64];
 
     //colors of the black and white squares and the overlay color
-    SDL_Color chess_board_color[3];	
+    SDL_Color m_chessBoardColor[3];
 
     //store textures of the 12 unique chess pieces
-	SDL_Texture* chessPieces[12];
+    SDL_Texture* m_chessPieces[12];
 
 	//Used in drawing the Board Overlay
 
     //the index of the clicked square, -1 if board overlay is off
-	int chessPieceIdx;
+    int m_chessPieceIdx;
 
     //current chess board description
-	std::string boardDescription;   
+    std::string m_boardDescription;
 
 	//Simulation time stats are retrieved from this object.
-	Timer timer;
+    Timer m_timer;
 };
