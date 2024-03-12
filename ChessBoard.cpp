@@ -22,9 +22,9 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_queueCustomSetDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
+    pushToCustomDescriptionQueue("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
 
-    m_queueFENSetDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    pushToFenDescriptionQueue("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
 }
 
@@ -51,7 +51,7 @@ void ChessBoard::prepChessPieceTextures()
 	std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 
 	// Create textures from font chess characters - only the black pieces (6)
-    TTF_Font *DejaVu = TextureFactory::Instance()->m_fonts["DejaVu"];
+    TTF_Font *DejaVu = TextureFactory::instance()->getFont("DejaVu");
 
     SDL_Surface *tempSurfaceText = NULL;
 
@@ -90,6 +90,46 @@ void ChessBoard::setBoardDescriptionFromQueueBack()
     m_boardDescription = m_queueCustomSetDescription.back();
 }
 
+void ChessBoard::pushToCustomDescriptionQueue(std::string description)
+{
+    m_queueCustomSetDescription.push(description);
+}
+
+void ChessBoard::pushToFenDescriptionQueue(std::string description)
+{
+    m_queueFENSetDescription.push(description);
+}
+
+void ChessBoard::popCustomDescriptionQueue()
+{
+    m_queueCustomSetDescription.pop();
+}
+
+void ChessBoard::popFenDescriptionQueue()
+{
+    m_queueFENSetDescription.pop();
+}
+
+std::string ChessBoard::fenDescriptionBackToString()
+{
+    return m_queueFENSetDescription.back();
+}
+
+std::string ChessBoard::fenDescriptionFrontToString()
+{
+    return m_queueFENSetDescription.front();
+}
+
+std::string ChessBoard::customDescriptionBackToString()
+{
+    return m_queueCustomSetDescription.back();
+}
+
+std::string ChessBoard::customDescriptionFrontToString()
+{
+    return m_queueCustomSetDescription.front();
+}
+
 void ChessBoard::setChessPieceIdx(int idx){
     m_chessPieceIdx = idx;
 }
@@ -98,6 +138,8 @@ SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
 {
     return m_chessBoardSquare[idx];
 }
+
+
 
 std::string ChessBoard::getSimulationSummary() const
 {
@@ -446,13 +488,13 @@ void ChessBoard::shufflePieces(bool shuff,
 
 		custDescription = temp;
 
-        m_queueCustomSetDescription.push(custDescription);
+        pushToCustomDescriptionQueue(custDescription);
 
         temp = std::string(FEN);
 
 		fenDescription = temp;
 
-        m_queueFENSetDescription.push(fenDescription);
+        pushToFenDescriptionQueue(fenDescription);
 
 		//if queue exceeds 20 pop one out
         if(m_queueCustomSetDescription.size()==21)

@@ -54,6 +54,16 @@ public:
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
 
+    void pushToCustomDescriptionQueue(std::string description);
+    void pushToFenDescriptionQueue(std::string description);
+    void popCustomDescriptionQueue();
+    void popFenDescriptionQueue();
+    std::string fenDescriptionBackToString();
+    std::string fenDescriptionFrontToString();
+    std::string customDescriptionBackToString();
+    std::string customDescriptionFrontToString();
+
+
     //sets the index of the currently clicked chess board square or -1
     void setChessPieceIdx(int idx);
 
@@ -79,8 +89,7 @@ public:
 
     //store generated chessboard descriptions - in a queue.
     //seek trough the last 20 simulations using Down Arrow Key
-    std::queue<std::string> m_queueCustomSetDescription;
-    std::queue<std::string> m_queueFENSetDescription;
+
 
 private:
     //needed for the drawing functions passed from the Game object
@@ -110,6 +119,12 @@ private:
 
     //current chess board description
     std::string m_boardDescription;
+
+    // custom board description
+    std::queue<std::string> m_queueCustomSetDescription;
+
+    // fen description
+    std::queue<std::string> m_queueFENSetDescription;
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;

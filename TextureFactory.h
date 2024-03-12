@@ -17,6 +17,8 @@ public:
                   std::string id,
                   int font_size);
 
+    TTF_Font* getFont(std::string font_id) const;
+
     bool textureFromImage(const char* fileName,
                           std::string id,
                           SDL_Renderer* ren);
@@ -36,12 +38,13 @@ public:
 
     void destroyTexture(std::string tex_id);
 
-    static TextureFactory* Instance();
+    static TextureFactory* instance();
 
-    std::map<std::string, TTF_Font*> m_fonts;
+
 
 private:
 
-    static TextureFactory* instance;
+    static TextureFactory* m_instance;
+    std::map<std::string, TTF_Font*> m_fonts;
     std::map<std::string, SDL_Texture*> m_textures;
 };

@@ -56,22 +56,22 @@ bool Game::init(const char* title,
 void Game::prepTextures()
 {
 	// loading fonts into pointer variables
-	TextureFactory::Instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
-	TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
-    TextureFactory::Instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
+    TextureFactory::instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
+    TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
+    TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
 
     // title
-    TextureFactory::Instance()->textureFromFont("textTitleTexture","Segoe",
+    TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
                                                 {0, 0, 0, 255},
                                                 1280, m_renderer, 0);
     //button buttonStartTex
-    TextureFactory::Instance()->textureFromFont("buttonStartTex","DejaVu",
+    TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
                                                 "     Start\n Simulation",
                                                 {235 ,235 ,255 ,255},
                                                 300, m_renderer, 0);
     //button buttonStopTex
-    TextureFactory::Instance()->textureFromFont("buttonStopTex","DejaVu",
+    TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
                                                 {235 ,235 ,255 ,255},
                                                 300, m_renderer, 0);
@@ -130,12 +130,12 @@ void Game::handleEvents()
 
                     m_chessBoard.setChessPieceIdx(-1);
 					std::string temp;
-                    temp = m_chessBoard.m_queueFENSetDescription.front();
-                    m_chessBoard.m_queueFENSetDescription.pop();
-                    m_chessBoard.m_queueFENSetDescription.push(temp);
-                    temp = m_chessBoard.m_queueCustomSetDescription.front();
-                    m_chessBoard.m_queueCustomSetDescription.pop();
-                    m_chessBoard.m_queueCustomSetDescription.push(temp);
+                    temp = m_chessBoard.fenDescriptionFrontToString();
+                    m_chessBoard.popFenDescriptionQueue();
+                    m_chessBoard.pushToFenDescriptionQueue(temp);
+                    temp = m_chessBoard.customDescriptionFrontToString();
+                    m_chessBoard.popCustomDescriptionQueue();
+                    m_chessBoard.pushToCustomDescriptionQueue(temp);
                     m_chessBoard.setBoardDescriptionFromQueueBack();
 				}
 			}
@@ -178,7 +178,7 @@ void Game::handleEvents()
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
                 { // Copy FEN code to clipboard
-                    SDL_SetClipboardText(m_chessBoard.m_queueFENSetDescription.back().c_str());
+                    SDL_SetClipboardText(m_chessBoard.fenDescriptionBackToString().c_str());
 				}	
                 for (int i = 0; i < 64; i++)
                 {
@@ -243,13 +243,13 @@ void Game::drawStaticElements()
 
 	// Static Draw
 	// Title
-    TextureFactory::Instance()->drawTexture(m_renderer,"textTitleTexture",NULL,&m_textTitleRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"textTitleTexture",NULL,&m_textTitleRect);
 	// Buttons
     SDL_SetRenderDrawColor(m_renderer, 50, 50, 110, 255); //Button BG
     SDL_RenderFillRect(m_renderer,&m_buttonStartRect);
-    TextureFactory::Instance()->drawTexture(m_renderer,"buttonStartTex",NULL, &m_buttonStartRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"buttonStartTex",NULL, &m_buttonStartRect);
     SDL_RenderFillRect(m_renderer,&m_buttonStopRect);
-    TextureFactory::Instance()->drawTexture(m_renderer,"buttonStopTex",NULL, &m_buttonStopRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"buttonStopTex",NULL, &m_buttonStopRect);
 
 }
 
@@ -257,23 +257,52 @@ void Game::drawDynamicElements()
 {
     // Dynamic Draw / Text
     // FEN Chess Board Notation - click to copy to clipboard
-    const char* dynamic_text_FEN = m_chessBoard.m_queueFENSetDescription.back().c_str();
-	TextureFactory::Instance()->textureFromFont(	"textInfoTexture", 
+    TextureFactory::instance()->textureFromFont(	"textInfoTexture",
                                                     "Segoe28",
-													dynamic_text_FEN, 
+                                                    m_chessBoard.fenDescriptionBackToString().c_str(),
                                                     {0, 0, 0, 255}, 1280, m_renderer, 0);
 
-    TextureFactory::Instance()->drawTexture(m_renderer, "textInfoTexture", NULL, &m_textFENRect);
-	TextureFactory::Instance()->destroyTexture("textInfoTexture");
+    TextureFactory::instance()->drawTexture(m_renderer, "textInfoTexture", NULL, &m_textFENRect);
+    TextureFactory::instance()->destroyTexture("textInfoTexture");
 
     // Statistics for the simulation time
     std::string dynamic_text_Times = m_chessBoard.getSimulationSummary();
-	TextureFactory::Instance()->textureFromFont(	"textTimeTexture", 
+    TextureFactory::instance()->textureFromFont(	"textTimeTexture",
                                                     "Segoe28",
                                                     dynamic_text_Times.c_str(),
                                                     {255, 255, 255, 255}, 640, m_renderer, 0);
-	
-    TextureFactory::Instance()->drawTexture(m_renderer, "textTimeTexture", NULL, &m_textTimeRect);
-	TextureFactory::Instance()->destroyTexture("textTimeTexture");
 
+    TextureFactory::instance()->drawTexture(m_renderer, "textTimeTexture", NULL, &m_textTimeRect);
+    TextureFactory::instance()->destroyTexture("textTimeTexture");
+
+}
+
+ChessBoard& Game::GetChessBoard()
+{
+    return m_chessBoard;
+}
+
+void Game::prepChessPieceTextures()
+{
+    m_chessBoard.prepChessPieceTextures();
+}
+
+void Game::initBoard()
+{
+    m_chessBoard.initBoard();
+}
+
+void Game::drawBoard()
+{
+    m_chessBoard.drawBoard();
+}
+
+void Game::drawBoardOverlay()
+{
+    m_chessBoard.drawBoardOverlay();
+}
+
+void Game::drawPieces()
+{
+    m_chessBoard.drawPieces();
 }

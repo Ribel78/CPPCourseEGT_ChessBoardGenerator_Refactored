@@ -24,8 +24,14 @@ public:
 	//Chess drawing functions
     void drawStaticElements();
     void drawDynamicElements();
+    void prepChessPieceTextures();
+    void initBoard();
+    void drawBoard();
+    void drawBoardOverlay();
+    void drawPieces();
 
-    ChessBoard m_chessBoard;
+    ChessBoard& GetChessBoard();
+
 
 private:
 
@@ -40,5 +46,7 @@ private:
     SDL_Rect m_buttonStopRect;
     SDL_Rect m_textFENRect;
     SDL_Rect m_textTimeRect;
+
+    ChessBoard m_chessBoard;
 
 };

@@ -17,7 +17,7 @@ TextureFactory::~TextureFactory(){
         SDL_DestroyTexture(t_it->second);
     }
     // delete static instance of Texture Factory
-    delete instance;
+    delete m_instance;
 }
 
 //Produce static textures ttf fonts and store into a map
@@ -40,6 +40,17 @@ bool TextureFactory::loadFont(const char* fileName,
         m_fonts[id] = font; // add font into the map
         return true;
     }
+}
+
+TTF_Font* TextureFactory::getFont(std::string font_id) const
+{
+    auto it = m_fonts.find(font_id);
+    if(it != m_fonts.end())
+    {
+        return it->second;
+    }
+
+    return nullptr;
 }
 
 //Produce static textures from images files and store into a map
@@ -126,14 +137,14 @@ void TextureFactory::destroyTexture(std::string tex_id)
 }
 
 //call static instance of the Texture Factory
-TextureFactory* TextureFactory::Instance(){
-    if(instance == 0)
+TextureFactory* TextureFactory::instance(){
+    if(m_instance == 0)
     {
-        instance = new TextureFactory();
-        return instance;
+        m_instance = new TextureFactory();
+        return m_instance;
     }
-        return instance;
+        return m_instance;
 }
 
 //initialize static instance of Texture Factory object
-TextureFactory* TextureFactory::instance = 0;
+TextureFactory* TextureFactory::m_instance = 0;

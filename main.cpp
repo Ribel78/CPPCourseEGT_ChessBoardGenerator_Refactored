@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
 
 	//game->prep_chess_piece_textures();
 
-    game->m_chessBoard.prepChessPieceTextures();
+    game->prepChessPieceTextures();
 
-    game->m_chessBoard.initBoard();
+    game->initBoard();
 
     while (game->isRunning())
     {
@@ -29,12 +29,12 @@ int main(int argc, char* argv[])
 		
 		//Static Parts
 		game->drawStaticElements();
-        game->m_chessBoard.drawBoard();
+        game->drawBoard();
 			
 		//Dynamic parts	
 		game->drawDynamicElements();
-        game->m_chessBoard.drawBoardOverlay();
-        game->m_chessBoard.drawPieces();
+        game->drawBoardOverlay();
+        game->GetChessBoard().drawPieces();
 	
 		//Update Data	
 		game->update();
