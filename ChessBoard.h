@@ -17,9 +17,6 @@ public:
     ChessBoard();
     ~ChessBoard();
 
-    //get renderer pointer from Game object and set it as this class member 
-    void setRenderer(SDL_Renderer* renderer);
-
     //extract chess glyphs from a font as textures
     void prepChessPieceTextures();
 
@@ -87,8 +84,6 @@ public:
 
 
 private:
-    //needed for the drawing functions passed from the Game object
-    SDL_Renderer* m_renderer = NULL;
 
     //check if board is currently being simulated
     bool m_simulating;

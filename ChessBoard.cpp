@@ -51,11 +51,6 @@ ChessBoard::~ChessBoard()
 
 }
 
-void ChessBoard::setRenderer(SDL_Renderer* renderer)
-{
-    this->m_renderer = renderer;
-}
-
 void ChessBoard::prepChessPieceTextures()
 {
 	//chess pieces in uinicode white to black in order King, Queen, Rook, Bishop, Knight, Pawn 
@@ -74,13 +69,15 @@ void ChessBoard::prepChessPieceTextures()
         { // white first - K, Q, R, B, N, P
 
             tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {254, 237, 211, 255});
-            m_chessPieces[i] = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
+            m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
+                                                            tempSurfaceText);
         }
         else
         { // black second - k, q, r, b, n, p
 
             tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {0, 0, 0, 255});
-            m_chessPieces[i] = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
+            m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
+                                                            tempSurfaceText);
         }
     }
     SDL_FreeSurface(tempSurfaceText);
@@ -161,19 +158,21 @@ void ChessBoard::drawBoard()
     for (int i = 0; i < 64; i++)
     {
 		SDL_SetRenderDrawColor(
-            m_renderer,
+            TextureFactory::instance()->getRenderer(),
             m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2 ].r,
             m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].g,
             m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].b,
             m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].a
             );
 
-        SDL_RenderFillRect(m_renderer,m_chessBoardSquare[i]);
+        SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+                           m_chessBoardSquare[i]);
 	}
 
     // draw label textures for the board
 
-    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(),
+                               SDL_BLENDMODE_BLEND);
 
     std::string letters = "abcdefgh";
     std::string numbers = "87654321";
@@ -199,16 +198,18 @@ void ChessBoard::drawBoardOverlay()
 
         for (int i = 0; i < 64; i++)
         {
-            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(),
+                                       SDL_BLENDMODE_BLEND);
 
             //hide unused rectangles with 0 alpha value
-            SDL_SetRenderDrawColor(m_renderer,
+            SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
                                    m_chessBoardColor[2].r,
                                    m_chessBoardColor[2].g,
                                    m_chessBoardColor[2].b,
                                    ((overlay[i]!='-') ? 100 : 0));
 
-            SDL_RenderFillRect(m_renderer,m_chessBoardSquare[i]);
+            SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+                               m_chessBoardSquare[i]);
 		}
 
     } else
@@ -245,7 +246,7 @@ void ChessBoard::drawPieces()
         {
             if (chessBoardShuffle[i] == cp_lookupRef[j])
             {
-                SDL_RenderCopy(m_renderer,
+                SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                                m_chessPieces[j],
                                NULL,
                                m_chessBoardSquare[i]);

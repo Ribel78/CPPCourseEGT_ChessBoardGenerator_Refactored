@@ -20,9 +20,9 @@ bool Game::init(const char* title,
             //renderer init success
             if (renderer != 0)
 			{
-				std::cout << "renderer creation success\n";
-                m_chessBoard.setRenderer(renderer);
                 TextureFactory::instance()->setRenderer(renderer);
+
+				std::cout << "renderer creation success\n";
 			}
             else
             {

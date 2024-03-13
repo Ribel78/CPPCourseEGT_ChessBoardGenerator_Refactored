@@ -6,16 +6,20 @@ TextureFactory::TextureFactory(){}
 TextureFactory::~TextureFactory(){
     //closing fonts
     std::map<std::string, TTF_Font*>::iterator f_it;
+
     for (f_it = m_fonts.begin(); f_it !=  m_fonts.end(); f_it++)
     {
         TTF_CloseFont(f_it->second);
     }
+
     //destroying textures
     std::map<std::string, SDL_Texture*>::iterator t_it;
+
     for(t_it = m_textures.begin(); t_it != m_textures.end(); t_it++)
     {
         SDL_DestroyTexture(t_it->second);
     }
+
     // delete static instance of Texture Factory
     delete m_instance;
 }
@@ -29,8 +33,6 @@ SDL_Renderer *TextureFactory::getRenderer()
 {
     return m_renderer;
 }
-
-
 
 //Produce static textures ttf fonts and store into a map
 bool TextureFactory::loadFont(const char* fileName,
