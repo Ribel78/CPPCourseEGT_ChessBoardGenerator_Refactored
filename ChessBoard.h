@@ -36,8 +36,8 @@ public:
     Use setPiecesToRemove method to set amount of removed pieces.
     */
     void shufflePieces(bool shuff,
-                       std::string &custDescription,
-                       std::string &fenDescription);
+                       std::string& custDescription,
+                       std::string& fenDescription);
 
     //parse result from shufflePieces to valid FEN notation for dispaly
     void parseFEN(char chess_set[65], char FEN[71]);
@@ -101,14 +101,22 @@ private:
     //store rectangles for each chess board square
     SDL_Rect* m_chessBoardSquare[64];
 
-    //colors of the black and white squares and the overlay color
-    SDL_Color m_chessBoardColor[3];
-
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
-	//Used in drawing the Board Overlay
+    //TODO rectangles for chess board labels
+    SDL_Rect* m_chessBoardLabelsV[8];
+    SDL_Rect* m_chessBoardLabelsH[8];
 
+    // SDL_Texture* m_chessLabelsV[8];
+    // SDL_Texture* m_chessLabelsH[8];
+
+
+    //colors of the black and white squares and the overlay color
+    SDL_Color m_chessBoardColor[3];
+
+
+	//Used in drawing the Board Overlay
     //the index of the clicked square, -1 if board overlay is off
     int m_chessPieceIdx;
 
@@ -116,10 +124,10 @@ private:
     std::string m_boardDescription;
 
     // custom board description
-    std::queue<std::string> m_queueCustomSetDescription;
+    std::queue<std::string> m_queueCustomDescription;
 
     // fen description
-    std::queue<std::string> m_queueFENSetDescription;
+    std::queue<std::string> m_queueFENDescription;
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;

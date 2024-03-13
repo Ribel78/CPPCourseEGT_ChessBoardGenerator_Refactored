@@ -20,21 +20,33 @@ ChessBoard::ChessBoard()
         m_chessBoardSquare[i] = new SDL_Rect{0, 0, 0, 0};
     }
 
+    for (int i = 0; i < 8; i++)
+    {
+        m_chessBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
+        m_chessBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
+    }
+
     m_chessPieceIdx = -1;
 
-    m_queueCustomSetDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
+    m_queueCustomDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
 
-    m_queueFENSetDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    m_queueFENDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
 }
 
 ChessBoard::~ChessBoard()
 {
-    //delete chess board rectangles
+    // delete chess board rectangles
     for (int i = 0; i < 64; i++)
     {
         delete m_chessBoardSquare[i];
-    }	
+    }
+    // delete chess board labels
+    for (int i = 0; i < 8; i++)
+    {
+        delete m_chessBoardLabelsV[i];
+        delete m_chessBoardLabelsH[i];
+    }
 
 }
 
@@ -51,9 +63,9 @@ void ChessBoard::prepChessPieceTextures()
 	std::string cpb_unicode[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 
 	// Create textures from font chess characters - only the black pieces (6)
-    TTF_Font *DejaVu = TextureFactory::instance()->getFont("DejaVu");
+    TTF_Font* DejaVu = TextureFactory::instance()->getFont("DejaVu");
 
-    SDL_Surface *tempSurfaceText = NULL;
+    SDL_Surface* tempSurfaceText = NULL;
 
     for (int i = 0; i < 12; i++)
     {
@@ -87,17 +99,17 @@ void ChessBoard::setSimulating(bool state)
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
-    m_boardDescription = m_queueCustomSetDescription.back();
+    m_boardDescription = m_queueCustomDescription.back();
 }
 
 std::queue<std::string>& ChessBoard::getMutableCustomDescriptionQueue()
 {
-    return m_queueCustomSetDescription;
+    return m_queueCustomDescription;
 }
 
 std::queue<std::string>& ChessBoard::getMutableFENDescriptionQueue()
 {
-    return m_queueFENSetDescription;
+    return m_queueFENDescription;
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
@@ -124,7 +136,22 @@ void ChessBoard::initBoard()
         m_chessBoardSquare[i]->x = (i % 8)*(m_chessBoardSize / 8);
         m_chessBoardSquare[i]->y = (i / 8)*(m_chessBoardSize / 8);
         m_chessBoardSquare[i]->w = m_chessBoardSquare[i]->h = m_chessBoardSize / 8;
-    }	
+    }
+
+    int square_size = m_chessBoardSize / 8;
+    int label_size = square_size /4;
+
+    for(int i = 0; i <8 ; i++)
+    {
+        //Labels
+        m_chessBoardLabelsV[i]->x = 0;
+        m_chessBoardLabelsV[i]->y = (i * square_size);
+        m_chessBoardLabelsV[i]->w = m_chessBoardLabelsV[i]->h = label_size;
+
+        m_chessBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
+        m_chessBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
+        m_chessBoardLabelsH[i]->w = m_chessBoardLabelsH[i]->h = label_size;
+    }
 }
 
 //Draws colored squares on the positioned SDL_Rect-s
@@ -142,7 +169,25 @@ void ChessBoard::drawBoard()
 
         SDL_RenderFillRect(m_renderer,m_chessBoardSquare[i]);
 	}
+
+    // draw label textures for the board
+
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+
+    std::string letters = "abcdefgh";
+    std::string numbers = "87654321";
+    for(int i = 0; i <8 ; i++)
+    {
+
+        TextureFactory::instance()->drawTexture(m_renderer, std::string(1, letters.at(i)), NULL, m_chessBoardLabelsH[i]);
+        TextureFactory::instance()->drawTexture(m_renderer, std::string(1, numbers.at(i)), NULL, m_chessBoardLabelsV[i]);
+
+        //SDL_RenderFillRect(m_renderer,m_chessBoardLabelsH[i]);
+        //SDL_RenderFillRect(m_renderer,m_chessBoardLabelsV[i]);
+    }
 }
+
+
 
 //Draw allowed positions of the selected chess piece
 void ChessBoard::drawBoardOverlay()
@@ -458,17 +503,17 @@ void ChessBoard::shufflePieces(bool shuff,
 
 		custDescription = temp;
 
-        m_queueCustomSetDescription.push(custDescription);
+        m_queueCustomDescription.push(custDescription);
         temp = std::string(FEN);
 
 		fenDescription = temp;
 
-        m_queueFENSetDescription.push(fenDescription);
+        m_queueFENDescription.push(fenDescription);
 		//if queue exceeds 20 pop one out
-        if(m_queueCustomSetDescription.size()==21)
+        if(m_queueCustomDescription.size()==21)
         {
-            m_queueCustomSetDescription.pop();
-            m_queueFENSetDescription.pop();
+            m_queueCustomDescription.pop();
+            m_queueFENDescription.pop();
 		}
 
     } else
@@ -478,9 +523,9 @@ void ChessBoard::shufflePieces(bool shuff,
          * custDescription = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
          * fenDescription = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         */
-        custDescription = m_queueCustomSetDescription.back();
-        fenDescription = m_queueFENSetDescription.back();
-	}
+        custDescription = m_queueCustomDescription.back();
+        fenDescription = m_queueFENDescription.back();
+    }
 }
 
 /*

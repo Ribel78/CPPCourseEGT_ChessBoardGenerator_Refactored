@@ -11,8 +11,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the rook (make sure it is either 'r' or 'R') from the _boardDescription at position x,y as attacking piece
 else puts the desired color rook at position x, y 
 */
-void rookAttack(std::string &boardDescription,
-                std::string &boardOverlay,
+void rookAttack(std::string& boardDescription,
+                std::string& boardOverlay,
                 char attackingPiece,
                 int x, int y,
                 char (&blackPieces)[6],
@@ -192,8 +192,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the bishop (make sure it is either 'b' or 'B') from the _boardDescription at position x,y as attacking piece
 else puts the desired color bishop at position x, y 
 */
-void bishopAttack(std::string &boardDescription,
-                  std::string &boardOverlay,
+void bishopAttack(std::string& boardDescription,
+                  std::string& boardOverlay,
                   char attackingPiece,
                   int x, int y,
                   char (&blackPieces)[6],
@@ -376,8 +376,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the queen (make sure it is either 'q' or 'Q') from the _boardDescription at position x,y as attacking piece
 else puts the desired color queen at position x, y 
 */
-void queenAttack(std::string &boardDescription,
-                 std::string &boardOverlay,
+void queenAttack(std::string& boardDescription,
+                 std::string& boardOverlay,
                  char attackingPiece,
                  int x, int y,
                  char (&blackPieces)[6],
@@ -429,8 +429,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the knight (make sure it is either 'n' or 'N') from the _boardDescription at position x,y as attacking piece
 else puts the desired color knight at position x, y 
 */
-void knightAttack(std::string &boardDescription,
-                  std::string &boardOverlay,
+void knightAttack(std::string& boardDescription,
+                  std::string& boardOverlay,
                   char attackingPiece,
                   int x, int y,
                   char (&blackPieces)[6],
@@ -494,8 +494,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the king (make sure it is either 'k' or 'K') from the _boardDescription at position x,y as attacking piece
 else puts the desired color king at position x, y 
 */
-void kingAttack(std::string &boardDescription,
-                std::string &boardOverlay,
+void kingAttack(std::string& boardDescription,
+                std::string& boardOverlay,
                 char attackingPiece,
                 int x, int y,
                 char (&blackPieces)[6],
@@ -559,8 +559,8 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the pawn (make sure it is either 'p' or 'P') from the _boardDescription at position x,y as attacking piece
 else puts the desired color pawn at position x, y 
 */
-void pawnAttack(std::string &boardDescription,
-                std::string &boardOverlay,
+void pawnAttack(std::string& boardDescription,
+                std::string& boardOverlay,
                 char attackingPiece,
                 int x, int y,
                 char (&blackPieces)[6],

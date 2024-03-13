@@ -93,6 +93,28 @@ void Game::prepTextures()
     m_textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
 
     m_chessBoard.prepChessPieceTextures();
+
+    // add label textures for the board
+    std::string letters = "abcdefgh";
+    std::string numbers = "87654321";
+
+    for(int i = 0; i < 8; i++)
+    {
+        std::string h_label = std::string(1, letters.at(i));
+        TextureFactory::instance()->textureFromFont(h_label,
+                                                    "DejaVu",
+                                                    h_label.c_str(),
+                                                    {255, 255, 120, 200},
+                                                    64, m_renderer, 32);
+
+        std::string v_label = std::string(1, numbers.at(i));
+        TextureFactory::instance()->textureFromFont(v_label,
+                                                    "DejaVu",
+                                                    v_label.c_str(),
+                                                    {255, 255, 120, 200},
+                                                    64,
+                                                    m_renderer, 32);
+    }
 }
 
 
@@ -247,13 +269,13 @@ void Game::drawStaticElements()
     SDL_RenderClear(m_renderer);
 
 	// Title
-    TextureFactory::instance()->drawTexture(m_renderer,"textTitleTexture",NULL,&m_textTitleRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"textTitleTexture", NULL, &m_textTitleRect);
 	// Buttons
     SDL_SetRenderDrawColor(m_renderer, 50, 50, 110, 255); //Button BG
     SDL_RenderFillRect(m_renderer,&m_buttonStartRect);
-    TextureFactory::instance()->drawTexture(m_renderer,"buttonStartTex",NULL, &m_buttonStartRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"buttonStartTex", NULL, &m_buttonStartRect);
     SDL_RenderFillRect(m_renderer,&m_buttonStopRect);
-    TextureFactory::instance()->drawTexture(m_renderer,"buttonStopTex",NULL, &m_buttonStopRect);
+    TextureFactory::instance()->drawTexture(m_renderer,"buttonStopTex", NULL, &m_buttonStopRect);
 
     m_chessBoard.drawBoard();
 }
