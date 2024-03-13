@@ -16,12 +16,13 @@ bool Game::init(const char* title,
         if (m_window != 0)
 		{
 			std::cout << "window creation success\n";
-            m_renderer = SDL_CreateRenderer(m_window, -1, 0);
+            SDL_Renderer* renderer = SDL_CreateRenderer(m_window, -1, 0);
             //renderer init success
-            if (m_renderer != 0)
+            if (renderer != 0)
 			{
 				std::cout << "renderer creation success\n";
-                m_chessBoard.setRenderer(m_renderer);
+                m_chessBoard.setRenderer(renderer);
+                TextureFactory::instance()->setRenderer(renderer);
 			}
             else
             {
@@ -68,17 +69,17 @@ void Game::prepTextures()
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
                                                 {0, 0, 0, 255},
-                                                1280, m_renderer, 0);
+                                                1280, 0);
     //button buttonStartTex
     TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
                                                 "     Start\n Simulation",
                                                 {235 ,235 ,255 ,255},
-                                                300, m_renderer, 0);
+                                                300, 0);
     //button buttonStopTex
     TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
                                                 {235 ,235 ,255 ,255},
-                                                300, m_renderer, 0);
+                                                300, 0);
 
     // Parametrizing the layout of the destination rectangles
 	int ww, wh;
@@ -105,19 +106,16 @@ void Game::prepTextures()
                                                     "DejaVu",
                                                     h_label.c_str(),
                                                     {255, 255, 120, 200},
-                                                    64, m_renderer, 32);
+                                                    64, 32);
 
         std::string v_label = std::string(1, numbers.at(i));
         TextureFactory::instance()->textureFromFont(v_label,
                                                     "DejaVu",
                                                     v_label.c_str(),
                                                     {255, 255, 120, 200},
-                                                    64,
-                                                    m_renderer, 32);
+                                                    64, 32);
     }
 }
-
-
 
 /*
 Checks positions of the mousedown / mouseup separately 
@@ -230,7 +228,7 @@ void Game::handleEvents()
 void Game::update()
 {
 	//Render All
-    SDL_RenderPresent(m_renderer);
+    SDL_RenderPresent(TextureFactory::instance()->getRenderer());
 
     //Slow down visual shuffling
     SDL_Delay(6);
@@ -240,7 +238,7 @@ void Game::clean()
 {
 	std::cout << "cleaning game\n";
     SDL_DestroyWindow(m_window);
-    SDL_DestroyRenderer(m_renderer);
+    SDL_DestroyRenderer(TextureFactory::instance()->getRenderer());
 	SDL_Quit();
 }
 
@@ -252,7 +250,6 @@ bool Game::isRunning() const
 Game::Game()
 {
     Game::m_window = NULL;
-    Game::m_renderer = NULL;
     Game::m_running = true;
 }
 
@@ -265,17 +262,26 @@ Game::~Game()
 void Game::drawStaticElements()
 {
 	//Background color
-    SDL_SetRenderDrawColor(m_renderer, 23,138,207, 255);
-    SDL_RenderClear(m_renderer);
+    SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
+                           23, 138, 207, 255);
+    SDL_RenderClear(TextureFactory::instance()->getRenderer());
 
 	// Title
-    TextureFactory::instance()->drawTexture(m_renderer,"textTitleTexture", NULL, &m_textTitleRect);
+    TextureFactory::instance()->drawTexture("textTitleTexture", NULL, &m_textTitleRect);
+
 	// Buttons
-    SDL_SetRenderDrawColor(m_renderer, 50, 50, 110, 255); //Button BG
-    SDL_RenderFillRect(m_renderer,&m_buttonStartRect);
-    TextureFactory::instance()->drawTexture(m_renderer,"buttonStartTex", NULL, &m_buttonStartRect);
-    SDL_RenderFillRect(m_renderer,&m_buttonStopRect);
-    TextureFactory::instance()->drawTexture(m_renderer,"buttonStopTex", NULL, &m_buttonStopRect);
+    SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
+                           50, 50, 110, 255); //Button BG
+
+    SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+                       &m_buttonStartRect);
+
+    TextureFactory::instance()->drawTexture("buttonStartTex", NULL, &m_buttonStartRect);
+
+    SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+                       &m_buttonStopRect);
+
+    TextureFactory::instance()->drawTexture("buttonStopTex", NULL, &m_buttonStopRect);
 
     m_chessBoard.drawBoard();
 }
@@ -287,10 +293,9 @@ void Game::drawDynamicElements()
     TextureFactory::instance()->textureFromFont("textInfoTexture",
                                                 "Segoe28",
                                                 m_chessBoard.getMutableFENDescriptionQueue().back().c_str(),
-                                                {0, 0, 0, 255}, 1280, m_renderer, 0);
+                                                {0, 0, 0, 255}, 1280, 0);
 
-    TextureFactory::instance()->drawTexture(m_renderer,
-                                            "textInfoTexture",
+    TextureFactory::instance()->drawTexture("textInfoTexture",
                                             NULL, &m_textFENRect);
 
     TextureFactory::instance()->destroyTexture("textInfoTexture");
@@ -301,10 +306,9 @@ void Game::drawDynamicElements()
     TextureFactory::instance()->textureFromFont("textTimeTexture",
                                                 "Segoe28",
                                                 dynamic_text_Times.c_str(),
-                                                {255, 255, 255, 255}, 640, m_renderer, 0);
+                                                {255, 255, 255, 255}, 640, 0);
 
-    TextureFactory::instance()->drawTexture(m_renderer,
-                                            "textTimeTexture",
+    TextureFactory::instance()->drawTexture("textTimeTexture",
                                             NULL, &m_textTimeRect);
 
     TextureFactory::instance()->destroyTexture("textTimeTexture");

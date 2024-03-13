@@ -20,6 +20,18 @@ TextureFactory::~TextureFactory(){
     delete m_instance;
 }
 
+void TextureFactory::setRenderer(SDL_Renderer *renderer)
+{
+    m_renderer = renderer;
+}
+
+SDL_Renderer *TextureFactory::getRenderer()
+{
+    return m_renderer;
+}
+
+
+
 //Produce static textures ttf fonts and store into a map
 bool TextureFactory::loadFont(const char* fileName,
                               std::string id,
@@ -55,10 +67,9 @@ TTF_Font* TextureFactory::getFont(std::string font_id) const
 
 //Produce static textures from images files and store into a map
 bool TextureFactory::textureFromImage(const char* fileName,
-                                      std::string id,
-                                      SDL_Renderer* ren){
+                                      std::string id){
 
-    SDL_Texture* tex = IMG_LoadTexture(ren, fileName);
+    SDL_Texture* tex = IMG_LoadTexture(m_renderer, fileName);
 
     if(tex == NULL)
     {
@@ -90,7 +101,6 @@ bool TextureFactory::textureFromFont(std::string id,
                                      const char* text,
                                      SDL_Color fg,
                                      Uint32 wrap_length,
-                                     SDL_Renderer* ren,
                                      int font_size = 0)
 {
     //create temp surface
@@ -103,7 +113,7 @@ bool TextureFactory::textureFromFont(std::string id,
                                                      fg,
                                                      wrap_length);
     //create a texture
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(ren,
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer,
                                                     tempSurfaceText);
 
     //free temp surface
@@ -119,12 +129,11 @@ bool TextureFactory::textureFromFont(std::string id,
     } 
 }
 
-void TextureFactory::drawTexture(SDL_Renderer* ren,
-                                 std::string tex_id,
+void TextureFactory::drawTexture(std::string tex_id,
                                  SDL_Rect* srcrect,
                                  SDL_Rect* dstrect)
 {
-    SDL_RenderCopy(ren,
+    SDL_RenderCopy(m_renderer,
                    m_textures[tex_id],
                    NULL,
                    dstrect);

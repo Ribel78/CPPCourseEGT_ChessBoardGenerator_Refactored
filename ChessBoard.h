@@ -108,10 +108,6 @@ private:
     SDL_Rect* m_chessBoardLabelsV[8];
     SDL_Rect* m_chessBoardLabelsH[8];
 
-    // SDL_Texture* m_chessLabelsV[8];
-    // SDL_Texture* m_chessLabelsH[8];
-
-
     //colors of the black and white squares and the overlay color
     SDL_Color m_chessBoardColor[3];
 

@@ -13,6 +13,10 @@ public:
     TextureFactory();
     ~TextureFactory();
 
+    void setRenderer(SDL_Renderer* renderer);
+
+    SDL_Renderer* getRenderer();
+
     bool loadFont(const char* fileName,
                   std::string id,
                   int font_size);
@@ -20,19 +24,16 @@ public:
     TTF_Font* getFont(std::string font_id) const;
 
     bool textureFromImage(const char* fileName,
-                          std::string id,
-                          SDL_Renderer* ren);
+                          std::string id);
 
     bool textureFromFont(std::string id,
                           std::string font_id,
                           const char* text,
                           SDL_Color fg,
                           Uint32 wrap_length,
-                          SDL_Renderer* ren,
                           int font_size);
 
-    void drawTexture(SDL_Renderer* ren,
-                     std::string tex_id,
+    void drawTexture(std::string tex_id,
                      SDL_Rect* srcrect,
                      SDL_Rect* dstrect);
 
@@ -44,6 +45,7 @@ public:
 
 private:
 
+    SDL_Renderer* m_renderer = NULL;
     static TextureFactory* m_instance;
     std::map<std::string, TTF_Font*> m_fonts;
     std::map<std::string, SDL_Texture*> m_textures;

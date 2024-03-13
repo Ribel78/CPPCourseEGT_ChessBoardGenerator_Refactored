@@ -41,6 +41,7 @@ ChessBoard::~ChessBoard()
     {
         delete m_chessBoardSquare[i];
     }
+
     // delete chess board labels
     for (int i = 0; i < 8; i++)
     {
@@ -178,16 +179,12 @@ void ChessBoard::drawBoard()
     std::string numbers = "87654321";
     for(int i = 0; i <8 ; i++)
     {
-
-        TextureFactory::instance()->drawTexture(m_renderer, std::string(1, letters.at(i)), NULL, m_chessBoardLabelsH[i]);
-        TextureFactory::instance()->drawTexture(m_renderer, std::string(1, numbers.at(i)), NULL, m_chessBoardLabelsV[i]);
-
-        //SDL_RenderFillRect(m_renderer,m_chessBoardLabelsH[i]);
-        //SDL_RenderFillRect(m_renderer,m_chessBoardLabelsV[i]);
+        TextureFactory::instance()->drawTexture(std::string(1, letters.at(i)),
+                                                NULL, m_chessBoardLabelsH[i]);
+        TextureFactory::instance()->drawTexture(std::string(1, numbers.at(i)),
+                                                NULL, m_chessBoardLabelsV[i]);
     }
 }
-
-
 
 //Draw allowed positions of the selected chess piece
 void ChessBoard::drawBoardOverlay()
