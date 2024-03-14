@@ -12,7 +12,6 @@
 
 class ChessBoard
 {
-
 public:
     ChessBoard();
     ~ChessBoard();
@@ -23,30 +22,14 @@ public:
     //check the current state of the simulation
     bool isSimulating() const;
 
-    //set the current state of the simulation 
-    void setSimulating(bool state);
+    //set the current state of the simulation
+    void setSimulating(const bool state);
 
     void setPiecesToRemove(int amount);
 
-    /*
-    Generate random chess board with given amount of removed pieces
-    Use setPiecesToRemove method to set amount of removed pieces.
-    */
-    void shufflePieces(bool shuff,
+    void shufflePieces(const bool shuff,
                        std::string& custDescription,
                        std::string& fenDescription);
-
-    //parse result from shufflePieces to valid FEN notation for dispaly
-    void parseFEN(char chess_set[65], char FEN[71]);
-
-    /*
-    Utility function to find the allowed (attack) squares of given chess piece
-    Taking into account of the rules of chess pieces moves.
-    Used in drawBoardOverlay and chess board generation
-    */
-    // friend std::string attackSquares(std::string boardDescription,
-    //                                 int x, int y,
-    //                                 char piece);
 
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
@@ -54,7 +37,6 @@ public:
     std::queue<std::string>& getMutableCustomDescriptionQueue();
 
     std::queue<std::string>& getMutableFENDescriptionQueue();
-
 
     //sets the index of the currently clicked chess board square or -1
     void setChessPieceIdx(int idx);
@@ -65,9 +47,7 @@ public:
     //returns string from Time object to be passed for drawing
     std::string getSimulationSummary() const;
 
-    //chess board drawing functions
-
-    //Initializes the chess board squares according to the given chess board size
+    //initializes the chess board squares according to the given chess board size
 	void initBoard();
 
     //draws colored chess board on the screen
@@ -84,6 +64,9 @@ public:
 
 
 private:
+
+    //parse result from shufflePieces to valid FEN notation for dispaly
+    void parseFEN(const char chess_set[65], char FEN[71]);
 
     //check if board is currently being simulated
     bool m_simulating;

@@ -3,40 +3,40 @@
 //#include <iostream>
 #include <string>
 
-void rookAttack(std::string& boardDescription,
+void rookAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6]);
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6]);
 
-void bishopAttack(std::string& boardDescription,
+void bishopAttack(const std::string& boardDescription,
                   std::string& boardOverlay,
-                  char attackingPiece,
+                  const char attackingPiece,
                   int x, int y,
-                  char (&blackPieces)[6],
-                  char (&whitePieces)[6]);
+                  const char (&blackPieces)[6],
+                  const char (&whitePieces)[6]);
 
-void queenAttack(std::string& boardDescription,
+void queenAttack(const std::string& boardDescription,
                  std::string& boardOverlay,
-                 char attackingPiece,
+                 const char attackingPiece,
                  int x, int y,
-                 char (&blackPieces)[6],
-                 char (&whitePieces)[6]);
+                 const char (&blackPieces)[6],
+                 const char (&whitePieces)[6]);
 
-void kingAttack(std::string& boardDescription,
+void kingAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6]);
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6]);
 
-void pawnAttack(std::string& boardDescription,
+void pawnAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6]);
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6]);
 
 std::string attackSquares(std::string boardDescription,
                           int x, int y,

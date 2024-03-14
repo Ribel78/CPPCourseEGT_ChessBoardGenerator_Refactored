@@ -11,12 +11,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the rook (make sure it is either 'r' or 'R') from the _boardDescription at position x,y as attacking piece
 else puts the desired color rook at position x, y 
 */
-void rookAttack(std::string& boardDescription,
+void rookAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6])
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6])
 {
 
     boardOverlay[(y * 8) + x] = attackingPiece; //mark init position
@@ -192,12 +192,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the bishop (make sure it is either 'b' or 'B') from the _boardDescription at position x,y as attacking piece
 else puts the desired color bishop at position x, y 
 */
-void bishopAttack(std::string& boardDescription,
+void bishopAttack(const std::string& boardDescription,
                   std::string& boardOverlay,
-                  char attackingPiece,
+                  const char attackingPiece,
                   int x, int y,
-                  char (&blackPieces)[6],
-                  char (&whitePieces)[6])
+                  const char (&blackPieces)[6],
+                  const char (&whitePieces)[6])
 {
     //mark bishop initial position
     boardOverlay[(y * 8) + x] = attackingPiece;
@@ -376,12 +376,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the queen (make sure it is either 'q' or 'Q') from the _boardDescription at position x,y as attacking piece
 else puts the desired color queen at position x, y 
 */
-void queenAttack(std::string& boardDescription,
+void queenAttack(const std::string& boardDescription,
                  std::string& boardOverlay,
-                 char attackingPiece,
+                 const char attackingPiece,
                  int x, int y,
-                 char (&blackPieces)[6],
-                 char (&whitePieces)[6])
+                 const char (&blackPieces)[6],
+                 const char (&whitePieces)[6])
 {
     if(attackingPiece == 'q')
     {
@@ -429,12 +429,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the knight (make sure it is either 'n' or 'N') from the _boardDescription at position x,y as attacking piece
 else puts the desired color knight at position x, y 
 */
-void knightAttack(std::string& boardDescription,
+void knightAttack(const std::string& boardDescription,
                   std::string& boardOverlay,
-                  char attackingPiece,
+                  const char attackingPiece,
                   int x, int y,
-                  char (&blackPieces)[6],
-                  char (&whitePieces)[6])
+                  const char (&blackPieces)[6],
+                  const char (&whitePieces)[6])
 {
     //mark bishop initial position
     boardOverlay[ (y * 8) + x ] = attackingPiece;
@@ -494,12 +494,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the king (make sure it is either 'k' or 'K') from the _boardDescription at position x,y as attacking piece
 else puts the desired color king at position x, y 
 */
-void kingAttack(std::string& boardDescription,
+void kingAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6])
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6])
 {
     boardOverlay[ (y * 8) + x ] = attackingPiece; //mark bishop initial position
 
@@ -559,12 +559,12 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the pawn (make sure it is either 'p' or 'P') from the _boardDescription at position x,y as attacking piece
 else puts the desired color pawn at position x, y 
 */
-void pawnAttack(std::string& boardDescription,
+void pawnAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
-                char attackingPiece,
+                const char attackingPiece,
                 int x, int y,
-                char (&blackPieces)[6],
-                char (&whitePieces)[6])
+                const char (&blackPieces)[6],
+                const char (&whitePieces)[6])
 {
     //mark bishop initial position
     boardOverlay[(y * 8) + x] = attackingPiece;
@@ -658,7 +658,7 @@ Returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the piece from _boardDescription at position x,y
 else puts the desired piece at position x, y 
 */
-std::string attackSquares(std::string boardDescription,
+std::string attackSquares(const std::string boardDescription,
                           int x, int y,
                           char piece )
 {

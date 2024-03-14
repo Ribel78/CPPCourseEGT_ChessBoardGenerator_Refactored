@@ -17,10 +17,9 @@ public:
     void handleEvents();
     void clean();
     bool isRunning() const;
-    bool buttonClicked(SDL_Rect* r,
+    bool buttonClicked(const SDL_Rect* r,
                        int xDown, int yDown,
                        int xUp, int yUp) const;
-
     void draw();
 
 

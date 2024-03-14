@@ -1,6 +1,18 @@
 //Game.cpp
 #include "Game.h"
 
+Game::Game()
+{
+    Game::m_window = NULL;
+    Game::m_running = true;
+}
+
+Game::~Game()
+{
+    // delete window;
+    // delete renderer;
+}
+
 //Initialize SDL library
 bool Game::init(const char* title,
                 int xpos, int ypos,
@@ -60,22 +72,22 @@ bool Game::init(const char* title,
 //Initialize SDL TTF library - rename the function to texture load or init
 void Game::prepTextures()
 {
-	// loading fonts into pointer variables
+    // Loading fonts into pointer variables
     TextureFactory::instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
     TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
     TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
 
-    // title
+    // Title
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
                                                 {0, 0, 0, 255},
                                                 1280, 0);
-    //button buttonStartTex
+    // Button buttonStartTex
     TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
                                                 "     Start\n Simulation",
                                                 {235 ,235 ,255 ,255},
                                                 300, 0);
-    //button buttonStopTex
+    // Button buttonStopTex
     TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
                                                 {235 ,235 ,255 ,255},
@@ -95,20 +107,18 @@ void Game::prepTextures()
 
     m_chessBoard.prepChessPieceTextures();
 
-    // add label textures for the board
-    std::string letters = "abcdefgh";
-    std::string numbers = "87654321";
+    // Add label textures for the board
 
     for(int i = 0; i < 8; i++)
     {
-        std::string h_label = std::string(1, letters.at(i));
+        std::string h_label = std::string(1, ('a' + i));
         TextureFactory::instance()->textureFromFont(h_label,
                                                     "DejaVu",
                                                     h_label.c_str(),
                                                     {255, 255, 120, 200},
                                                     64, 32);
 
-        std::string v_label = std::string(1, numbers.at(i));
+        std::string v_label = std::string(1, ('8' - i));
         TextureFactory::instance()->textureFromFont(v_label,
                                                     "DejaVu",
                                                     v_label.c_str(),
@@ -117,25 +127,13 @@ void Game::prepTextures()
     }
 }
 
-/*
-Checks positions of the mousedown / mouseup separately 
-and compare against 
-given SDL_Rect coordinates and dimensions
-*/
-bool Game::buttonClicked(SDL_Rect* r,
-                         int xDown, int yDown,
-                         int xUp, int yUp) const
+void Game::update()
 {
+    //Render All
+    SDL_RenderPresent(TextureFactory::instance()->getRenderer());
 
-    if(((xDown > r->x) && (xDown < r->x +r->w)) &&
-        ((xUp > r->x) && (xUp < r->x +r->w))&&
-        ((yDown > r->y) && (yDown < r->y +r->h)) &&
-        ((yUp > r->y) && (yUp < r->y +r->h)))
-    {
-			
-			return true; //click coordinates inside  SDL_Rect r
-	}
-    return false; //click coordinates outside inside  SDL_Rect r
+    //Slow down visual shuffling
+    SDL_Delay(6);
 }
 
 void Game::handleEvents()
@@ -225,21 +223,12 @@ void Game::handleEvents()
 	}
 }
 
-void Game::update()
-{
-	//Render All
-    SDL_RenderPresent(TextureFactory::instance()->getRenderer());
-
-    //Slow down visual shuffling
-    SDL_Delay(6);
-}
-
 void Game::clean()
 {
-	std::cout << "cleaning game\n";
+    std::cout << "cleaning game\n";
     SDL_DestroyWindow(m_window);
     SDL_DestroyRenderer(TextureFactory::instance()->getRenderer());
-	SDL_Quit();
+    SDL_Quit();
 }
 
 bool Game::isRunning() const
@@ -247,18 +236,32 @@ bool Game::isRunning() const
     return Game::m_running;
 }
 
-Game::Game()
+/*
+Checks positions of the mousedown / mouseup separately
+and compare against
+given SDL_Rect coordinates and dimensions
+*/
+bool Game::buttonClicked(const SDL_Rect* r,
+                         int xDown, int yDown,
+                         int xUp, int yUp) const
 {
-    Game::m_window = NULL;
-    Game::m_running = true;
+    if(((xDown > r->x) && (xDown < r->x +r->w)) &&
+        ((xUp > r->x) && (xUp < r->x +r->w))&&
+        ((yDown > r->y) && (yDown < r->y +r->h)) &&
+        ((yUp > r->y) && (yUp < r->y +r->h)))
+    {
+        return true; //click coordinates inside  SDL_Rect r
+    }
+    return false; //click coordinates outside inside  SDL_Rect r
 }
 
-Game::~Game()
+void Game::draw()
 {
-	// delete window;
-	// delete renderer;
+    drawStaticElements();
+    drawDynamicElements();
 }
 
+// Private functions
 void Game::drawStaticElements()
 {
 	//Background color
@@ -319,10 +322,4 @@ void Game::drawDynamicElements()
     // Draw the chess pieces
     m_chessBoard.drawPieces();
 
-}
-
-void Game::draw()
-{
-    drawStaticElements();
-    drawDynamicElements();
 }
