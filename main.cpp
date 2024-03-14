@@ -1,11 +1,11 @@
 //main.cpp
 #include "Game.h"
+#include "Constants.h"
 
-//#include <iostream>
+using namespace Constants;
 
 Game* game = NULL;
-const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
+
 
 int main(int argc, char* argv[])
 {

@@ -59,10 +59,6 @@ public:
     //draws the chess pieces according to given board description
     void drawPieces();
 
-    //store generated chessboard descriptions - in a queue.
-    //seek trough the last 20 simulations using Down Arrow Key
-
-
 private:
 
     //parse result from shufflePieces to valid FEN notation for dispaly
@@ -82,8 +78,9 @@ private:
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
-    //TODO rectangles for chess board labels
+    //rectangles for chess board labels
     SDL_Rect* m_chessBoardLabelsV[8];
+
     SDL_Rect* m_chessBoardLabelsH[8];
 
     //colors of the black and white squares and the overlay color

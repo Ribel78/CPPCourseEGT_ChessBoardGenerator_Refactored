@@ -1,5 +1,6 @@
 //Game.cpp
 #include "Game.h"
+#include "Constants.h"
 
 Game::Game()
 {
@@ -9,8 +10,7 @@ Game::Game()
 
 Game::~Game()
 {
-    // delete window;
-    // delete renderer;
+    std::cout << "Destructing Game Object." << std::endl;
 }
 
 //Initialize SDL library
@@ -115,14 +115,14 @@ void Game::prepTextures()
         TextureFactory::instance()->textureFromFont(h_label,
                                                     "DejaVu",
                                                     h_label.c_str(),
-                                                    {255, 255, 120, 200},
+                                                    (i%2)?Constants::CB_DARK : Constants::CB_LIGHT,
                                                     64, 32);
 
         std::string v_label = std::string(1, ('8' - i));
         TextureFactory::instance()->textureFromFont(v_label,
                                                     "DejaVu",
                                                     v_label.c_str(),
-                                                    {255, 255, 120, 200},
+                                                    (i%2)?Constants::CB_LIGHT : Constants::CB_DARK,
                                                     64, 32);
     }
 }
@@ -144,13 +144,15 @@ void Game::handleEvents()
         switch (event.type)
         {
         case SDL_QUIT: m_running = false; break;
-
-		case SDL_KEYUP:{ // Use down arrow to select a simulation from the past 20 stored in a queue
+        /*
+         * store last 20 generated chessboard descriptions - in queues.
+         * seek trough the simulations using Down Arrow Key
+        */
+        case SDL_KEYUP:{
             if(event.key.keysym.sym == SDLK_DOWN)
             {
                 if(!m_chessBoard.isSimulating())
                 {
-
                     m_chessBoard.setChessPieceIdx(-1);
 					std::string temp;
                     temp = m_chessBoard.getMutableFENDescriptionQueue().front();

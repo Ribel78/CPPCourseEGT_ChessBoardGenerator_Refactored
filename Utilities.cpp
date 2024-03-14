@@ -658,12 +658,12 @@ Returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the piece from _boardDescription at position x,y
 else puts the desired piece at position x, y 
 */
-std::string attackSquares(const std::string boardDescription,
+std::string attackSquares(const std::string& boardDescription,
                           int x, int y,
                           char piece )
 {
-    char blackPieces[6] = {'k','q','r','b','n','p'};
-    char whitePieces[6] = {'K','Q','R','B','N','P'};
+    const char blackPieces[6] = {'k','q','r','b','n','p'};
+    const char whitePieces[6] = {'K','Q','R','B','N','P'};
 
     //a string to write sequential results in
     std::string boardOverlay = "";

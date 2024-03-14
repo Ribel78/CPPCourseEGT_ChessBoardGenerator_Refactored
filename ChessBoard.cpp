@@ -1,4 +1,5 @@
 #include "ChessBoard.h"
+#include "Constants.h"
 
 ChessBoard::ChessBoard()
 {
@@ -10,10 +11,10 @@ ChessBoard::ChessBoard()
     ChessBoard::m_simulating = false;
 
 	//Chess Board Size and Color
-    m_chessBoardSize = 640;
-    m_chessBoardColor[0] = {214, 187, 141, 255}; //"white" square
-    m_chessBoardColor[1] = {198, 130, 66, 255}; //"black" square
-    m_chessBoardColor[2] = {100, 255, 100, 50}; // highlight color
+    m_chessBoardSize = Constants::CB_SIZE;
+    m_chessBoardColor[0] = Constants::CB_LIGHT; //"light" square
+    m_chessBoardColor[1] = Constants::CB_DARK; //"dark" square
+    m_chessBoardColor[2] = Constants::CB_HIGHLIGHT; // highlight color
 
     for (int i = 0; i < 64; i++)
     {
@@ -28,9 +29,9 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_queueCustomDescription.push("rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR");
+    m_queueCustomDescription.push(Constants::CB_INIT_DESCR);
 
-    m_queueFENDescription.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    m_queueFENDescription.push(Constants::CB_INIT_FEN);
 
 }
 
@@ -63,19 +64,20 @@ void ChessBoard::prepChessPieceTextures()
 
     SDL_Surface* tempSurfaceText = NULL;
 
+    using namespace Constants;
+
     for (int i = 0; i < 12; i++)
     {
         if (i / 6 == 0)
-        { // white first - K, Q, R, B, N, P
+        { // white chess glyphs - K, Q, R, B, N, P
 
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {254, 237, 211, 255});
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), CP_LIGHT);
             m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
                                                             tempSurfaceText);
         }
         else
-        { // black second - k, q, r, b, n, p
-
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), {0, 0, 0, 255});
+        { // black chess glyphs - k, q, r, b, n, p
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, cpb_unicode[i % 6].c_str(), CP_DARK);
             m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
                                                             tempSurfaceText);
         }
@@ -353,11 +355,6 @@ void ChessBoard::shufflePieces(const bool shuff,
 
     } else
     { //if shuff = false, display last board descriptions in queue
-        /*
-         * option for resetting to start chess board
-         * custDescription = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
-         * fenDescription = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-        */
         custDescription = m_queueCustomDescription.back();
         fenDescription = m_queueFENDescription.back();
     }

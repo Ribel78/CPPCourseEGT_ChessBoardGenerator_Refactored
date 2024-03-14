@@ -38,6 +38,6 @@ void pawnAttack(const std::string& boardDescription,
                 const char (&blackPieces)[6],
                 const char (&whitePieces)[6]);
 
-std::string attackSquares(std::string boardDescription,
+std::string attackSquares(const std::string& boardDescription,
                           int x, int y,
                           char piece = '\0' );

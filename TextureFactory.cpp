@@ -36,7 +36,7 @@ SDL_Renderer *TextureFactory::getRenderer()
 
 //Produce static textures ttf fonts and store into a map
 bool TextureFactory::loadFont(const char* fileName,
-                              const std::string id,
+                              const std::string& id,
                               int font_size)
 {
     if(TTF_Init() == -1)
@@ -56,7 +56,7 @@ bool TextureFactory::loadFont(const char* fileName,
     }
 }
 
-TTF_Font* TextureFactory::getFont(const std::string font_id) const
+TTF_Font* TextureFactory::getFont(const std::string& font_id) const
 {
     auto it = m_fonts.find(font_id);
     if(it != m_fonts.end())
@@ -69,7 +69,7 @@ TTF_Font* TextureFactory::getFont(const std::string font_id) const
 
 //Produce static textures from images files and store into a map
 bool TextureFactory::textureFromImage(const char* fileName,
-                                      const std::string id){
+                                      const std::string& id){
 
     SDL_Texture* tex = IMG_LoadTexture(m_renderer, fileName);
 
@@ -98,10 +98,10 @@ _wrap_length - length of the box in pixels to start wrapping the text, if 0 wrap
 _ren - renderer 
 int font_size - set the fornt size, if 0 - uses the initial size when font was loaded
 */
-bool TextureFactory::textureFromFont(const std::string id,
-                                     const std::string font_id,
+bool TextureFactory::textureFromFont(const std::string& id,
+                                     const std::string& font_id,
                                      const char* text,
-                                     const SDL_Color fg,
+                                     const SDL_Color& fg,
                                      Uint32 wrap_length,
                                      int font_size = 0)
 {
@@ -131,7 +131,7 @@ bool TextureFactory::textureFromFont(const std::string id,
     } 
 }
 
-void TextureFactory::drawTexture(const std::string tex_id,
+void TextureFactory::drawTexture(const std::string& tex_id,
                                  const SDL_Rect* srcrect,
                                  const SDL_Rect* dstrect)
 {
@@ -142,7 +142,7 @@ void TextureFactory::drawTexture(const std::string tex_id,
 }
 
 //individual call to destroy a texture by id usually used in the dynamic elements
-void TextureFactory::destroyTexture(const std::string tex_id)
+void TextureFactory::destroyTexture(const std::string& tex_id)
 {
     SDL_DestroyTexture(m_textures[tex_id]);
 }
