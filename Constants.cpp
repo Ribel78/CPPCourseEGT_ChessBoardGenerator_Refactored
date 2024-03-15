@@ -25,7 +25,7 @@ namespace Constants
     // chess board colors
     const SDL_Color CB_LIGHT {214, 187, 141, 255};
     const SDL_Color CB_DARK {198, 130, 66, 255};
-    const SDL_Color CB_HIGHLIGHT {100, 255, 100, 50};
+    const SDL_Color CB_HIGHLIGHT {255, 80, 50, 50};
 
     //text colors
     const SDL_Color TXT_LIGHT {235 ,235 ,255 ,255};
@@ -35,6 +35,9 @@ namespace Constants
     const std::string CB_INIT_DESCR = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
     const std::string CB_INIT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     const std::string CB_LOOKUPREF = "KQRBNPkqrbnp";
+
+    //chess piece black unicode
+    const std::string CPB_UNICODE[6] = {"\u265A", "\u265B", "\u265C", "\u265D", "\u265E", "\u265F"};
 
     const char CP_LABELS_BLACK[6] {'k','q','r','b','n','p'};
     const char CP_LABELS_WHITE[6] {'K','Q','R','B','N','P'};

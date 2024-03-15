@@ -39,6 +39,9 @@ namespace Constants
     extern const std::string CB_INIT_FEN;
     extern const std::string CB_LOOKUPREF;
 
+    //chess piece black unicode
+    extern const std::string CPB_UNICODE[6];
+
     extern const char CP_LABELS_BLACK[6];
     extern const char CP_LABELS_WHITE[6];
 
