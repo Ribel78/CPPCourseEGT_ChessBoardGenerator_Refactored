@@ -165,6 +165,7 @@ void ChessBoard::shufflePieces(const bool shuff,
                 }
             }
         }
+
         if (blackBishopOnBlack > 1 ||
             blackBishopOnWhite > 1 ||
             whiteBishopOnBlack > 1 ||
@@ -217,9 +218,6 @@ void ChessBoard::shufflePieces(const bool shuff,
         }
 
         // Reintroduce Kings
-        char blackPieces[6] = {'k','q','r','b','n','p'};
-        char whitePieces[6] = {'K','Q','R','B','N','P'};
-
         // Add  Black King
         bool isSafeSquare = false;
 
@@ -241,13 +239,13 @@ void ChessBoard::shufflePieces(const bool shuff,
                 std::string attackedPieces = attackSquares(emptySquaresLookup,
                                                            rand_index % 8,
                                                            rand_index / 8,
-                                                           blackPieces[b_p]);
+                                                           Constants::CP_LABELS_BLACK[b_p]);
 
                 //for cell in attack board
                 for (char piece : attackedPieces)
                 {
                     //if white piece is oposite of current black piece
-                    if (piece == whitePieces[b_p])
+                    if (piece == Constants::CP_LABELS_WHITE[b_p])
                     {
                         isSafeSquare = false;
                         break;
@@ -293,12 +291,12 @@ void ChessBoard::shufflePieces(const bool shuff,
                 std::string attackedPieces = attackSquares(emptySquaresLookup,
                                                            rand_index % 8,
                                                            rand_index / 8,
-                                                           whitePieces[w_p]);
+                                                           Constants::CP_LABELS_WHITE[w_p]);
                 //for cell in attack board
                 for (char piece : attackedPieces)
                 {
                     //if white piece is oposite of current black piece
-                    if (piece == blackPieces[w_p])
+                    if (piece == Constants::CP_LABELS_BLACK[w_p])
                     {
 
                         isSafeSquare = false;
@@ -353,7 +351,8 @@ void ChessBoard::shufflePieces(const bool shuff,
             m_queueFENDescription.pop();
         }
 
-    } else
+    }
+    else
     { //if shuff = false, display last board descriptions in queue
         custDescription = m_queueCustomDescription.back();
         fenDescription = m_queueFENDescription.back();
@@ -535,7 +534,7 @@ void ChessBoard::drawBoardOverlay()
 void ChessBoard::drawPieces()
 {
 	//chess pieces lookup string - capitals are white
-	std::string cp_lookupRef = "KQRBNPkqrbnp";
+    //std::string cp_lookupRef = "KQRBNPkqrbnp";
 
     /*
      * Example FEN chess board description:
@@ -557,7 +556,7 @@ void ChessBoard::drawPieces()
 		}
         for (int j = 0; j < 12; j++)
         {
-            if (chessBoardShuffle[i] == cp_lookupRef[j])
+            if (chessBoardShuffle[i] == Constants::CB_LOOKUPREF[j])
             {
                 SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                                m_chessPieces[j],

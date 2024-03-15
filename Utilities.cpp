@@ -1,4 +1,5 @@
 #include "Utilities.h"
+#include "Constants.h"
 
 /*
 _boardDescription - chess board description in custom format 
@@ -660,11 +661,8 @@ else puts the desired piece at position x, y
 */
 std::string attackSquares(const std::string& boardDescription,
                           int x, int y,
-                          char piece )
+                          char piece)
 {
-    const char blackPieces[6] = {'k','q','r','b','n','p'};
-    const char whitePieces[6] = {'K','Q','R','B','N','P'};
-
     //a string to write sequential results in
     std::string boardOverlay = "";
 
@@ -685,8 +683,8 @@ std::string attackSquares(const std::string& boardDescription,
         rookAttack(boardDescription,
                    boardOverlay,
                    'r', x, y,
-                   blackPieces,
-                   whitePieces);
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'R')
@@ -694,8 +692,8 @@ std::string attackSquares(const std::string& boardDescription,
         rookAttack(boardDescription,
                    boardOverlay,
                    'R', x, y,
-                   blackPieces,
-                   whitePieces);
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'b')
@@ -703,8 +701,8 @@ std::string attackSquares(const std::string& boardDescription,
         bishopAttack(boardDescription,
                      boardOverlay,
                      'b', x, y,
-                     blackPieces,
-                     whitePieces);
+                     Constants::CP_LABELS_BLACK,
+                     Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'B')
@@ -712,8 +710,8 @@ std::string attackSquares(const std::string& boardDescription,
         bishopAttack(boardDescription,
                      boardOverlay,
                      'B', x, y,
-                     blackPieces,
-                     whitePieces);
+                     Constants::CP_LABELS_BLACK,
+                     Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'q')
@@ -721,8 +719,8 @@ std::string attackSquares(const std::string& boardDescription,
         queenAttack(boardDescription,
                     boardOverlay,
                     'q', x, y,
-                    blackPieces,
-                    whitePieces);
+                    Constants::CP_LABELS_BLACK,
+                    Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'Q')
@@ -730,8 +728,8 @@ std::string attackSquares(const std::string& boardDescription,
         queenAttack(boardDescription,
                     boardOverlay,
                     'Q', x, y,
-                    blackPieces,
-                    whitePieces);
+                    Constants::CP_LABELS_BLACK,
+                    Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'n')
@@ -739,8 +737,8 @@ std::string attackSquares(const std::string& boardDescription,
         knightAttack(boardDescription,
                      boardOverlay,
                      'n', x, y,
-                     blackPieces,
-                     whitePieces);
+                     Constants::CP_LABELS_BLACK,
+                     Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'N')
@@ -748,8 +746,8 @@ std::string attackSquares(const std::string& boardDescription,
         knightAttack(boardDescription,
                      boardOverlay,
                      'N', x, y,
-                     blackPieces,
-                     whitePieces);
+                     Constants::CP_LABELS_BLACK,
+                     Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'k')
@@ -757,8 +755,8 @@ std::string attackSquares(const std::string& boardDescription,
         kingAttack (boardDescription,
                    boardOverlay,
                    'k', x, y,
-                   blackPieces,
-                   whitePieces);
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'K')
@@ -766,8 +764,8 @@ std::string attackSquares(const std::string& boardDescription,
         kingAttack (boardDescription,
                    boardOverlay,
                    'K', x, y,
-                   blackPieces,
-                   whitePieces);
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'p')
@@ -775,8 +773,8 @@ std::string attackSquares(const std::string& boardDescription,
         pawnAttack(boardDescription,
                    boardOverlay,
                    'p', x, y,
-                   blackPieces,
-                   whitePieces);
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }
 
     if (piece == 'P')
@@ -784,8 +782,8 @@ std::string attackSquares(const std::string& boardDescription,
         pawnAttack(boardDescription,
                    boardOverlay,
                    'P', x, y,
-                   blackPieces,
-                   whitePieces );
+                   Constants::CP_LABELS_BLACK,
+                   Constants::CP_LABELS_WHITE);
     }     
 
     return boardOverlay;

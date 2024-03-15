@@ -72,25 +72,25 @@ bool Game::init(const char* title,
 //Initialize SDL TTF library - rename the function to texture load or init
 void Game::prepTextures()
 {
-    // Loading fonts into pointer variables
-    TextureFactory::instance()->loadFont("fonts/DejaVuSans.ttf","DejaVu", 48);
-    TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe", 72);
-    TextureFactory::instance()->loadFont("fonts/segoepr.ttf","Segoe28", 28);
+    // Loading fonts and storing them into map as pointer variables
+    TextureFactory::instance()->loadFont(Constants::TTF_DEJAVUSANS,"DejaVu", 48);
+    TextureFactory::instance()->loadFont(Constants::TTF_SEGOEPR,"Segoe", 72);
+    TextureFactory::instance()->loadFont(Constants::TTF_SEGOEPR,"Segoe28", 28);
 
-    // Title
+    // Title texture
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
-                                                {0, 0, 0, 255},
+                                                Constants::TXT_DARK,
                                                 1280, 0);
-    // Button buttonStartTex
+    // Button Start Simulation
     TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
                                                 "     Start\n Simulation",
-                                                {235 ,235 ,255 ,255},
+                                                Constants::TXT_LIGHT,
                                                 300, 0);
-    // Button buttonStopTex
+    // Button Stop Simulation
     TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
-                                                {235 ,235 ,255 ,255},
+                                                Constants::TXT_LIGHT,
                                                 300, 0);
 
     // Parametrizing the layout of the destination rectangles
@@ -266,17 +266,23 @@ void Game::draw()
 // Private functions
 void Game::drawStaticElements()
 {
-	//Background color
+    //Window BG Color
     SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                           23, 138, 207, 255);
+                           Constants::BG_COL_WINDOW.r,
+                           Constants::BG_COL_WINDOW.g,
+                           Constants::BG_COL_WINDOW.b,
+                           Constants::BG_COL_WINDOW.a);
     SDL_RenderClear(TextureFactory::instance()->getRenderer());
 
 	// Title
     TextureFactory::instance()->drawTexture("textTitleTexture", NULL, &m_textTitleRect);
 
-	// Buttons
+    // Buttons BG Color
     SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                           50, 50, 110, 255); //Button BG
+                           Constants::BG_COL_BUTTON.r,
+                           Constants::BG_COL_BUTTON.g,
+                           Constants::BG_COL_BUTTON.b,
+                           Constants::BG_COL_BUTTON.a);
 
     SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
                        &m_buttonStartRect);
@@ -298,7 +304,8 @@ void Game::drawDynamicElements()
     TextureFactory::instance()->textureFromFont("textInfoTexture",
                                                 "Segoe28",
                                                 m_chessBoard.getMutableFENDescriptionQueue().back().c_str(),
-                                                {0, 0, 0, 255}, 1280, 0);
+                                                Constants::TXT_DARK,
+                                                1280, 0);
 
     TextureFactory::instance()->drawTexture("textInfoTexture",
                                             NULL, &m_textFENRect);
@@ -311,7 +318,7 @@ void Game::drawDynamicElements()
     TextureFactory::instance()->textureFromFont("textTimeTexture",
                                                 "Segoe28",
                                                 dynamic_text_Times.c_str(),
-                                                {255, 255, 255, 255}, 640, 0);
+                                                Constants::TXT_LIGHT, 640, 0);
 
     TextureFactory::instance()->drawTexture("textTimeTexture",
                                             NULL, &m_textTimeRect);
