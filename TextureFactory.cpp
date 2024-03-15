@@ -1,3 +1,6 @@
+//TextureFactory.cpp
+
+#include <iostream>
 #include "TextureFactory.h"
 
 TextureFactory::TextureFactory(){}
@@ -71,7 +74,14 @@ TTF_Font* TextureFactory::getFont(const std::string& font_id) const
 bool TextureFactory::textureFromImage(const char* fileName,
                                       const std::string& id){
 
-    SDL_Texture* tex = IMG_LoadTexture(m_renderer, fileName);
+    SDL_Texture* tex = NULL;
+
+    //Init SDL_Image library
+    // load support for PNG and JPG image formats
+    int img_init = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    std::cout << "IMG_Init flags " << img_init <<std::endl;
+
+    tex = IMG_LoadTexture(m_renderer, fileName);
 
     if(tex == NULL)
     {
@@ -82,6 +92,7 @@ bool TextureFactory::textureFromImage(const char* fileName,
     } else
     {
         m_textures[id] = tex; //add the created texture in the textureMap map
+        IMG_Quit();
         return true;
     }
 

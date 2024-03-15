@@ -1,14 +1,9 @@
 #pragma once
 
 #include <queue>
-#include <algorithm>
-#include <array>
-#include <random>
-#include <cstring>
-#include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "Timer.h"
-#include "TextureFactory.h"
-#include "Utilities.h"
 
 class ChessBoard
 {

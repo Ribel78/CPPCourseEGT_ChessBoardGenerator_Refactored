@@ -1,4 +1,5 @@
 //main.cpp
+
 #include "Game.h"
 #include "Constants.h"
 
@@ -13,7 +14,7 @@ int main(int argc, char* argv[])
     game->init("Chess Board Generator",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+               DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT, 0);
 
     while (game->isRunning())
     {

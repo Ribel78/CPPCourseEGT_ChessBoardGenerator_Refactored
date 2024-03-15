@@ -1,5 +1,11 @@
+//ChessBoard.cpp
+
+#include <algorithm>
+#include <random>
 #include "ChessBoard.h"
 #include "Constants.h"
+#include "Utilities.h"
+#include "TextureFactory.h"
 
 ChessBoard::ChessBoard()
 {
@@ -11,10 +17,10 @@ ChessBoard::ChessBoard()
     ChessBoard::m_simulating = false;
 
 	//Chess Board Size and Color
-    m_chessBoardSize = Constants::CB_SIZE;
-    m_chessBoardColor[0] = Constants::CB_LIGHT; //"light" square
-    m_chessBoardColor[1] = Constants::CB_DARK; //"dark" square
-    m_chessBoardColor[2] = Constants::CB_HIGHLIGHT; // highlight color
+    m_chessBoardSize = Constants::DIM_CB_SIZE;
+    m_chessBoardColor[0] = Constants::COL_CB_LIGHT; //"light" square
+    m_chessBoardColor[1] = Constants::COL_CB_DARK; //"dark" square
+    m_chessBoardColor[2] = Constants::COL_CB_HIGHLIGHT; // highlight color
 
     for (int i = 0; i < 64; i++)
     {
@@ -29,9 +35,9 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_queueCustomDescription.push(Constants::CB_INIT_DESCR);
+    m_queueCustomDescription.push(Constants::STR_CB_INIT_DESCR);
 
-    m_queueFENDescription.push(Constants::CB_INIT_FEN);
+    m_queueFENDescription.push(Constants::STR_CB_INIT_FEN);
 
 }
 
@@ -66,13 +72,13 @@ void ChessBoard::prepChessPieceTextures()
         if (i / 6 == 0)
         { // white chess glyphs - K, Q, R, B, N, P
 
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), CP_LIGHT);
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), COL_CP_LIGHT);
             m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
                                                             tempSurfaceText);
         }
         else
         { // black chess glyphs - k, q, r, b, n, p
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), CP_DARK);
+            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), COL_CP_DARK);
             m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
                                                             tempSurfaceText);
         }
@@ -117,7 +123,10 @@ void ChessBoard::shufflePieces(const bool shuff,
     //Mark start of simulation
     m_timer.markStart();
 
+    //always initialize a chess set with all pieces
     char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
+
+    //check if simulation needs to be repeated - cases - same colored bishops or exceeded piece removal
     bool rep_sim = true;
 
     if (shuff)
@@ -166,7 +175,7 @@ void ChessBoard::shufflePieces(const bool shuff,
                 whiteBishopOnBlack > 1 ||
                 whiteBishopOnWhite > 1 )
             {
-                //if Bishops of a kind on same color square - reshuffle
+                //if Bishops of a kind on same color square - start a new cycle
                 continue;
             }
 
@@ -550,7 +559,7 @@ void ChessBoard::drawPieces()
 		}
         for (int j = 0; j < 12; j++)
         {
-            if (chessBoardShuffle[i] == Constants::CB_LOOKUPREF[j])
+            if (chessBoardShuffle[i] == Constants::STR_CB_LOOKUPREF[j])
             {
                 SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                                m_chessPieces[j],

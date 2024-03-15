@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <iostream>
 #include <string>
 
 void rookAttack(const std::string& boardDescription,
