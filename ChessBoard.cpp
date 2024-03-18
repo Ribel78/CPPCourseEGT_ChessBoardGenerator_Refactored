@@ -343,9 +343,12 @@ void ChessBoard::shufflePieces(const bool shuff,
             char FEN[71] = {'0',};
             parseFEN(chess_set, FEN);
 
-            //converting chess_set and FEN to string and push to queue
+            //update external variables
             custDescription = chess_set;
             fenDescription = FEN;
+
+            //converting chess_set and FEN to string and push to queue
+
             m_CB_Descriptions.push(ChessBoardDescriptions{std::string(chess_set), std::string(FEN)});
 
             //if queue exceeds 20 pop one out

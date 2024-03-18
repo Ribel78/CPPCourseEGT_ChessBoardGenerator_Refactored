@@ -153,7 +153,7 @@ void Game::handleEvents()
         case SDL_QUIT: m_running = false; break;
         /*
          * store last 20 generated chessboard descriptions - in queues.
-         * seek trough the simulations using Down Arrow Key
+         * seek trough the simulations using Down and Up Arrow Keys
         */
         case SDL_KEYUP:{
             if(event.key.keysym.sym == SDLK_DOWN)
@@ -170,6 +170,20 @@ void Game::handleEvents()
                     m_chessBoard.setBoardDescriptionFromQueueBack();
 				}
 			}
+            if(event.key.keysym.sym == SDLK_UP)
+            {
+                if(!m_chessBoard.isSimulating())
+                {
+                    m_chessBoard.setChessPieceIdx(-1);
+
+                    for (int i = 0; i < m_chessBoard.getMutableDescriptionsQueue().size()-1; i++)
+                    {
+                        ChessBoardDescriptions temp = m_chessBoard.getMutableDescriptionsQueue().front();
+                        m_chessBoard.getMutableDescriptionsQueue().pop();
+                        m_chessBoard.getMutableDescriptionsQueue().push(temp);
+                    }
+                }
+            }
 		}; break;
         case SDL_MOUSEBUTTONDOWN:
         {
