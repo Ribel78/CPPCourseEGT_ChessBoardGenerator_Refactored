@@ -37,6 +37,8 @@ public:
                      const SDL_Rect* srcrect,
                      const SDL_Rect* dstrect);
 
+    void setTextureAlpha(std::string tex_id, Uint8 alpha);
+
     void destroyTexture(const std::string& tex_id);
 
     static TextureFactory* instance();

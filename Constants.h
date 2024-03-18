@@ -15,6 +15,8 @@ namespace Constants
     // file paths
     extern const char* TTF_DEJAVUSANS;
     extern const char* TTF_SEGOEPR;
+    extern const char* TEX_BACKGROUND;
+    extern const char* TEX_CHESS_TILE;
 
     // colors
 

@@ -74,20 +74,20 @@ private:
 
     int m_piecesToRemove;
 
-    //store rectangles for each chess board square
-    SDL_Rect* m_chessBoardSquare[64];
-
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
+    //store rectangles for each chess board square
+    SDL_Rect* m_chessBoardSquare[64];
+
+    SDL_Rect* m_srcChessTileRect;
+
     //rectangles for chess board labels
     SDL_Rect* m_chessBoardLabelsV[8];
-
     SDL_Rect* m_chessBoardLabelsH[8];
 
     //colors of the black and white squares and the overlay color
     SDL_Color m_chessBoardColor[3];
-
 
 	//Used in drawing the Board Overlay
     //the index of the clicked square, -1 if board overlay is off

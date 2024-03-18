@@ -14,6 +14,8 @@ namespace Constants
     //file paths
     const char* TTF_DEJAVUSANS = "fonts/DejaVuSans.ttf";
     const char* TTF_SEGOEPR = "fonts/segoepr.ttf";
+    const char* TEX_BACKGROUND = "images/background.jpg";
+    const char* TEX_CHESS_TILE = "images/chess_board.jpg";
 
     // Colors
 

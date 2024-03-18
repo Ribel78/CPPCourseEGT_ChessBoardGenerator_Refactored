@@ -148,8 +148,13 @@ void TextureFactory::drawTexture(const std::string& tex_id,
 {
     SDL_RenderCopy(m_renderer,
                    m_textures[tex_id],
-                   NULL,
+                   srcrect,
                    dstrect);
+}
+
+void TextureFactory::setTextureAlpha(std::string tex_id, Uint8 alpha){
+    SDL_SetTextureAlphaMod(m_textures[tex_id], alpha);
+    SDL_SetTextureBlendMode(m_textures[tex_id], SDL_BLENDMODE_BLEND);
 }
 
 //destroy a texture by id

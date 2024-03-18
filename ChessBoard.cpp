@@ -32,14 +32,10 @@ ChessBoard::ChessBoard()
         m_chessBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
         m_chessBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
     }
+    m_srcChessTileRect = new SDL_Rect{0, 0, 64, 64};
 
     m_chessPieceIdx = -1;
 
-    //m_queueCustomDescription.push(Constants::STR_CB_INIT_DESCR); - Refact
-
-    //m_queueFENDescription.push(Constants::STR_CB_INIT_FEN); - Refact
-
-    //NEW
     m_CB_Descriptions.push(ChessBoardDescriptions{Constants::STR_CB_INIT_DESCR, Constants::STR_CB_INIT_FEN});
 
 }
@@ -58,6 +54,7 @@ ChessBoard::~ChessBoard()
         delete m_chessBoardLabelsV[i];
         delete m_chessBoardLabelsH[i];
     }
+    delete m_srcChessTileRect;
 
 }
 
@@ -474,6 +471,7 @@ void ChessBoard::initBoard()
 
 void ChessBoard::drawBoard()
 {
+    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(), SDL_BLENDMODE_BLEND);
     for (int i = 0; i < 64; i++)
     {
 		SDL_SetRenderDrawColor(
@@ -486,6 +484,11 @@ void ChessBoard::drawBoard()
 
         SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
                            m_chessBoardSquare[i]);
+        srand (i);
+        m_srcChessTileRect->x = rand()%(640-64);
+        m_srcChessTileRect->y = rand()%(640-64);
+        TextureFactory::instance()->setTextureAlpha("chess_tile", 55);
+        TextureFactory::instance()->drawTexture("chess_tile", m_srcChessTileRect, m_chessBoardSquare[i]);
 	}
 
     // Draw label textures for the board

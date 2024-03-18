@@ -35,6 +35,7 @@ private:
     void drawDynamicElements();
 
     //Rectangles
+    SDL_Rect m_windowRect;
     SDL_Rect m_textTitleRect;
     SDL_Rect m_buttonStartRect;
     SDL_Rect m_buttonStopRect;

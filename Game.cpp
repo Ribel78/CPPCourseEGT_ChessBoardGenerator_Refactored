@@ -77,11 +77,17 @@ bool Game::init(const char* title,
 void Game::prepTextures()
 {
     using namespace Constants;
+
+    // Loading image textures
+    TextureFactory::instance()->textureFromImage(TEX_BACKGROUND, "background");
+    TextureFactory::instance()->textureFromImage(TEX_CHESS_TILE, "chess_tile");
+
+
     // Loading fonts and storing them into map as pointer variables
     TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
     std::cout << SDL_GetError() << std::endl;
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe", 72);
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 28);
+    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 32);
 
     // Title texture
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
@@ -102,6 +108,9 @@ void Game::prepTextures()
     // Parametrizing the layout of the destination rectangles
 	int ww, wh;
     SDL_GetWindowSize(m_window, &ww, &wh);
+
+    m_windowRect = {0, 0, ww, wh};
+
 	int padding = 40;
 	int chess_sq = (ww / 2) / 8;
 
@@ -294,6 +303,8 @@ void Game::drawStaticElements()
                            Constants::COL_WINDOW_BG.b,
                            Constants::COL_WINDOW_BG.a);
     SDL_RenderClear(TextureFactory::instance()->getRenderer());
+    //Window BG Texture
+    TextureFactory::instance()->drawTexture("background", NULL, &m_windowRect);
 
 	// Title
     TextureFactory::instance()->drawTexture("textTitleTexture", NULL, &m_textTitleRect);
@@ -325,7 +336,7 @@ void Game::drawDynamicElements()
     TextureFactory::instance()->textureFromFont("textInfoTexture",
                                                 "Segoe28",
                                                 m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str(),
-                                                Constants::COL_TXT_DARK,
+                                                Constants::COL_TXT_LIGHT,
                                                 1280, 0);
 
     TextureFactory::instance()->drawTexture("textInfoTexture",
