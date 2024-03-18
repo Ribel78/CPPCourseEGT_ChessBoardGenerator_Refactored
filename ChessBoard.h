@@ -5,6 +5,11 @@
 #include <SDL2/SDL_ttf.h>
 #include "Timer.h"
 
+struct ChessBoardDescriptions {
+    std::string Custom;
+    std::string FEN;
+};
+
 class ChessBoard
 {
 public:
@@ -29,9 +34,11 @@ public:
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
 
-    std::queue<std::string>& getMutableCustomDescriptionQueue();
+    // std::queue<std::string>& getMutableCustomDescriptionQueue();
 
-    std::queue<std::string>& getMutableFENDescriptionQueue();
+    // std::queue<std::string>& getMutableFENDescriptionQueue();
+
+    std::queue<ChessBoardDescriptions>& getMutableDescriptionsQueue();
 
     //sets the index of the currently clicked chess board square or -1
     void setChessPieceIdx(int idx);
@@ -89,11 +96,9 @@ private:
     //current chess board description
     std::string m_boardDescription;
 
-    // custom board description
-    std::queue<std::string> m_queueCustomDescription;
+    //NEW struct queue
 
-    // fen description
-    std::queue<std::string> m_queueFENDescription;
+    std::queue<ChessBoardDescriptions> m_CB_Descriptions;
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;

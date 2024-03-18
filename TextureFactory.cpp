@@ -152,7 +152,7 @@ void TextureFactory::drawTexture(const std::string& tex_id,
                    dstrect);
 }
 
-//individual call to destroy a texture by id usually used in the dynamic elements
+//destroy a texture by id
 void TextureFactory::destroyTexture(const std::string& tex_id)
 {
     SDL_DestroyTexture(m_textures[tex_id]);

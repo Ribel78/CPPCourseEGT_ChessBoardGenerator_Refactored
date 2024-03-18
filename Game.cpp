@@ -79,6 +79,7 @@ void Game::prepTextures()
     using namespace Constants;
     // Loading fonts and storing them into map as pointer variables
     TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
+    std::cout << SDL_GetError() << std::endl;
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe", 72);
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 28);
 
@@ -131,9 +132,6 @@ void Game::prepTextures()
                                                     64, 32);
     }
 
-    //Test IMG texture
-    TextureFactory::instance()->textureFromImage("images/a.png", "test");
-
 }
 
 void Game::update()
@@ -163,13 +161,12 @@ void Game::handleEvents()
                 if(!m_chessBoard.isSimulating())
                 {
                     m_chessBoard.setChessPieceIdx(-1);
-					std::string temp;
-                    temp = m_chessBoard.getMutableFENDescriptionQueue().front();
-                    m_chessBoard.getMutableFENDescriptionQueue().pop();
-                    m_chessBoard.getMutableFENDescriptionQueue().push(temp);
-                    temp = m_chessBoard.getMutableCustomDescriptionQueue().front();
-                    m_chessBoard.getMutableCustomDescriptionQueue().pop();
-                    m_chessBoard.getMutableCustomDescriptionQueue().push(temp);
+
+                    std::string tempCustDescr, tempFENDescr;
+                    tempCustDescr = m_chessBoard.getMutableDescriptionsQueue().front().Custom;
+                    tempFENDescr = m_chessBoard.getMutableDescriptionsQueue().front().FEN;
+                    m_chessBoard.getMutableDescriptionsQueue().pop();
+                    m_chessBoard.getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr});
                     m_chessBoard.setBoardDescriptionFromQueueBack();
 				}
 			}
@@ -212,7 +209,7 @@ void Game::handleEvents()
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
                 { // Copy FEN code to clipboard
-                    SDL_SetClipboardText(m_chessBoard.getMutableFENDescriptionQueue().back().c_str());
+                    SDL_SetClipboardText(m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str());
 				}	
                 for (int i = 0; i < 64; i++)
                 {
@@ -304,9 +301,6 @@ void Game::drawStaticElements()
 
     TextureFactory::instance()->drawTexture("buttonStopTex", NULL, &m_buttonStopRect);
 
-    //test IMG
-    TextureFactory::instance()->drawTexture("test", NULL, &m_buttonStopRect);
-
     m_chessBoard.drawBoard();
 }
 
@@ -316,7 +310,7 @@ void Game::drawDynamicElements()
     // FEN Chess Board Notation - click to copy to clipboard
     TextureFactory::instance()->textureFromFont("textInfoTexture",
                                                 "Segoe28",
-                                                m_chessBoard.getMutableFENDescriptionQueue().back().c_str(),
+                                                m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str(),
                                                 Constants::COL_TXT_DARK,
                                                 1280, 0);
 

@@ -35,9 +35,12 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_queueCustomDescription.push(Constants::STR_CB_INIT_DESCR);
+    //m_queueCustomDescription.push(Constants::STR_CB_INIT_DESCR); - Refact
 
-    m_queueFENDescription.push(Constants::STR_CB_INIT_FEN);
+    //m_queueFENDescription.push(Constants::STR_CB_INIT_FEN); - Refact
+
+    //NEW
+    m_CB_Descriptions.push(ChessBoardDescriptions{Constants::STR_CB_INIT_DESCR, Constants::STR_CB_INIT_FEN});
 
 }
 
@@ -340,22 +343,15 @@ void ChessBoard::shufflePieces(const bool shuff,
             char FEN[71] = {'0',};
             parseFEN(chess_set, FEN);
 
-            //converting chess_set to string and push to queue
-            std::string temp(chess_set);
+            //converting chess_set and FEN to string and push to queue
+            custDescription = chess_set;
+            fenDescription = FEN;
+            m_CB_Descriptions.push(ChessBoardDescriptions{std::string(chess_set), std::string(FEN)});
 
-            custDescription = temp;
-
-            m_queueCustomDescription.push(custDescription);
-            temp = std::string(FEN);
-
-            fenDescription = temp;
-
-            m_queueFENDescription.push(fenDescription);
             //if queue exceeds 20 pop one out
-            if(m_queueCustomDescription.size()==21)
+            if(m_CB_Descriptions.size()==21)
             {
-                m_queueCustomDescription.pop();
-                m_queueFENDescription.pop();
+                m_CB_Descriptions.pop();
             }
 
             //terminate while loop
@@ -364,8 +360,8 @@ void ChessBoard::shufflePieces(const bool shuff,
     }
     else
     { //if shuff = false, display last board descriptions in queue
-        custDescription = m_queueCustomDescription.back();
-        fenDescription = m_queueFENDescription.back();
+        custDescription = m_CB_Descriptions.back().Custom;
+        fenDescription = m_CB_Descriptions.back().FEN;
     }
 
 }
@@ -426,17 +422,12 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
-    m_boardDescription = m_queueCustomDescription.back();
+    m_boardDescription = m_CB_Descriptions.back().Custom;
 }
 
-std::queue<std::string>& ChessBoard::getMutableCustomDescriptionQueue()
+std::queue<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsQueue()
 {
-    return m_queueCustomDescription;
-}
-
-std::queue<std::string>& ChessBoard::getMutableFENDescriptionQueue()
-{
-    return m_queueFENDescription;
+    return m_CB_Descriptions;
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
