@@ -11,7 +11,7 @@ ChessBoard::ChessBoard()
 {
     //this->renderer = renderer;
     //Posible UI feature
-    setPiecesToRemove(8);
+    setPiecesToRemove(16);
 
     //simulate chessboard
     ChessBoard::m_simulating = false;
@@ -139,6 +139,8 @@ void ChessBoard::shufflePieces(const bool shuff,
             rand_en.seed(seed);
             //random chess board with all pieces
             std::shuffle(chess_set, chess_set+64, rand_en);
+            //new seed for each subsequent use of rand in the code
+            srand(time(NULL));
 
             // Check if bishops are on different colors if not re-shuffle
             int blackBishopOnBlack = 0;

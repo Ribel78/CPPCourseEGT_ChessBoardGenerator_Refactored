@@ -87,7 +87,7 @@ void Game::prepTextures()
     TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
     std::cout << SDL_GetError() << std::endl;
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe", 72);
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 32);
+    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 28);
 
     // Title texture
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",

@@ -27,8 +27,8 @@ namespace Constants
     const SDL_Color COL_CP_DARK {0, 0, 0 , 255};
 
     // chess board colors
-    const SDL_Color COL_CB_LIGHT {214, 187, 141, 255};
-    const SDL_Color COL_CB_DARK {198, 130, 66, 255};
+    const SDL_Color COL_CB_LIGHT {150, 200, 255, 255};
+    const SDL_Color COL_CB_DARK {0, 100, 150, 255};
     const SDL_Color COL_CB_HIGHLIGHT {50, 255, 180, 120};
 
     //text colors
