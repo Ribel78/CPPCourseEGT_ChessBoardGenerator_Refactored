@@ -16,6 +16,13 @@ namespace Constants
     const char* TTF_SEGOEPR = "fonts/segoepr.ttf";
     const char* TEX_BACKGROUND = "images/background.jpg";
     const char* TEX_CHESS_TILE = "images/chess_board.jpg";
+    const char* TEX_BUTTON_START_UP = "images/button_start_up.png";
+    const char* TEX_BUTTON_START_DOWN = "images/button_start_down.png";
+    const char* TEX_BUTTON_STOP_UP = "images/button_stop_up.png";
+    const char* TEX_BUTTON_STOP_DOWN = "images/button_stop_down.png";
+    const char* TEX_BUTTON_VIEWER_UP = "images/button_viewer_up.png";
+    const char* TEX_BUTTON_VIEWER_DOWN = "images/button_viewer_down.png";
+    const char* TEX_BUTTON_VIEWER_DISABLED = "images/button_viewer_disabled.png";
 
     // Colors
 

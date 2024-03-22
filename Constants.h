@@ -17,6 +17,13 @@ namespace Constants
     extern const char* TTF_SEGOEPR;
     extern const char* TEX_BACKGROUND;
     extern const char* TEX_CHESS_TILE;
+    extern const char* TEX_BUTTON_START_UP;
+    extern const char* TEX_BUTTON_START_DOWN;
+    extern const char* TEX_BUTTON_STOP_UP;
+    extern const char* TEX_BUTTON_STOP_DOWN;
+    extern const char* TEX_BUTTON_VIEWER_UP;
+    extern const char* TEX_BUTTON_VIEWER_DOWN;
+    extern const char* TEX_BUTTON_VIEWER_DISABLED;
 
     // colors
 

@@ -19,11 +19,13 @@ public:
     //extract chess glyphs from a font as textures
     void prepChessPieceTextures();
 
-    //check the current state of the simulation
     bool isSimulating() const;
 
-    //set the current state of the simulation
+    bool isViewing() const;
+
     void setSimulating(const bool state);
+
+    void setViewing(const bool state);
 
     void setPiecesToRemove(int amount);
 
@@ -66,8 +68,9 @@ private:
     //parse result from shufflePieces to valid FEN notation for dispaly
     void parseFEN(const char chess_set[65], char FEN[71]);
 
-    //check if board is currently being simulated
-    bool m_simulating;
+    bool m_simulating; //check if board is currently being simulated
+
+    bool m_viewing; //check if board is in viewer mode
 
 	//size of the chess board in pixels 
     int m_chessBoardSize;

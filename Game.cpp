@@ -81,7 +81,13 @@ void Game::prepTextures()
     // Loading image textures
     TextureFactory::instance()->textureFromImage(TEX_BACKGROUND, "background");
     TextureFactory::instance()->textureFromImage(TEX_CHESS_TILE, "chess_tile");
-
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_START_UP, "button_start_up");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_START_DOWN, "button_start_down");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_STOP_UP, "button_stop_up");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_STOP_DOWN, "button_stop_down");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_UP, "button_viewer_up");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DOWN, "button_viewer_down");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DISABLED, "button_viewer_disabled");
 
     // Loading fonts and storing them into map as pointer variables
     TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
@@ -92,13 +98,13 @@ void Game::prepTextures()
     // Title texture
     TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
                                                 "Chess Board Generator",
-                                                COL_TXT_DARK,
+                                                COL_TXT_LIGHT,
                                                 1280, 0);
     // Button Start Simulation
-    TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
-                                                "     Start\n Simulation",
-                                                COL_TXT_LIGHT,
-                                                300, 0);
+    // TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
+    //                                             "     Start\n Simulation",
+    //                                             COL_TXT_LIGHT,
+    //                                             300, 0);
     // Button Stop Simulation
     TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
                                                 "     Stop\n Simulation",
@@ -115,8 +121,8 @@ void Game::prepTextures()
 	int chess_sq = (ww / 2) / 8;
 
     m_textTitleRect = {ww / 2 + padding, padding / 2, ww / 2 - 2*padding, chess_sq};
-    m_buttonStartRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
-    m_buttonStopRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
+    m_buttonSimulationRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
+    m_buttonViewerRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
     m_textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
     m_textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
 
@@ -211,17 +217,25 @@ void Game::handleEvents()
             {
 				SDL_GetMouseState(&msx, &msy);
 			}
-			//int msx, msy;
+
             if (event.button.button == SDL_BUTTON_LEFT)
             {
 				SDL_GetMouseState(&msx, &msy);
-                if(buttonClicked(&m_buttonStartRect,
+                // toggle simulation button
+                if(buttonClicked(&m_buttonSimulationRect,
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy))
                 {
-                    m_chessBoard.setSimulating(true);
+                    if (m_chessBoard.isSimulating())
+                    {
+                        m_chessBoard.setSimulating(false);
+                    }
+                    else
+                    {
+                        m_chessBoard.setSimulating(true);
+                    }
 				}
-                if(buttonClicked(&m_buttonStopRect,
+                if(buttonClicked(&m_buttonViewerRect,
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy))
                 {
@@ -316,15 +330,27 @@ void Game::drawStaticElements()
                            Constants::COL_BUTTON_BG.b,
                            Constants::COL_BUTTON_BG.a);
 
-    SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                       &m_buttonStartRect);
+    // SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+    //                    &m_buttonStartRect);
 
-    TextureFactory::instance()->drawTexture("buttonStartTex", NULL, &m_buttonStartRect);
+    //TextureFactory::instance()->drawTexture("buttonStartTex", NULL, &m_buttonStartRect);
 
-    SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                       &m_buttonStopRect);
+    //NEW - Implement Start/Stop Simulation toggle button
+    if (m_chessBoard.isSimulating())
+    {
+        TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
+        TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
+    }
+    else
+    {
+        TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
+        TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
+    }
 
-    TextureFactory::instance()->drawTexture("buttonStopTex", NULL, &m_buttonStopRect);
+    // SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+    //                    &m_buttonViewerRect);
+
+
 
     m_chessBoard.drawBoard();
 }

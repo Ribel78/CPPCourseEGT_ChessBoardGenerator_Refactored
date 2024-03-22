@@ -91,6 +91,16 @@ bool ChessBoard::isSimulating() const
     return ChessBoard::m_simulating;
 }
 
+bool ChessBoard::isViewing() const
+{
+    return ChessBoard::m_viewing;
+}
+
+void ChessBoard::setViewing(const bool state)
+{
+    ChessBoard::m_viewing = state;
+}
+
 void ChessBoard::setSimulating(const bool state)
 {
     ChessBoard::m_simulating = state;
