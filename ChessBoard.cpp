@@ -14,7 +14,8 @@ ChessBoard::ChessBoard()
     setPiecesToRemove(16);
 
     //simulate chessboard
-    ChessBoard::m_simulating = false;
+    m_simulating = false;
+    m_viewing = false;
 
 	//Chess Board Size and Color
     m_chessBoardSize = Constants::DIM_CB_SIZE;
@@ -36,8 +37,8 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_CB_Descriptions.push(ChessBoardDescriptions{Constants::STR_CB_INIT_DESCR, Constants::STR_CB_INIT_FEN});
-
+    m_current_CB_Description = {Constants::STR_CB_INIT_DESCR, Constants::STR_CB_INIT_FEN, "0.0"};
+    m_CB_Descriptions.push(m_current_CB_Description);
 }
 
 ChessBoard::~ChessBoard()
@@ -115,7 +116,6 @@ void ChessBoard::setPiecesToRemove(int amount)
     {
         m_piecesToRemove = amount;
     }
-
 }
 
 /*
@@ -357,8 +357,9 @@ void ChessBoard::shufflePieces(const bool shuff,
             fenDescription = FEN;
 
             //converting chess_set and FEN to string and push to queue
+            m_current_CB_Description = {std::string(chess_set), std::string(FEN), std::to_string(m_timer.getSimulationTime())};
 
-            m_CB_Descriptions.push(ChessBoardDescriptions{std::string(chess_set), std::string(FEN)});
+            m_CB_Descriptions.push(m_current_CB_Description);
 
             //if queue exceeds 20 pop one out
             if(m_CB_Descriptions.size()==21)
@@ -375,7 +376,6 @@ void ChessBoard::shufflePieces(const bool shuff,
         custDescription = m_CB_Descriptions.back().Custom;
         fenDescription = m_CB_Descriptions.back().FEN;
     }
-
 }
 
 /*
@@ -434,12 +434,17 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
-    m_boardDescription = m_CB_Descriptions.back().Custom;
+    m_current_CB_Description.Custom = m_CB_Descriptions.back().Custom;
 }
 
 std::queue<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsQueue()
 {
     return m_CB_Descriptions;
+}
+
+ChessBoardDescriptions ChessBoard::getCurrentDescription() const
+{
+    return m_current_CB_Description;
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
@@ -453,7 +458,12 @@ SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
 
 std::string ChessBoard::getSimulationSummary() const
 {
-    return m_timer.simulationTimeToString();
+    return m_timer.simulationTimeStatistics();
+}
+
+void ChessBoard::resetSimulationSummary()
+{
+    m_timer.reset();
 }
 
 void ChessBoard::initBoard()
@@ -526,7 +536,7 @@ void ChessBoard::drawBoardOverlay()
         int x = m_chessPieceIdx % 8;
         int y = m_chessPieceIdx / 8;
 
-        std::string overlay = attackSquares(m_boardDescription, x, y, '\0' );
+        std::string overlay = attackSquares(m_current_CB_Description.Custom, x, y, '\0' );
 
         for (int i = 0; i < 64; i++)
         {
@@ -547,7 +557,7 @@ void ChessBoard::drawBoardOverlay()
     } else
     {
 		//Board descriptions is empty - no overlay
-        m_boardDescription = "----------------------------------------------------------------";
+        m_current_CB_Description.Custom = "----------------------------------------------------------------";
 	}
 }
 
@@ -579,3 +589,5 @@ void ChessBoard::drawPieces()
 		}
 	}
 }
+
+

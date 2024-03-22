@@ -78,8 +78,8 @@ bool TextureFactory::textureFromImage(const char* fileName,
 
     //Init SDL_Image library
     // load support for PNG and JPG image formats
-    int img_init = IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
-    std::cout << "IMG_Init flags " << img_init <<std::endl;
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    //std::cout << "IMG_Init flags " << img_init <<std::endl;
 
     tex = IMG_LoadTexture(m_renderer, fileName);
 

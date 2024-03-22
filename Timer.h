@@ -11,7 +11,9 @@ public:
     void markEnd();
     void setDurationInNanoseconds();
     void updateStats();
-    std::string simulationTimeToString() const;
+    std::string simulationTimeStatistics() const;
+    double getSimulationTime() const;
+    void reset();
 
 private:
     std::chrono::time_point<std::chrono::steady_clock> m_startTime;

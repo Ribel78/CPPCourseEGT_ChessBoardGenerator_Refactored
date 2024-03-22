@@ -23,6 +23,8 @@ namespace Constants
     const char* TEX_BUTTON_VIEWER_UP = "images/button_viewer_up.png";
     const char* TEX_BUTTON_VIEWER_DOWN = "images/button_viewer_down.png";
     const char* TEX_BUTTON_VIEWER_DISABLED = "images/button_viewer_disabled.png";
+    const char* TEX_BUTTON_SIMULATOR_UP = "images/button_simulator_up.png";
+    const char* TEX_BUTTON_SIMULATOR_DOWN = "images/button_simulator_down.png";
 
     // Colors
 

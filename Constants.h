@@ -24,6 +24,8 @@ namespace Constants
     extern const char* TEX_BUTTON_VIEWER_UP;
     extern const char* TEX_BUTTON_VIEWER_DOWN;
     extern const char* TEX_BUTTON_VIEWER_DISABLED;
+    extern const char* TEX_BUTTON_SIMULATOR_UP;
+    extern const char* TEX_BUTTON_SIMULATOR_DOWN;
 
     // colors
 

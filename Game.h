@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ChessBoard.h"
+#include <fstream>
 
 class Game
 {
@@ -22,7 +23,6 @@ public:
                        int xUp, int yUp) const;
     void draw();
 
-
 private:
 
     SDL_Window* m_window = NULL;
@@ -43,5 +43,7 @@ private:
     SDL_Rect m_textTimeRect;
 
     ChessBoard m_chessBoard;
+
+    std::fstream data_stream;
 
 };

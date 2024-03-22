@@ -1,9 +1,12 @@
 //Game.cpp
+#include <stdlib.h>
 
 #include <iostream>
 #include "Game.h"
 #include "TextureFactory.h"
 #include "Constants.h"
+
+
 
 Game::Game()
 {
@@ -88,6 +91,8 @@ void Game::prepTextures()
     TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_UP, "button_viewer_up");
     TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DOWN, "button_viewer_down");
     TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DISABLED, "button_viewer_disabled");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_SIMULATOR_UP, "button_simulator_up");
+    TextureFactory::instance()->textureFromImage(TEX_BUTTON_SIMULATOR_DOWN, "button_simulator_down");
 
     // Loading fonts and storing them into map as pointer variables
     TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
@@ -95,21 +100,26 @@ void Game::prepTextures()
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe", 72);
     TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 28);
 
-    // Title texture
-    TextureFactory::instance()->textureFromFont("textTitleTexture","Segoe",
-                                                "Chess Board Generator",
+    // Title textures
+    TextureFactory::instance()->textureFromFont("textTitleGenerator","Segoe",
+                                                "Chess Board Simulator",
                                                 COL_TXT_LIGHT,
                                                 1280, 0);
+    TextureFactory::instance()->textureFromFont("textTitleViewer","Segoe",
+                                                "Chess Board Viewer",
+                                                COL_TXT_LIGHT,
+                                                1280, 0);
+
     // Button Start Simulation
     // TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
     //                                             "     Start\n Simulation",
     //                                             COL_TXT_LIGHT,
     //                                             300, 0);
     // Button Stop Simulation
-    TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
-                                                "     Stop\n Simulation",
-                                                COL_TXT_LIGHT,
-                                                300, 0);
+    // TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
+    //                                             "     Stop\n Simulation",
+    //                                             COL_TXT_LIGHT,
+    //                                             300, 0);
 
     // Parametrizing the layout of the destination rectangles
 	int ww, wh;
@@ -153,6 +163,12 @@ void Game::update()
 {
     //Render All
     SDL_RenderPresent(TextureFactory::instance()->getRenderer());
+
+    if(data_stream.is_open())
+        data_stream << m_chessBoard.getCurrentDescription().Custom << ","
+                    << m_chessBoard.getCurrentDescription().FEN << ","
+                    << m_chessBoard.getCurrentDescription().simulationTime
+                    << std::endl;
 
     //Slow down visual shuffling
     SDL_Delay(6);
@@ -224,29 +240,50 @@ void Game::handleEvents()
                 // toggle simulation button
                 if(buttonClicked(&m_buttonSimulationRect,
                                   m_mouseDownX,m_mouseDownY,
-                                  msx, msy))
+                                  msx, msy) &&
+                                !m_chessBoard.isViewing())
                 {
                     if (m_chessBoard.isSimulating())
                     {
                         m_chessBoard.setSimulating(false);
+                        data_stream.close();
+
                     }
                     else
                     {
                         m_chessBoard.setSimulating(true);
+                        m_chessBoard.resetSimulationSummary();
+
+                        data_stream.open("data/descriptions.csv", std::ios::out);
+                        if(!data_stream.is_open())
+                            std::cout << "Failed to open data/descriptions.csv" << std::endl;
                     }
 				}
+
                 if(buttonClicked(&m_buttonViewerRect,
                                   m_mouseDownX,m_mouseDownY,
-                                  msx, msy))
+                                  msx, msy) &&
+                                !m_chessBoard.isSimulating())
                 {
-                    m_chessBoard.setSimulating(false);
+                    if (m_chessBoard.isViewing())
+                        m_chessBoard.setViewing(false);
+                    else
+                        m_chessBoard.setViewing(true);
 				}
+
                 if(buttonClicked(&m_textFENRect,
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
                 { // Copy FEN code to clipboard
                     SDL_SetClipboardText(m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str());
+                    try {
+                        //Ubuntu only - open URL in the default browser
+                        system("x-www-browser https://www.365chess.com/board_editor.php");
+                    } catch (...) {
+                        std::cout << "Error opening URL in browser." << std::endl;
+                    }
+
 				}	
                 for (int i = 0; i < 64; i++)
                 {
@@ -321,7 +358,10 @@ void Game::drawStaticElements()
     TextureFactory::instance()->drawTexture("background", NULL, &m_windowRect);
 
 	// Title
-    TextureFactory::instance()->drawTexture("textTitleTexture", NULL, &m_textTitleRect);
+    if(m_chessBoard.isViewing())
+        TextureFactory::instance()->drawTexture("textTitleViewer", NULL, &m_textTitleRect);
+    else
+        TextureFactory::instance()->drawTexture("textTitleGenerator", NULL, &m_textTitleRect);
 
     // Buttons BG Color
     SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
@@ -336,15 +376,21 @@ void Game::drawStaticElements()
     //TextureFactory::instance()->drawTexture("buttonStartTex", NULL, &m_buttonStartRect);
 
     //NEW - Implement Start/Stop Simulation toggle button
-    if (m_chessBoard.isSimulating())
-    {
-        TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
-        TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
-    }
+    if (!m_chessBoard.isViewing()){
+        if (m_chessBoard.isSimulating())
+        {
+            TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
+            TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
+        }
+        else
+        {
+            TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
+            TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
+        }
+        }
     else
     {
-        TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
-        TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
+       TextureFactory::instance()->drawTexture("button_simulator_up", NULL, &m_buttonViewerRect);
     }
 
     // SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),

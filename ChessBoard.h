@@ -6,8 +6,9 @@
 #include "Timer.h"
 
 struct ChessBoardDescriptions {
-    std::string Custom;
-    std::string FEN;
+    std::string Custom {};
+    std::string FEN {};
+    std::string simulationTime {};
 };
 
 class ChessBoard
@@ -36,11 +37,9 @@ public:
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
 
-    // std::queue<std::string>& getMutableCustomDescriptionQueue();
-
-    // std::queue<std::string>& getMutableFENDescriptionQueue();
-
     std::queue<ChessBoardDescriptions>& getMutableDescriptionsQueue();
+
+    ChessBoardDescriptions getCurrentDescription() const;
 
     //sets the index of the currently clicked chess board square or -1
     void setChessPieceIdx(int idx);
@@ -50,6 +49,8 @@ public:
 
     //returns string from Time object to be passed for drawing
     std::string getSimulationSummary() const;
+
+    void resetSimulationSummary();
 
     //initializes the chess board squares according to the given chess board size
 	void initBoard();
@@ -80,12 +81,8 @@ private:
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
-    //store rectangles for each chess board square
     SDL_Rect* m_chessBoardSquare[64];
-
     SDL_Rect* m_srcChessTileRect;
-
-    //rectangles for chess board labels
     SDL_Rect* m_chessBoardLabelsV[8];
     SDL_Rect* m_chessBoardLabelsH[8];
 
@@ -96,12 +93,9 @@ private:
     //the index of the clicked square, -1 if board overlay is off
     int m_chessPieceIdx;
 
-    //current chess board description
-    std::string m_boardDescription;
-
-    //NEW struct queue
-
     std::queue<ChessBoardDescriptions> m_CB_Descriptions;
+    //current chess board description
+    ChessBoardDescriptions m_current_CB_Description;
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;

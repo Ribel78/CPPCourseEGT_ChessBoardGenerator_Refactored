@@ -22,7 +22,6 @@ void Timer::markEnd()
 void Timer::setDurationInNanoseconds()
 {
     m_simTime = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
-    m_numberOfSimulations += 1;
 }
 
 void Timer::updateStats()
@@ -37,7 +36,7 @@ void Timer::updateStats()
 Format time statistics for dynamic text display 
 Returns a string */
 
-std::string Timer::simulationTimeToString() const
+std::string Timer::simulationTimeStatistics() const
 {
 	std::string timeStatsString = "";
 	timeStatsString.append("Number of simulations: ");
@@ -54,4 +53,17 @@ std::string Timer::simulationTimeToString() const
 	timeStatsString.append(" ns");	
 	
 	return 	timeStatsString;
+}
+
+double Timer::getSimulationTime() const
+{
+    return m_simulationTime;
+}
+
+void Timer::reset()
+{
+    m_numberOfSimulations = 0;
+    m_totalSimulationTime = 0;
+    m_averageSimulationTime = 0;
+    m_simulationTime = 0;
 }
