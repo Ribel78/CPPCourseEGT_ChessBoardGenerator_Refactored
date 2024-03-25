@@ -165,8 +165,8 @@ void Game::update()
     SDL_RenderPresent(TextureFactory::instance()->getRenderer());
 
     if(data_stream.is_open())
-        data_stream << m_chessBoard.getCurrentDescription().Custom << ","
-                    << m_chessBoard.getCurrentDescription().FEN << ","
+        data_stream << m_chessBoard.getCurrentDescription().Custom << " "
+                    << m_chessBoard.getCurrentDescription().FEN << " "
                     << m_chessBoard.getCurrentDescription().simulationTime
                     << std::endl;
 
@@ -192,13 +192,22 @@ void Game::handleEvents()
                 if(!m_chessBoard.isSimulating())
                 {
                     m_chessBoard.setChessPieceIdx(-1);
-
-                    std::string tempCustDescr, tempFENDescr;
-                    tempCustDescr = m_chessBoard.getMutableDescriptionsQueue().front().Custom;
-                    tempFENDescr = m_chessBoard.getMutableDescriptionsQueue().front().FEN;
-                    m_chessBoard.getMutableDescriptionsQueue().pop();
-                    m_chessBoard.getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr});
-                    m_chessBoard.setBoardDescriptionFromQueueBack();
+                    //NEW
+                    if(!m_chessBoard.isViewing())
+                    {
+                        std::string tempCustDescr, tempFENDescr;
+                        tempCustDescr = m_chessBoard.getMutableDescriptionsQueue().front().Custom;
+                        tempFENDescr = m_chessBoard.getMutableDescriptionsQueue().front().FEN;
+                        m_chessBoard.getMutableDescriptionsQueue().pop();
+                        m_chessBoard.getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr});
+                        m_chessBoard.setBoardDescriptionFromQueueBack();
+                    }
+                    else
+                    {
+                        m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() += 1;
+                        m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() %= m_chessBoard.getMutableDescriptionsVector().size();
+                        m_chessBoard.setBoardDescriptionFromVector();
+                    }
 				}
 			}
             if(event.key.keysym.sym == SDLK_UP)
@@ -206,12 +215,22 @@ void Game::handleEvents()
                 if(!m_chessBoard.isSimulating())
                 {
                     m_chessBoard.setChessPieceIdx(-1);
-
-                    for (int i = 0; i < m_chessBoard.getMutableDescriptionsQueue().size()-1; i++)
+                    if(!m_chessBoard.isViewing())
                     {
-                        ChessBoardDescriptions temp = m_chessBoard.getMutableDescriptionsQueue().front();
-                        m_chessBoard.getMutableDescriptionsQueue().pop();
-                        m_chessBoard.getMutableDescriptionsQueue().push(temp);
+                        for (int i = 0; i < m_chessBoard.getMutableDescriptionsQueue().size()-1; i++)
+                        {
+                            ChessBoardDescriptions temp = m_chessBoard.getMutableDescriptionsQueue().front();
+                            m_chessBoard.getMutableDescriptionsQueue().pop();
+                            m_chessBoard.getMutableDescriptionsQueue().push(temp);
+                        }
+                    }
+                    else
+                    {
+                        if (m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() - 1 < 0)
+                            m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() = m_chessBoard.getMutableDescriptionsVector().size()-1;
+                        else
+                            m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() -= 1;
+                        m_chessBoard.setBoardDescriptionFromVector();
                     }
                 }
             }
@@ -260,15 +279,35 @@ void Game::handleEvents()
                     }
 				}
 
+                //viewer button clicked
                 if(buttonClicked(&m_buttonViewerRect,
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                                 !m_chessBoard.isSimulating())
                 {
                     if (m_chessBoard.isViewing())
+                    {
                         m_chessBoard.setViewing(false);
+                        m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() = 0;
+                    }
                     else
+                    {
                         m_chessBoard.setViewing(true);
+                        m_chessBoard.getMutableDescriptionsVector().clear();
+                        data_stream.open("data/descriptions.csv", std::ios::in);
+                        ChessBoardDescriptions temp_cb_descr;
+                        while(data_stream >> temp_cb_descr)
+                        {
+                            m_chessBoard.getMutableDescriptionsVector().push_back(temp_cb_descr);
+                        }
+                        // int size = m_chessBoard.getMutableDescriptionsVector().size();
+                        // std::cout << size << std::endl;
+                        // std::cout
+                        //     << m_chessBoard.getMutableDescriptionsVector().at(size - 1).FEN
+                        //     << m_chessBoard.getMutableDescriptionsVector().at(size - 1).simulationTime
+                        //     << std::endl;
+                        data_stream.close();
+                    }
 				}
 
                 if(buttonClicked(&m_textFENRect,
@@ -276,7 +315,14 @@ void Game::handleEvents()
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
                 { // Copy FEN code to clipboard
-                    SDL_SetClipboardText(m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str());
+                    std::string clipboard_text{};
+                    if(!m_chessBoard.isViewing())
+                        clipboard_text = m_chessBoard.getMutableDescriptionsQueue().back().FEN;
+                    else
+                        clipboard_text = m_chessBoard.getCurrentDescription().FEN;
+
+                    SDL_SetClipboardText(clipboard_text.c_str());
+
                     try {
                         //Ubuntu only - open URL in the default browser
                         system("x-www-browser https://www.365chess.com/board_editor.php");
@@ -294,7 +340,14 @@ void Game::handleEvents()
                     {
                         m_chessBoard.setChessPieceIdx(i);
 						//chessPieceIdx = i;
-                        m_chessBoard.setBoardDescriptionFromQueueBack();
+                        if(!m_chessBoard.isViewing())
+                        {
+                            m_chessBoard.setBoardDescriptionFromQueueBack();
+                        }
+                        else
+                        {
+                            m_chessBoard.setBoardDescriptionFromVector();
+                        }
 						break;
 					}	
 				}		
@@ -405,9 +458,19 @@ void Game::drawDynamicElements()
 {
     // Dynamic Draw / Text
     // FEN Chess Board Notation - click to copy to clipboard
+    std::string dynamic_fen {};
+    if (!m_chessBoard.isViewing())
+    {
+        dynamic_fen = m_chessBoard.getMutableDescriptionsQueue().back().FEN;
+    }
+    else
+    {
+        m_chessBoard.setBoardDescriptionFromVector();
+        dynamic_fen = m_chessBoard.getCurrentDescription().FEN;
+    }
     TextureFactory::instance()->textureFromFont("textInfoTexture",
                                                 "Segoe28",
-                                                m_chessBoard.getMutableDescriptionsQueue().back().FEN.c_str(),
+                                                dynamic_fen.c_str(),
                                                 Constants::COL_TXT_LIGHT,
                                                 1280, 0);
 

@@ -373,8 +373,17 @@ void ChessBoard::shufflePieces(const bool shuff,
     }
     else
     { //if shuff = false, display last board descriptions in queue
-        custDescription = m_CB_Descriptions.back().Custom;
-        fenDescription = m_CB_Descriptions.back().FEN;
+        if(!isViewing()){
+            custDescription = m_CB_Descriptions.back().Custom;
+            fenDescription = m_CB_Descriptions.back().FEN;
+        }
+        else
+        {
+            setBoardDescriptionFromVector();
+            custDescription = getCurrentDescription().Custom;
+            fenDescription = getCurrentDescription().FEN;
+        }
+
     }
 }
 
@@ -437,9 +446,27 @@ void ChessBoard::setBoardDescriptionFromQueueBack()
     m_current_CB_Description.Custom = m_CB_Descriptions.back().Custom;
 }
 
+void ChessBoard::setBoardDescriptionFromVector()
+{
+    int idx = m_CB_Descriptions_Vec_Seek % m_CB_Descriptions_Vec.size();
+    m_current_CB_Description.Custom = m_CB_Descriptions_Vec.at(idx).Custom;
+    m_current_CB_Description.FEN = m_CB_Descriptions_Vec.at(idx).FEN;
+    m_current_CB_Description.simulationTime = m_CB_Descriptions_Vec.at(idx).simulationTime;
+}
+
+int& ChessBoard::getMutable_CB_Descriptions_Vec_Seek()
+{
+    return m_CB_Descriptions_Vec_Seek;
+}
+
 std::queue<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsQueue()
 {
     return m_CB_Descriptions;
+}
+
+std::vector<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsVector()
+{
+    return m_CB_Descriptions_Vec;
 }
 
 ChessBoardDescriptions ChessBoard::getCurrentDescription() const
@@ -458,7 +485,24 @@ SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
 
 std::string ChessBoard::getSimulationSummary() const
 {
+    if(!isViewing())
+    {
     return m_timer.simulationTimeStatistics();
+    }
+    else
+    {
+        std::string file_stat {};
+        file_stat.append("Record ");
+        file_stat.append(std::to_string(m_CB_Descriptions_Vec_Seek + 1));
+        file_stat.append(" of ");
+        file_stat.append(std::to_string(m_CB_Descriptions_Vec.size()));
+        file_stat.append("\n");
+        file_stat.append("Simulation Time: ");
+        file_stat.append(m_current_CB_Description.simulationTime);
+        file_stat.append("\n\n\n");
+
+        return file_stat;
+    }
 }
 
 void ChessBoard::resetSimulationSummary()

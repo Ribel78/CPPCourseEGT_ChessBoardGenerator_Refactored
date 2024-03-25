@@ -9,6 +9,24 @@ struct ChessBoardDescriptions {
     std::string Custom {};
     std::string FEN {};
     std::string simulationTime {};
+
+    // friend auto operator <<(std::ostream& output_stream, const ChessBoardDescriptions& rhs) -> std::ostream&
+    // {
+    //     output_stream << rhs.Custom << " "
+    //                   << rhs.FEN << " "
+    //                   << rhs.simulationTime << "\n";
+
+    //     return output_stream;
+    // }
+
+    friend auto operator >>(std::istream& input_stream, ChessBoardDescriptions& rhs) -> std::istream&
+    {
+        input_stream    >> rhs.Custom
+                        >> rhs.FEN
+                        >> rhs.simulationTime;;
+
+        return input_stream;
+    }
 };
 
 class ChessBoard
@@ -37,7 +55,12 @@ public:
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
 
+    void setBoardDescriptionFromVector();
+    int& getMutable_CB_Descriptions_Vec_Seek();
+
     std::queue<ChessBoardDescriptions>& getMutableDescriptionsQueue();
+
+    std::vector<ChessBoardDescriptions>& getMutableDescriptionsVector();
 
     ChessBoardDescriptions getCurrentDescription() const;
 
@@ -94,6 +117,10 @@ private:
     int m_chessPieceIdx;
 
     std::queue<ChessBoardDescriptions> m_CB_Descriptions;
+
+    std::vector<ChessBoardDescriptions> m_CB_Descriptions_Vec;
+    int m_CB_Descriptions_Vec_Seek {};
+
     //current chess board description
     ChessBoardDescriptions m_current_CB_Description;
 
