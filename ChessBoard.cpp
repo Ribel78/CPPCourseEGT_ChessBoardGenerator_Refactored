@@ -9,7 +9,7 @@
 
 ChessBoard::ChessBoard()
 {
-    //this->renderer = renderer;
+    using namespace Constants;
     //Posible UI feature
     setPiecesToRemove(16);
 
@@ -18,10 +18,10 @@ ChessBoard::ChessBoard()
     m_viewing = false;
 
 	//Chess Board Size and Color
-    m_chessBoardSize = Constants::DIM_CB_SIZE;
-    m_chessBoardColor[0] = Constants::COL_CB_LIGHT; //"light" square
-    m_chessBoardColor[1] = Constants::COL_CB_DARK; //"dark" square
-    m_chessBoardColor[2] = Constants::COL_CB_HIGHLIGHT; // highlight color
+    m_chessBoardSize = DIM_CB_SIZE;
+    m_chessBoardColor[0] = COL_CB_LIGHT; //"light" square
+    m_chessBoardColor[1] = COL_CB_DARK; //"dark" square
+    m_chessBoardColor[2] = COL_CB_HIGHLIGHT; // highlight color
 
     for (int i = 0; i < 64; i++)
     {
@@ -35,9 +35,35 @@ ChessBoard::ChessBoard()
     }
     m_srcChessTileRect = new SDL_Rect{0, 0, 64, 64};
 
+    int padding = 40;
+    int chess_sq = (DIM_WINDOW_WIDTH / 2) / 8;
+
+    m_textFENRect = {padding / 2, DIM_WINDOW_WIDTH / 2 + 10,
+                     DIM_WINDOW_WIDTH / 2 - padding,
+                     chess_sq - padding / 2};
+
+    m_textTimeRect = {DIM_WINDOW_WIDTH / 2 + padding,
+                      chess_sq * 2 ,
+                      DIM_WINDOW_WIDTH / 2 - 2*padding,
+                      DIM_WINDOW_HEIGHT / 3};
+    m_buttonSimulationRect = {DIM_WINDOW_WIDTH / 2 + padding,
+                              DIM_WINDOW_WIDTH / 2 - chess_sq,
+                              (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
+                              chess_sq};
+    m_buttonViewerRect = {DIM_WINDOW_WIDTH / 2 + 2*padding + (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
+                          DIM_WINDOW_WIDTH / 2 - chess_sq,
+                          (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
+                          chess_sq};
+    m_textTitleRect = {DIM_WINDOW_WIDTH / 2 + padding,
+                       padding / 2,
+                       DIM_WINDOW_WIDTH / 2 - 2*padding,
+                       chess_sq};
+
+    m_windowRect = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
+
     m_chessPieceIdx = -1;
 
-    m_current_CB_Description = {Constants::STR_CB_INIT_DESCR, Constants::STR_CB_INIT_FEN, "0.0"};
+    m_current_CB_Description = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0"};
     m_CB_Descriptions.push(m_current_CB_Description);
 }
 
@@ -483,6 +509,26 @@ SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
     return m_chessBoardSquare[idx];
 }
 
+SDL_Rect* ChessBoard::getTextFENRect()
+{
+    return &m_textFENRect;
+}
+
+SDL_Rect* ChessBoard::getbuttonViewerRect()
+{
+    return &m_buttonViewerRect;
+}
+
+SDL_Rect* ChessBoard::getbuttonSimulationRect()
+{
+    return &m_buttonSimulationRect;
+}
+
+SDL_Rect* ChessBoard::getWindowRect()
+{
+    return &m_windowRect;
+}
+
 std::string ChessBoard::getSimulationSummary() const
 {
     if(!isViewing())
@@ -535,6 +581,44 @@ void ChessBoard::initBoard()
     }
 }
 
+void ChessBoard::drawTitle()
+{
+    // Title
+    if(isViewing())
+        TextureFactory::instance()->drawTexture("textTitleViewer", NULL, &m_textTitleRect);
+    else
+        TextureFactory::instance()->drawTexture("textTitleGenerator", NULL, &m_textTitleRect);
+
+}
+
+void ChessBoard::drawModeToggleButtons()
+{
+    //NEW - Implement Start/Stop Simulation toggle button
+    if (!isViewing())
+    {
+        if (isSimulating())
+        {
+            TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
+            TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
+        }
+        else
+        {
+            TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
+            TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
+        }
+    }
+    else
+    {
+        TextureFactory::instance()->drawTexture("button_simulator_up", NULL, &m_buttonViewerRect);
+    }
+
+}
+
+void ChessBoard::drawWindowBackground(){
+    //Window BG Texture
+    TextureFactory::instance()->drawTexture("background", NULL, &m_windowRect);
+}
+
 void ChessBoard::drawBoard()
 {
     SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(), SDL_BLENDMODE_BLEND);
@@ -570,6 +654,47 @@ void ChessBoard::drawBoard()
         TextureFactory::instance()->drawTexture(std::string(1, ('8' - i)),
                                                 NULL, m_chessBoardLabelsV[i]);
     }
+}
+
+void ChessBoard::drawFENDescription()
+{
+    std::string dynamic_fen {};
+    if (!isViewing())
+    {
+        dynamic_fen = getMutableDescriptionsQueue().back().FEN;
+    }
+    else
+    {
+        setBoardDescriptionFromVector();
+        dynamic_fen = getCurrentDescription().FEN;
+    }
+    TextureFactory::instance()->textureFromFont("textInfoTexture",
+                                                "Segoe28",
+                                                dynamic_fen.c_str(),
+                                                Constants::COL_TXT_LIGHT,
+                                                1280, 0);
+
+    TextureFactory::instance()->drawTexture("textInfoTexture",
+                                            NULL, &m_textFENRect);
+
+    TextureFactory::instance()->destroyTexture("textInfoTexture");
+
+}
+
+void ChessBoard::drawStatistics()
+{
+    // Statistics for the simulation time
+    std::string dynamic_text_Times = getSimulationSummary();
+
+    TextureFactory::instance()->textureFromFont("textTimeTexture",
+                                                "Segoe28",
+                                                dynamic_text_Times.c_str(),
+                                                Constants::COL_TXT_LIGHT, 640, 0);
+
+    TextureFactory::instance()->drawTexture("textTimeTexture",
+                                            NULL, &m_textTimeRect);
+
+    TextureFactory::instance()->destroyTexture("textTimeTexture");
 }
 
 void ChessBoard::drawBoardOverlay()

@@ -35,9 +35,6 @@ public:
     ChessBoard();
     ~ChessBoard();
 
-    //extract chess glyphs from a font as textures
-    void prepChessPieceTextures();
-
     bool isSimulating() const;
 
     bool isViewing() const;
@@ -45,6 +42,9 @@ public:
     void setSimulating(const bool state);
 
     void setViewing(const bool state);
+
+    //extract chess glyphs from a font as textures
+    void prepChessPieceTextures();
 
     void setPiecesToRemove(int amount);
 
@@ -64,27 +64,25 @@ public:
 
     ChessBoardDescriptions getCurrentDescription() const;
 
-    //sets the index of the currently clicked chess board square or -1
     void setChessPieceIdx(int idx);
 
-    //get a rectangle from the chess board for drawing
     SDL_Rect* getChessBoardSquareRect(int idx) const;
+    SDL_Rect* getTextFENRect();
+    SDL_Rect* getbuttonViewerRect();
+    SDL_Rect* getbuttonSimulationRect();
+    SDL_Rect* getWindowRect();
 
-    //returns string from Time object to be passed for drawing
     std::string getSimulationSummary() const;
 
     void resetSimulationSummary();
-
-    //initializes the chess board squares according to the given chess board size
 	void initBoard();
-
-    //draws colored chess board on the screen
+    void drawTitle();
+    void drawModeToggleButtons();
+    void drawWindowBackground();
 	void drawBoard();
-
-    //draws color overlay on top of the chessboard - for displaying allowed moves 
+    void drawFENDescription();
+    void drawStatistics();
 	void drawBoardOverlay();
-
-    //draws the chess pieces according to given board description
     void drawPieces();
 
 private:
@@ -93,7 +91,6 @@ private:
     void parseFEN(const char chess_set[65], char FEN[71]);
 
     bool m_simulating; //check if board is currently being simulated
-
     bool m_viewing; //check if board is in viewer mode
 
 	//size of the chess board in pixels 
@@ -108,6 +105,13 @@ private:
     SDL_Rect* m_srcChessTileRect;
     SDL_Rect* m_chessBoardLabelsV[8];
     SDL_Rect* m_chessBoardLabelsH[8];
+
+    SDL_Rect m_textFENRect;
+    SDL_Rect m_textTimeRect;
+    SDL_Rect m_buttonSimulationRect;
+    SDL_Rect m_buttonViewerRect;
+    SDL_Rect m_textTitleRect;
+    SDL_Rect m_windowRect;
 
     //colors of the black and white squares and the overlay color
     SDL_Color m_chessBoardColor[3];

@@ -110,35 +110,7 @@ void Game::prepTextures()
                                                 COL_TXT_LIGHT,
                                                 1280, 0);
 
-    // Button Start Simulation
-    // TextureFactory::instance()->textureFromFont("buttonStartTex","DejaVu",
-    //                                             "     Start\n Simulation",
-    //                                             COL_TXT_LIGHT,
-    //                                             300, 0);
-    // Button Stop Simulation
-    // TextureFactory::instance()->textureFromFont("buttonStopTex","DejaVu",
-    //                                             "     Stop\n Simulation",
-    //                                             COL_TXT_LIGHT,
-    //                                             300, 0);
-
-    // Parametrizing the layout of the destination rectangles
-	int ww, wh;
-    SDL_GetWindowSize(m_window, &ww, &wh);
-
-    m_windowRect = {0, 0, ww, wh};
-
-	int padding = 40;
-	int chess_sq = (ww / 2) / 8;
-
-    m_textTitleRect = {ww / 2 + padding, padding / 2, ww / 2 - 2*padding, chess_sq};
-    m_buttonSimulationRect = {ww / 2 + padding, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
-    m_buttonViewerRect = {ww / 2 + 2*padding + (ww / 2 - 3*padding)/2, ww / 2 - chess_sq, (ww / 2 - 3*padding)/2, chess_sq};
-    m_textFENRect = {padding / 2, ww / 2 + 10, ww / 2 - padding, chess_sq - padding / 2};
-    m_textTimeRect = {ww / 2 + padding, chess_sq * 2 , ww / 2 - 2*padding, wh / 3};
-
     m_chessBoard.prepChessPieceTextures();
-
-    // Add label textures for the board
 
     for(int i = 0; i < 8; i++)
     {
@@ -257,7 +229,7 @@ void Game::handleEvents()
             {
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
-                if(buttonClicked(&m_buttonSimulationRect,
+                if(buttonClicked(m_chessBoard.getbuttonSimulationRect(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                                 !m_chessBoard.isViewing())
@@ -280,7 +252,7 @@ void Game::handleEvents()
 				}
 
                 //viewer button clicked
-                if(buttonClicked(&m_buttonViewerRect,
+                if(buttonClicked(m_chessBoard.getbuttonViewerRect(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                                 !m_chessBoard.isSimulating())
@@ -300,17 +272,11 @@ void Game::handleEvents()
                         {
                             m_chessBoard.getMutableDescriptionsVector().push_back(temp_cb_descr);
                         }
-                        // int size = m_chessBoard.getMutableDescriptionsVector().size();
-                        // std::cout << size << std::endl;
-                        // std::cout
-                        //     << m_chessBoard.getMutableDescriptionsVector().at(size - 1).FEN
-                        //     << m_chessBoard.getMutableDescriptionsVector().at(size - 1).simulationTime
-                        //     << std::endl;
                         data_stream.close();
                     }
 				}
 
-                if(buttonClicked(&m_textFENRect,
+                if(buttonClicked(m_chessBoard.getTextFENRect(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
@@ -399,103 +365,16 @@ void Game::draw()
 // Private functions
 void Game::drawStaticElements()
 {
-
-    //Window BG Color
-    SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                           Constants::COL_WINDOW_BG.r,
-                           Constants::COL_WINDOW_BG.g,
-                           Constants::COL_WINDOW_BG.b,
-                           Constants::COL_WINDOW_BG.a);
-    SDL_RenderClear(TextureFactory::instance()->getRenderer());
-    //Window BG Texture
-    TextureFactory::instance()->drawTexture("background", NULL, &m_windowRect);
-
-	// Title
-    if(m_chessBoard.isViewing())
-        TextureFactory::instance()->drawTexture("textTitleViewer", NULL, &m_textTitleRect);
-    else
-        TextureFactory::instance()->drawTexture("textTitleGenerator", NULL, &m_textTitleRect);
-
-    // Buttons BG Color
-    SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                           Constants::COL_BUTTON_BG.r,
-                           Constants::COL_BUTTON_BG.g,
-                           Constants::COL_BUTTON_BG.b,
-                           Constants::COL_BUTTON_BG.a);
-
-    // SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-    //                    &m_buttonStartRect);
-
-    //TextureFactory::instance()->drawTexture("buttonStartTex", NULL, &m_buttonStartRect);
-
-    //NEW - Implement Start/Stop Simulation toggle button
-    if (!m_chessBoard.isViewing()){
-        if (m_chessBoard.isSimulating())
-        {
-            TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
-            TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
-        }
-        else
-        {
-            TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
-            TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
-        }
-        }
-    else
-    {
-       TextureFactory::instance()->drawTexture("button_simulator_up", NULL, &m_buttonViewerRect);
-    }
-
-    // SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-    //                    &m_buttonViewerRect);
-
-
-
+    m_chessBoard.drawWindowBackground();
+    m_chessBoard.drawTitle();
+    m_chessBoard.drawModeToggleButtons();
     m_chessBoard.drawBoard();
 }
 
 void Game::drawDynamicElements()
 {
-    // Dynamic Draw / Text
-    // FEN Chess Board Notation - click to copy to clipboard
-    std::string dynamic_fen {};
-    if (!m_chessBoard.isViewing())
-    {
-        dynamic_fen = m_chessBoard.getMutableDescriptionsQueue().back().FEN;
-    }
-    else
-    {
-        m_chessBoard.setBoardDescriptionFromVector();
-        dynamic_fen = m_chessBoard.getCurrentDescription().FEN;
-    }
-    TextureFactory::instance()->textureFromFont("textInfoTexture",
-                                                "Segoe28",
-                                                dynamic_fen.c_str(),
-                                                Constants::COL_TXT_LIGHT,
-                                                1280, 0);
-
-    TextureFactory::instance()->drawTexture("textInfoTexture",
-                                            NULL, &m_textFENRect);
-
-    TextureFactory::instance()->destroyTexture("textInfoTexture");
-
-    // Statistics for the simulation time
-    std::string dynamic_text_Times = m_chessBoard.getSimulationSummary();
-
-    TextureFactory::instance()->textureFromFont("textTimeTexture",
-                                                "Segoe28",
-                                                dynamic_text_Times.c_str(),
-                                                Constants::COL_TXT_LIGHT, 640, 0);
-
-    TextureFactory::instance()->drawTexture("textTimeTexture",
-                                            NULL, &m_textTimeRect);
-
-    TextureFactory::instance()->destroyTexture("textTimeTexture");
-
-    // Highlight allowed moves by clicking on chess piece when not simulating
+    m_chessBoard.drawFENDescription();
+    m_chessBoard.drawStatistics();
     m_chessBoard.drawBoardOverlay();
-
-    // Draw the chess pieces
     m_chessBoard.drawPieces();
-
 }

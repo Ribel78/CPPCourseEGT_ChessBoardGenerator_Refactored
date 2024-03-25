@@ -22,9 +22,6 @@ TextureFactory::~TextureFactory(){
     {
         SDL_DestroyTexture(t_it->second);
     }
-
-    // delete static instance of Texture Factory
-    //delete m_instance;
 }
 
 void TextureFactory::setRenderer(SDL_Renderer *renderer)
@@ -39,7 +36,7 @@ SDL_Renderer *TextureFactory::getRenderer()
 
 //Produce static textures ttf fonts and store into a map
 bool TextureFactory::loadFont(const char* fileName,
-                              const std::string& id,
+                              const std::string& font_id,
                               int font_size)
 {
     if(TTF_Init() == -1)
@@ -54,7 +51,7 @@ bool TextureFactory::loadFont(const char* fileName,
 		return false;
     } else
     {
-        m_fonts[id] = font; // add font into the map
+        m_fonts[font_id] = font; // add font into the map
         return true;
     }
 }
@@ -72,7 +69,7 @@ TTF_Font* TextureFactory::getFont(const std::string& font_id) const
 
 //Produce static textures from images files and store into a map
 bool TextureFactory::textureFromImage(const char* fileName,
-                                      const std::string& id){
+                                      const std::string& texture_id){
 
     SDL_Texture* tex = NULL;
 
@@ -91,7 +88,7 @@ bool TextureFactory::textureFromImage(const char* fileName,
             << std::endl;
     } else
     {
-        m_textures[id] = tex; //add the created texture in the textureMap map
+        m_textures[texture_id] = tex; //add the created texture in the textureMap map
         IMG_Quit();
         return true;
     }
@@ -109,61 +106,52 @@ _wrap_length - length of the box in pixels to start wrapping the text, if 0 wrap
 _ren - renderer 
 int font_size - set the fornt size, if 0 - uses the initial size when font was loaded
 */
-bool TextureFactory::textureFromFont(const std::string& id,
+bool TextureFactory::textureFromFont(const std::string& texture_id,
                                      const std::string& font_id,
                                      const char* text,
                                      const SDL_Color& fg,
                                      Uint32 wrap_length,
                                      int font_size = 0)
 {
-    //create temp surface
 	SDL_Surface* tempSurfaceText = NULL;
-    //choose a font
+
     TTF_Font* font = m_fonts[font_id];
 
-    tempSurfaceText = TTF_RenderText_Blended_Wrapped(font,
-                                                     text,
-                                                     fg,
-                                                     wrap_length);
-    //create a texture
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer,
-                                                    tempSurfaceText);
+    tempSurfaceText = TTF_RenderText_Blended_Wrapped(font, text, fg, wrap_length);
 
-    //free temp surface
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
+
     SDL_FreeSurface(tempSurfaceText);
 
-    m_textures[id] = tex;
+    m_textures[texture_id] = tex;
     if(tex)
-    {
         return true;
-    } else
-    {
+    else
         return false;
-    } 
 }
 
-void TextureFactory::drawTexture(const std::string& tex_id,
+void TextureFactory::drawTexture(const std::string& texture_id,
                                  const SDL_Rect* srcrect,
                                  const SDL_Rect* dstrect)
 {
     SDL_RenderCopy(m_renderer,
-                   m_textures[tex_id],
+                   m_textures[texture_id],
                    srcrect,
                    dstrect);
 }
 
-void TextureFactory::setTextureAlpha(std::string tex_id, Uint8 alpha){
-    SDL_SetTextureAlphaMod(m_textures[tex_id], alpha);
-    SDL_SetTextureBlendMode(m_textures[tex_id], SDL_BLENDMODE_BLEND);
+void TextureFactory::setTextureAlpha(std::string texture_id, Uint8 alpha){
+    SDL_SetTextureAlphaMod(m_textures[texture_id], alpha);
+    SDL_SetTextureBlendMode(m_textures[texture_id], SDL_BLENDMODE_BLEND);
 }
 
-//destroy a texture by id
-void TextureFactory::destroyTexture(const std::string& tex_id)
+// Destroy a texture by given id
+void TextureFactory::destroyTexture(const std::string& texture_id)
 {
-    SDL_DestroyTexture(m_textures[tex_id]);
+    SDL_DestroyTexture(m_textures[texture_id]);
 }
 
-//call static instance of the Texture Factory
+// Keep single static instance of the Texture Factory class
 TextureFactory* TextureFactory::instance(){
     if(m_instance == 0)
     {
@@ -173,5 +161,5 @@ TextureFactory* TextureFactory::instance(){
         return m_instance;
 }
 
-//initialize static instance of Texture Factory object
+// Initialize static instance of Texture Factory object
 TextureFactory* TextureFactory::m_instance = 0;

@@ -33,9 +33,8 @@ void Timer::updateStats()
 }
 
 /*
-Format time statistics for dynamic text display 
-Returns a string */
-
+* Statistics for dynamic text display in Simulator Mode
+*/
 std::string Timer::simulationTimeStatistics() const
 {
 	std::string timeStatsString = "";

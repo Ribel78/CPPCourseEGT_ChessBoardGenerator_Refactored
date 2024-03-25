@@ -35,12 +35,12 @@ private:
     void drawDynamicElements();
 
     //Rectangles
-    SDL_Rect m_windowRect;
-    SDL_Rect m_textTitleRect;
-    SDL_Rect m_buttonSimulationRect;
-    SDL_Rect m_buttonViewerRect;
-    SDL_Rect m_textFENRect;
-    SDL_Rect m_textTimeRect;
+    //SDL_Rect m_windowRect;
+    //SDL_Rect m_textTitleRect;
+    //SDL_Rect m_buttonSimulationRect;
+    //SDL_Rect m_buttonViewerRect;
+    //SDL_Rect m_textFENRect;
+    //SDL_Rect m_textTimeRect;
 
     ChessBoard m_chessBoard;
 
