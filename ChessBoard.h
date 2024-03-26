@@ -10,15 +10,6 @@ struct ChessBoardDescriptions {
     std::string FEN {};
     std::string simulationTime {};
 
-    // friend auto operator <<(std::ostream& output_stream, const ChessBoardDescriptions& rhs) -> std::ostream&
-    // {
-    //     output_stream << rhs.Custom << " "
-    //                   << rhs.FEN << " "
-    //                   << rhs.simulationTime << "\n";
-
-    //     return output_stream;
-    // }
-
     friend auto operator >>(std::istream& input_stream, ChessBoardDescriptions& rhs) -> std::istream&
     {
         input_stream    >> rhs.Custom
@@ -36,15 +27,16 @@ public:
     ~ChessBoard();
 
     bool isSimulating() const;
-
     bool isViewing() const;
 
     void setSimulating(const bool state);
-
     void setViewing(const bool state);
 
-    //extract chess glyphs from a font as textures
+    void prepFonts();
+    void prepStaticFontTextures();
+    void prepStaticImageTextures();
     void prepChessPieceTextures();
+    void prepBoardLabelsTextures();
 
     void setPiecesToRemove(int amount);
 
@@ -54,8 +46,8 @@ public:
 
     //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
-
     void setBoardDescriptionFromVector();
+
     int& getMutable_CB_Descriptions_Vec_Seek();
 
     std::queue<ChessBoardDescriptions>& getMutableDescriptionsQueue();
@@ -66,16 +58,16 @@ public:
 
     void setChessPieceIdx(int idx);
 
-    SDL_Rect* getChessBoardSquareRect(int idx) const;
-    SDL_Rect* getTextFENRect();
-    SDL_Rect* getbuttonViewerRect();
-    SDL_Rect* getbuttonSimulationRect();
-    SDL_Rect* getWindowRect();
+    SDL_Rect* getRectChessBoardTile(int idx) const;
+    SDL_Rect* getRectTextFEN();
+    SDL_Rect* getRectButtonViewer();
+    SDL_Rect* getRectButtonSimulator();
+    SDL_Rect* getRectWindow();
 
     std::string getSimulationSummary() const;
-
     void resetSimulationSummary();
-	void initBoard();
+
+    void initBoardRects();
     void drawTitle();
     void drawModeToggleButtons();
     void drawWindowBackground();
@@ -101,20 +93,20 @@ private:
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
-    SDL_Rect* m_chessBoardSquare[64];
-    SDL_Rect* m_srcChessTileRect;
-    SDL_Rect* m_chessBoardLabelsV[8];
-    SDL_Rect* m_chessBoardLabelsH[8];
+    SDL_Rect* m_RectPtrChessBoardTile[64];
+    SDL_Rect* m_RectPtrFloatingChessTile;
+    SDL_Rect* m_RectPtrBoardLabelsV[8];
+    SDL_Rect* m_RectPtrBoardLabelsH[8];
 
-    SDL_Rect m_textFENRect;
-    SDL_Rect m_textTimeRect;
-    SDL_Rect m_buttonSimulationRect;
-    SDL_Rect m_buttonViewerRect;
-    SDL_Rect m_textTitleRect;
-    SDL_Rect m_windowRect;
+    SDL_Rect m_RectTextFEN;
+    SDL_Rect m_RectTextStats;
+    SDL_Rect m_RectButtonSimulator;
+    SDL_Rect m_RectButtonViewer;
+    SDL_Rect m_RectTextTitle;
+    SDL_Rect m_RectWindow;
 
     //colors of the black and white squares and the overlay color
-    SDL_Color m_chessBoardColor[3];
+    SDL_Color m_ColorChessBoard[3];
 
 	//Used in drawing the Board Overlay
     //the index of the clicked square, -1 if board overlay is off

@@ -7,59 +7,35 @@
 #include "Utilities.h"
 #include "TextureFactory.h"
 
+using namespace Constants;
+
 ChessBoard::ChessBoard()
 {
-    using namespace Constants;
-    //Posible UI feature
-    setPiecesToRemove(16);
-
-    //simulate chessboard
     m_simulating = false;
     m_viewing = false;
 
-	//Chess Board Size and Color
+    //Posible UI feature
+    setPiecesToRemove(16);
+
+    //Chess Board Size and Colors
     m_chessBoardSize = DIM_CB_SIZE;
-    m_chessBoardColor[0] = COL_CB_LIGHT; //"light" square
-    m_chessBoardColor[1] = COL_CB_DARK; //"dark" square
-    m_chessBoardColor[2] = COL_CB_HIGHLIGHT; // highlight color
+    m_ColorChessBoard[0] = COL_CB_LIGHT;
+    m_ColorChessBoard[1] = COL_CB_DARK;
+    m_ColorChessBoard[2] = COL_CB_HIGHLIGHT;
 
-    for (int i = 0; i < 64; i++)
-    {
-        m_chessBoardSquare[i] = new SDL_Rect{0, 0, 0, 0};
-    }
+    //Generate and place various chess board rectangles
+    initBoardRects();
 
-    for (int i = 0; i < 8; i++)
-    {
-        m_chessBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
-        m_chessBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
-    }
-    m_srcChessTileRect = new SDL_Rect{0, 0, 64, 64};
+    //Set up UI Rectangles
+    //const int padding = 40; //make const?
+    //int chess_sq = (DIM_WINDOW_WIDTH / 2) / 8;
 
-    int padding = 40;
-    int chess_sq = (DIM_WINDOW_WIDTH / 2) / 8;
-
-    m_textFENRect = {padding / 2, DIM_WINDOW_WIDTH / 2 + 10,
-                     DIM_WINDOW_WIDTH / 2 - padding,
-                     chess_sq - padding / 2};
-
-    m_textTimeRect = {DIM_WINDOW_WIDTH / 2 + padding,
-                      chess_sq * 2 ,
-                      DIM_WINDOW_WIDTH / 2 - 2*padding,
-                      DIM_WINDOW_HEIGHT / 3};
-    m_buttonSimulationRect = {DIM_WINDOW_WIDTH / 2 + padding,
-                              DIM_WINDOW_WIDTH / 2 - chess_sq,
-                              (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
-                              chess_sq};
-    m_buttonViewerRect = {DIM_WINDOW_WIDTH / 2 + 2*padding + (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
-                          DIM_WINDOW_WIDTH / 2 - chess_sq,
-                          (DIM_WINDOW_WIDTH / 2 - 3*padding)/2,
-                          chess_sq};
-    m_textTitleRect = {DIM_WINDOW_WIDTH / 2 + padding,
-                       padding / 2,
-                       DIM_WINDOW_WIDTH / 2 - 2*padding,
-                       chess_sq};
-
-    m_windowRect = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
+    m_RectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
+    m_RectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE * 2 , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
+    m_RectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_RectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_RectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_RectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
 
     m_chessPieceIdx = -1;
 
@@ -72,27 +48,62 @@ ChessBoard::~ChessBoard()
     // delete chess board rectangles
     for (int i = 0; i < 64; i++)
     {
-        delete m_chessBoardSquare[i];
+        delete m_RectPtrChessBoardTile[i];
     }
 
     // delete chess board labels
     for (int i = 0; i < 8; i++)
     {
-        delete m_chessBoardLabelsV[i];
-        delete m_chessBoardLabelsH[i];
+        delete m_RectPtrBoardLabelsV[i];
+        delete m_RectPtrBoardLabelsH[i];
     }
-    delete m_srcChessTileRect;
+    delete m_RectPtrFloatingChessTile;
 
+}
+
+void ChessBoard::prepFonts()
+{
+    // Loading fonts
+    TextureFactory::instance()->loadFont(TTF_DEJAVUSANS, ID_FONT_DEJAVU, 48);
+    TextureFactory::instance()->loadFont(TTF_SEGOEPR, ID_FONT_SEGOE, 72);
+    TextureFactory::instance()->loadFont(TTF_SEGOEPR, ID_FONT_SEGOE28, 28);
+}
+
+void ChessBoard::prepStaticFontTextures()
+{
+    // Title textures
+    TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_SIMULATOR,ID_FONT_SEGOE,
+                                                "Chess Board Simulator",
+                                                COL_TXT_LIGHT,
+                                                1280, 0);
+    TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_VIEWER,ID_FONT_SEGOE,
+                                                "Chess Board Viewer",
+                                                COL_TXT_LIGHT,
+                                                1280, 0);
+}
+
+void ChessBoard::prepStaticImageTextures()
+{
+    // Loading image textures
+    TextureFactory::instance()->textureFromImage(IMG_BACKGROUND, ID_BACKGROUND);
+    TextureFactory::instance()->textureFromImage(IMG_CHESS_TILE, ID_CHESS_TILE);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_START_UP, ID_BTN_START_UP);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_START_DOWN, ID_BTN_START_DOWN);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_STOP_UP, ID_BTN_STOP_UP);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_STOP_DOWN, ID_BTN_STOP_DOWN);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_UP, ID_BTN_VIEWER_UP);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_DOWN, ID_BTN_VIEWER_DOWN);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_DISABLED, ID_BTN_VIEWER_DISABLED);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_UP, ID_BTN_SIMULATOR_UP);
+    TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_DOWN, ID_BTN_SIMULATOR_DOWN);
 }
 
 void ChessBoard::prepChessPieceTextures()
 {
 	// Create textures from font chess characters - only the black pieces (6)
-    TTF_Font* DejaVu = TextureFactory::instance()->getFont("DejaVu");
+    TTF_Font* DejaVu = TextureFactory::instance()->getFont(ID_FONT_DEJAVU);
 
     SDL_Surface* tempSurfaceText = NULL;
-
-    using namespace Constants;
 
     for (int i = 0; i < 12; i++)
     {
@@ -111,6 +122,26 @@ void ChessBoard::prepChessPieceTextures()
         }
     }
     SDL_FreeSurface(tempSurfaceText);
+}
+
+void ChessBoard::prepBoardLabelsTextures()
+{
+    for(int i = 0; i < 8; i++)
+    {
+        std::string h_label = std::string(1, ('a' + i));
+        TextureFactory::instance()->textureFromFont(h_label,
+                                                    ID_FONT_DEJAVU,
+                                                    h_label.c_str(),
+                                                    (i%2)?COL_CB_DARK : COL_CB_LIGHT,
+                                                    64, 32);
+
+        std::string v_label = std::string(1, ('8' - i));
+        TextureFactory::instance()->textureFromFont(v_label,
+                                                    ID_FONT_DEJAVU,
+                                                    v_label.c_str(),
+                                                    (i%2)?COL_CB_LIGHT : COL_CB_DARK,
+                                                    64, 32);
+    }
 }
 
 bool ChessBoard::isSimulating() const
@@ -415,10 +446,7 @@ void ChessBoard::shufflePieces(const bool shuff,
 
 /*
 Parse custom chess board description to FEN notation
-Not Important but fun to have. Click on the notation in the window to copy it in the clipboard
-Takes char array pointers to the custom chess board description and
-char array with 71 chars for the notation (the longest FEN notation is 71 characters).
-Both arrays must be already initialized outside the function.
+Click on the notation in the window to copy it in the clipboard
 */
 void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
 {
@@ -504,29 +532,29 @@ void ChessBoard::setChessPieceIdx(int idx){
     m_chessPieceIdx = idx;
 }
 
-SDL_Rect* ChessBoard::getChessBoardSquareRect(int idx) const
+SDL_Rect* ChessBoard::getRectChessBoardTile(int idx) const
 {
-    return m_chessBoardSquare[idx];
+    return m_RectPtrChessBoardTile[idx];
 }
 
-SDL_Rect* ChessBoard::getTextFENRect()
+SDL_Rect* ChessBoard::getRectTextFEN()
 {
-    return &m_textFENRect;
+    return &m_RectTextFEN;
 }
 
-SDL_Rect* ChessBoard::getbuttonViewerRect()
+SDL_Rect* ChessBoard::getRectButtonViewer()
 {
-    return &m_buttonViewerRect;
+    return &m_RectButtonViewer;
 }
 
-SDL_Rect* ChessBoard::getbuttonSimulationRect()
+SDL_Rect* ChessBoard::getRectButtonSimulator()
 {
-    return &m_buttonSimulationRect;
+    return &m_RectButtonSimulator;
 }
 
-SDL_Rect* ChessBoard::getWindowRect()
+SDL_Rect* ChessBoard::getRectWindow()
 {
-    return &m_windowRect;
+    return &m_RectWindow;
 }
 
 std::string ChessBoard::getSimulationSummary() const
@@ -556,67 +584,80 @@ void ChessBoard::resetSimulationSummary()
     m_timer.reset();
 }
 
-void ChessBoard::initBoard()
+void ChessBoard::initBoardRects()
 {
+    //init squares rects
     for (int i = 0; i < 64; i++)
     {
-        m_chessBoardSquare[i]->x = (i % 8)*(m_chessBoardSize / 8);
-        m_chessBoardSquare[i]->y = (i / 8)*(m_chessBoardSize / 8);
-        m_chessBoardSquare[i]->w = m_chessBoardSquare[i]->h = m_chessBoardSize / 8;
+        m_RectPtrChessBoardTile[i] = new SDL_Rect{0, 0, 0, 0};
     }
-
+    //init label rects
+    for (int i = 0; i < 8; i++)
+    {
+        m_RectPtrBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
+        m_RectPtrBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
+    }
+    //place square rects
+    for (int i = 0; i < 64; i++)
+    {
+        m_RectPtrChessBoardTile[i]->x = (i % 8)*(m_chessBoardSize / 8);
+        m_RectPtrChessBoardTile[i]->y = (i / 8)*(m_chessBoardSize / 8);
+        m_RectPtrChessBoardTile[i]->w = m_RectPtrChessBoardTile[i]->h = m_chessBoardSize / 8;
+    }
+    //place label rects
     int square_size = m_chessBoardSize / 8;
     int label_size = square_size /4;
-
     for(int i = 0; i <8 ; i++)
     {
         //Labels
-        m_chessBoardLabelsV[i]->x = 0;
-        m_chessBoardLabelsV[i]->y = (i * square_size);
-        m_chessBoardLabelsV[i]->w = m_chessBoardLabelsV[i]->h = label_size;
+        m_RectPtrBoardLabelsV[i]->x = 0;
+        m_RectPtrBoardLabelsV[i]->y = (i * square_size);
+        m_RectPtrBoardLabelsV[i]->w = m_RectPtrBoardLabelsV[i]->h = label_size;
 
-        m_chessBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
-        m_chessBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
-        m_chessBoardLabelsH[i]->w = m_chessBoardLabelsH[i]->h = label_size;
+        m_RectPtrBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
+        m_RectPtrBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
+        m_RectPtrBoardLabelsH[i]->w = m_RectPtrBoardLabelsH[i]->h = label_size;
     }
+
+    //init random board tile texture rect
+    m_RectPtrFloatingChessTile = new SDL_Rect{0, 0, 64, 64};
 }
 
 void ChessBoard::drawTitle()
 {
     // Title
     if(isViewing())
-        TextureFactory::instance()->drawTexture("textTitleViewer", NULL, &m_textTitleRect);
+        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_RectTextTitle);
     else
-        TextureFactory::instance()->drawTexture("textTitleGenerator", NULL, &m_textTitleRect);
+        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_RectTextTitle);
 
 }
 
 void ChessBoard::drawModeToggleButtons()
 {
-    //NEW - Implement Start/Stop Simulation toggle button
     if (!isViewing())
     {
         if (isSimulating())
         {
-            TextureFactory::instance()->drawTexture("button_stop_up", NULL, &m_buttonSimulationRect);
-            TextureFactory::instance()->drawTexture("button_viewer_disabled", NULL, &m_buttonViewerRect);
+            TextureFactory::instance()->drawTexture(ID_BTN_STOP_UP, NULL, &m_RectButtonSimulator);
+            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_RectButtonViewer);
         }
         else
         {
-            TextureFactory::instance()->drawTexture("button_start_up", NULL, &m_buttonSimulationRect);
-            TextureFactory::instance()->drawTexture("button_viewer_up", NULL, &m_buttonViewerRect);
+            TextureFactory::instance()->drawTexture(ID_BTN_START_UP, NULL, &m_RectButtonSimulator);
+            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_UP, NULL, &m_RectButtonViewer);
         }
     }
     else
     {
-        TextureFactory::instance()->drawTexture("button_simulator_up", NULL, &m_buttonViewerRect);
+        TextureFactory::instance()->drawTexture(ID_BTN_SIMULATOR_UP, NULL, &m_RectButtonViewer);
     }
 
 }
 
 void ChessBoard::drawWindowBackground(){
     //Window BG Texture
-    TextureFactory::instance()->drawTexture("background", NULL, &m_windowRect);
+    TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_RectWindow);
 }
 
 void ChessBoard::drawBoard()
@@ -626,19 +667,19 @@ void ChessBoard::drawBoard()
     {
 		SDL_SetRenderDrawColor(
             TextureFactory::instance()->getRenderer(),
-            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2 ].r,
-            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].g,
-            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].b,
-            m_chessBoardColor[(i + ( i / 8 ) % 2 ) %2].a
+            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2 ].r,
+            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].g,
+            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].b,
+            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].a
             );
 
         SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                           m_chessBoardSquare[i]);
+                           m_RectPtrChessBoardTile[i]);
         srand (i);
-        m_srcChessTileRect->x = rand()%(640-64);
-        m_srcChessTileRect->y = rand()%(640-64);
-        TextureFactory::instance()->setTextureAlpha("chess_tile", 55);
-        TextureFactory::instance()->drawTexture("chess_tile", m_srcChessTileRect, m_chessBoardSquare[i]);
+        m_RectPtrFloatingChessTile->x = rand()%(640-64);
+        m_RectPtrFloatingChessTile->y = rand()%(640-64);
+        TextureFactory::instance()->setTextureAlpha(ID_CHESS_TILE, 55);
+        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, m_RectPtrFloatingChessTile, m_RectPtrChessBoardTile[i]);
 	}
 
     // Draw label textures for the board
@@ -649,10 +690,10 @@ void ChessBoard::drawBoard()
     for(int i = 0; i < 8 ; i++)
     {
         TextureFactory::instance()->drawTexture(std::string(1, ('a' + i)),
-                                                NULL, m_chessBoardLabelsH[i]);
+                                                NULL, m_RectPtrBoardLabelsH[i]);
 
         TextureFactory::instance()->drawTexture(std::string(1, ('8' - i)),
-                                                NULL, m_chessBoardLabelsV[i]);
+                                                NULL, m_RectPtrBoardLabelsV[i]);
     }
 }
 
@@ -668,16 +709,16 @@ void ChessBoard::drawFENDescription()
         setBoardDescriptionFromVector();
         dynamic_fen = getCurrentDescription().FEN;
     }
-    TextureFactory::instance()->textureFromFont("textInfoTexture",
-                                                "Segoe28",
+    TextureFactory::instance()->textureFromFont(ID_TXT_FEN,
+                                                ID_FONT_SEGOE28,
                                                 dynamic_fen.c_str(),
                                                 Constants::COL_TXT_LIGHT,
                                                 1280, 0);
 
-    TextureFactory::instance()->drawTexture("textInfoTexture",
-                                            NULL, &m_textFENRect);
+    TextureFactory::instance()->drawTexture(ID_TXT_FEN,
+                                            NULL, &m_RectTextFEN);
 
-    TextureFactory::instance()->destroyTexture("textInfoTexture");
+    TextureFactory::instance()->destroyTexture(ID_TXT_FEN);
 
 }
 
@@ -686,15 +727,15 @@ void ChessBoard::drawStatistics()
     // Statistics for the simulation time
     std::string dynamic_text_Times = getSimulationSummary();
 
-    TextureFactory::instance()->textureFromFont("textTimeTexture",
-                                                "Segoe28",
+    TextureFactory::instance()->textureFromFont(ID_TXT_STATS,
+                                                ID_FONT_SEGOE28,
                                                 dynamic_text_Times.c_str(),
                                                 Constants::COL_TXT_LIGHT, 640, 0);
 
-    TextureFactory::instance()->drawTexture("textTimeTexture",
-                                            NULL, &m_textTimeRect);
+    TextureFactory::instance()->drawTexture(ID_TXT_STATS,
+                                            NULL, &m_RectTextStats);
 
-    TextureFactory::instance()->destroyTexture("textTimeTexture");
+    TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
 }
 
 void ChessBoard::drawBoardOverlay()
@@ -714,13 +755,13 @@ void ChessBoard::drawBoardOverlay()
 
             //hide unused rectangles with 0 alpha value
             SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                                   m_chessBoardColor[2].r,
-                                   m_chessBoardColor[2].g,
-                                   m_chessBoardColor[2].b,
+                                   m_ColorChessBoard[2].r,
+                                   m_ColorChessBoard[2].g,
+                                   m_ColorChessBoard[2].b,
                                    ((overlay[i]!='-') ? 100 : 0));
 
             SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                               m_chessBoardSquare[i]);
+                               m_RectPtrChessBoardTile[i]);
 		}
 
     } else
@@ -732,11 +773,10 @@ void ChessBoard::drawBoardOverlay()
 
 void ChessBoard::drawPieces()
 {
-    //declare string descriptions
-	std::string chessBoardShuffle; 
-	std::string fenChessBoard;
+    std::string chessBoardShuffle {};
+    std::string fenChessBoard {};
 
-	//init string descriptions
+    //init descriptions
 	shufflePieces(isSimulating(), chessBoardShuffle, fenChessBoard);
 
     for (int i = 0; i < 64; i++)
@@ -752,7 +792,7 @@ void ChessBoard::drawPieces()
                 SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                                m_chessPieces[j],
                                NULL,
-                               m_chessBoardSquare[i]);
+                               m_RectPtrChessBoardTile[i]);
 				continue;
 			}
 		}

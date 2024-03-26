@@ -11,21 +11,45 @@ namespace Constants
 
     // chess board size
     extern const int DIM_CB_SIZE;
+    extern const int DIM_CB_TILE_SIZE;
+    extern const int DIM_PADDING;
 
     // file paths
     extern const char* TTF_DEJAVUSANS;
     extern const char* TTF_SEGOEPR;
-    extern const char* TEX_BACKGROUND;
-    extern const char* TEX_CHESS_TILE;
-    extern const char* TEX_BUTTON_START_UP;
-    extern const char* TEX_BUTTON_START_DOWN;
-    extern const char* TEX_BUTTON_STOP_UP;
-    extern const char* TEX_BUTTON_STOP_DOWN;
-    extern const char* TEX_BUTTON_VIEWER_UP;
-    extern const char* TEX_BUTTON_VIEWER_DOWN;
-    extern const char* TEX_BUTTON_VIEWER_DISABLED;
-    extern const char* TEX_BUTTON_SIMULATOR_UP;
-    extern const char* TEX_BUTTON_SIMULATOR_DOWN;
+    extern const char* IMG_BACKGROUND;
+    extern const char* IMG_CHESS_TILE;
+    extern const char* IMG_BUTTON_START_UP;
+    extern const char* IMG_BUTTON_START_DOWN;
+    extern const char* IMG_BUTTON_STOP_UP;
+    extern const char* IMG_BUTTON_STOP_DOWN;
+    extern const char* IMG_BUTTON_VIEWER_UP;
+    extern const char* IMG_BUTTON_VIEWER_DOWN;
+    extern const char* IMG_BUTTON_VIEWER_DISABLED;
+    extern const char* IMG_BUTTON_SIMULATOR_UP;
+    extern const char* IMG_BUTTON_SIMULATOR_DOWN;
+
+    // texture IDs
+    extern const std::string ID_BACKGROUND;
+    extern const std::string ID_CHESS_TILE;
+    extern const std::string ID_BTN_START_UP;
+    extern const std::string ID_BTN_START_DOWN;
+    extern const std::string ID_BTN_STOP_UP;
+    extern const std::string ID_BTN_STOP_DOWN;
+    extern const std::string ID_BTN_VIEWER_UP;
+    extern const std::string ID_BTN_VIEWER_DOWN;
+    extern const std::string ID_BTN_VIEWER_DISABLED;
+    extern const std::string ID_BTN_SIMULATOR_UP;
+    extern const std::string ID_BTN_SIMULATOR_DOWN;
+    extern const std::string ID_TXT_STATS;
+    extern const std::string ID_TXT_FEN;
+    extern const std::string ID_TXT_TITLE_VIEWER;
+    extern const std::string ID_TXT_TITLE_SIMULATOR;
+
+    // font IDs
+    extern const std::string ID_FONT_DEJAVU;
+    extern const std::string ID_FONT_SEGOE;
+    extern const std::string ID_FONT_SEGOE28;
 
     // colors
 

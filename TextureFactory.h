@@ -41,6 +41,8 @@ public:
 
     void destroyTexture(const std::string& texture_id);
 
+    void loadResources();
+
     static TextureFactory* instance();
 
 private:

@@ -4,7 +4,6 @@
 #include <iostream>
 #include "Game.h"
 #include "TextureFactory.h"
-#include "Constants.h"
 
 
 
@@ -30,27 +29,27 @@ bool Game::init(const char* title,
 		std::cout << "SDL init success\n";
 
         m_window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-        //window init success
         if (m_window != 0)
 		{
-			std::cout << "window creation success\n";
+            std::cout << "Window creation success\n";
+
             SDL_Renderer* renderer = SDL_CreateRenderer(m_window, -1, 0);
-            //renderer init success
             if (renderer != 0)
 			{
                 TextureFactory::instance()->setRenderer(renderer);
 
-				std::cout << "renderer creation success\n";
+                std::cout << "Renderer creation success\n";
 			}
             else
             {
-				std::cout << "renderer init failed\n";
+                std::cout << "Renderer init failed\n";
+
 				return false;
 			}
 		}
         else
         {
-			std::cout << "window init failed\n";
+            std::cout << "Window init failed\n";
 			return false;
 		}
 	}
@@ -68,8 +67,8 @@ bool Game::init(const char* title,
 
     std::cout << "init success\n";
     m_running = true;
-    m_chessBoard.setSimulating(false);
-    m_chessBoard.initBoard();
+    //m_chessBoard.setSimulating(false);
+    //m_chessBoard.initBoard();
 
     prepTextures();
 
@@ -79,56 +78,11 @@ bool Game::init(const char* title,
 // Prepare textures for rendering
 void Game::prepTextures()
 {
-    using namespace Constants;
-
-    // Loading image textures
-    TextureFactory::instance()->textureFromImage(TEX_BACKGROUND, "background");
-    TextureFactory::instance()->textureFromImage(TEX_CHESS_TILE, "chess_tile");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_START_UP, "button_start_up");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_START_DOWN, "button_start_down");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_STOP_UP, "button_stop_up");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_STOP_DOWN, "button_stop_down");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_UP, "button_viewer_up");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DOWN, "button_viewer_down");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_VIEWER_DISABLED, "button_viewer_disabled");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_SIMULATOR_UP, "button_simulator_up");
-    TextureFactory::instance()->textureFromImage(TEX_BUTTON_SIMULATOR_DOWN, "button_simulator_down");
-
-    // Loading fonts and storing them into map as pointer variables
-    TextureFactory::instance()->loadFont(TTF_DEJAVUSANS,"DejaVu", 48);
-    std::cout << SDL_GetError() << std::endl;
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe", 72);
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR,"Segoe28", 28);
-
-    // Title textures
-    TextureFactory::instance()->textureFromFont("textTitleGenerator","Segoe",
-                                                "Chess Board Simulator",
-                                                COL_TXT_LIGHT,
-                                                1280, 0);
-    TextureFactory::instance()->textureFromFont("textTitleViewer","Segoe",
-                                                "Chess Board Viewer",
-                                                COL_TXT_LIGHT,
-                                                1280, 0);
-
+    m_chessBoard.prepFonts();
+    m_chessBoard.prepStaticFontTextures();
+    m_chessBoard.prepStaticImageTextures();
     m_chessBoard.prepChessPieceTextures();
-
-    for(int i = 0; i < 8; i++)
-    {
-        std::string h_label = std::string(1, ('a' + i));
-        TextureFactory::instance()->textureFromFont(h_label,
-                                                    "DejaVu",
-                                                    h_label.c_str(),
-                                                    (i%2)?COL_CB_DARK : COL_CB_LIGHT,
-                                                    64, 32);
-
-        std::string v_label = std::string(1, ('8' - i));
-        TextureFactory::instance()->textureFromFont(v_label,
-                                                    "DejaVu",
-                                                    v_label.c_str(),
-                                                    (i%2)?COL_CB_LIGHT : COL_CB_DARK,
-                                                    64, 32);
-    }
-
+    m_chessBoard.prepBoardLabelsTextures();
 }
 
 void Game::update()
@@ -164,7 +118,6 @@ void Game::handleEvents()
                 if(!m_chessBoard.isSimulating())
                 {
                     m_chessBoard.setChessPieceIdx(-1);
-                    //NEW
                     if(!m_chessBoard.isViewing())
                     {
                         std::string tempCustDescr, tempFENDescr;
@@ -220,16 +173,12 @@ void Game::handleEvents()
         case SDL_MOUSEBUTTONUP:
         {
 			int msx, msy;
-            if (event.button.button == SDL_BUTTON_RIGHT)
-            {
-				SDL_GetMouseState(&msx, &msy);
-			}
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
-                if(buttonClicked(m_chessBoard.getbuttonSimulationRect(),
+                if(buttonClicked(m_chessBoard.getRectButtonSimulator(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                                 !m_chessBoard.isViewing())
@@ -252,7 +201,7 @@ void Game::handleEvents()
 				}
 
                 //viewer button clicked
-                if(buttonClicked(m_chessBoard.getbuttonViewerRect(),
+                if(buttonClicked(m_chessBoard.getRectButtonViewer(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                                 !m_chessBoard.isSimulating())
@@ -260,23 +209,30 @@ void Game::handleEvents()
                     if (m_chessBoard.isViewing())
                     {
                         m_chessBoard.setViewing(false);
+
                         m_chessBoard.getMutable_CB_Descriptions_Vec_Seek() = 0;
                     }
                     else
                     {
                         m_chessBoard.setViewing(true);
+
                         m_chessBoard.getMutableDescriptionsVector().clear();
+
                         data_stream.open("data/descriptions.csv", std::ios::in);
+
                         ChessBoardDescriptions temp_cb_descr;
+
                         while(data_stream >> temp_cb_descr)
                         {
                             m_chessBoard.getMutableDescriptionsVector().push_back(temp_cb_descr);
                         }
                         data_stream.close();
                     }
+
+                    m_chessBoard.setChessPieceIdx(-1);
 				}
 
-                if(buttonClicked(m_chessBoard.getTextFENRect(),
+                if(buttonClicked(m_chessBoard.getRectTextFEN(),
                                   m_mouseDownX,m_mouseDownY,
                                   msx, msy) &&
                     !m_chessBoard.isSimulating())
@@ -299,7 +255,7 @@ void Game::handleEvents()
 				}	
                 for (int i = 0; i < 64; i++)
                 {
-                    if(buttonClicked(m_chessBoard.getChessBoardSquareRect(i),
+                    if(buttonClicked(m_chessBoard.getRectChessBoardTile(i),
                                       m_mouseDownX, m_mouseDownY,
                                       msx, msy) &&
                         !m_chessBoard.isSimulating())
@@ -337,11 +293,6 @@ bool Game::isRunning() const
     return Game::m_running;
 }
 
-/*
-Checks positions of the mousedown / mouseup separately
-and compare against
-given SDL_Rect coordinates and dimensions
-*/
 bool Game::buttonClicked(const SDL_Rect* r,
                          int xDown, int yDown,
                          int xUp, int yUp) const
@@ -358,23 +309,14 @@ bool Game::buttonClicked(const SDL_Rect* r,
 
 void Game::draw()
 {
-    drawStaticElements();
-    drawDynamicElements();
-}
-
-// Private functions
-void Game::drawStaticElements()
-{
     m_chessBoard.drawWindowBackground();
     m_chessBoard.drawTitle();
-    m_chessBoard.drawModeToggleButtons();
     m_chessBoard.drawBoard();
-}
 
-void Game::drawDynamicElements()
-{
+    m_chessBoard.drawModeToggleButtons();
     m_chessBoard.drawFENDescription();
     m_chessBoard.drawStatistics();
     m_chessBoard.drawBoardOverlay();
     m_chessBoard.drawPieces();
 }
+
