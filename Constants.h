@@ -13,6 +13,7 @@ namespace Constants
     extern const int DIM_CB_SIZE;
     extern const int DIM_CB_TILE_SIZE;
     extern const int DIM_PADDING;
+    extern const int DIM_CP_TO_REMOVE;
 
     // file paths
     extern const char* TTF_DEJAVUSANS;
@@ -28,6 +29,8 @@ namespace Constants
     extern const char* IMG_BUTTON_VIEWER_DISABLED;
     extern const char* IMG_BUTTON_SIMULATOR_UP;
     extern const char* IMG_BUTTON_SIMULATOR_DOWN;
+    extern const char* IMG_SLIDER_SLIT;
+    extern const char* IMG_SLIDER_KNOB;
 
     // texture IDs
     extern const std::string ID_BACKGROUND;
@@ -45,6 +48,8 @@ namespace Constants
     extern const std::string ID_TXT_FEN;
     extern const std::string ID_TXT_TITLE_VIEWER;
     extern const std::string ID_TXT_TITLE_SIMULATOR;
+    extern const std::string ID_SLIDER_SLIT;
+    extern const std::string ID_SLIDER_KNOB;
 
     // font IDs
     extern const std::string ID_FONT_DEJAVU;

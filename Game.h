@@ -21,6 +21,7 @@ public:
     bool buttonClicked(const SDL_Rect* r,
                        int xDown, int yDown,
                        int xUp, int yUp) const;
+    bool buttonFocus(const SDL_Rect* r, int x, int y) const;
     void draw();
 
 private:
@@ -28,7 +29,7 @@ private:
     SDL_Window* m_window = NULL;
     bool m_running;
 
-    int m_mouseDownX, m_mouseDownY;
+    int m_mouseDownX, m_mouseDownY, m_offsetX;
 
     ChessBoard m_chessBoard;
 

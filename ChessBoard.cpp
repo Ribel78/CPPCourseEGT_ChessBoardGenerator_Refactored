@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include "Utilities.h"
 #include "TextureFactory.h"
+#include <iostream>
 
 using namespace Constants;
 
@@ -15,7 +16,7 @@ ChessBoard::ChessBoard()
     m_viewing = false;
 
     //Posible UI feature
-    setPiecesToRemove(16);
+    setPiecesToRemove(DIM_CP_TO_REMOVE);
 
     //Chess Board Size and Colors
     m_chessBoardSize = DIM_CB_SIZE;
@@ -27,15 +28,21 @@ ChessBoard::ChessBoard()
     initBoardRects();
 
     //Set up UI Rectangles
-    //const int padding = 40; //make const?
-    //int chess_sq = (DIM_WINDOW_WIDTH / 2) / 8;
 
     m_RectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
-    m_RectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE * 2 , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
+    m_RectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
     m_RectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
     m_RectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
     m_RectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
     m_RectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
+    m_Rect_SliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_Rect_SliderKnob = {m_Rect_SliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_Rect_SliderSlit.w)/ 33), m_Rect_SliderSlit.y, m_Rect_SliderSlit.h, m_Rect_SliderSlit.h};
+
+
+    setButtonViewerTexID(ID_BTN_VIEWER_UP);
+    setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
+    setButtonStartTexID(ID_BTN_START_UP);
+    setButtonStopTexID(ID_BTN_STOP_UP);
 
     m_chessPieceIdx = -1;
 
@@ -75,11 +82,11 @@ void ChessBoard::prepStaticFontTextures()
     TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_SIMULATOR,ID_FONT_SEGOE,
                                                 "Chess Board Simulator",
                                                 COL_TXT_LIGHT,
-                                                1280, 0);
+                                                DIM_WINDOW_WIDTH, 0);
     TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_VIEWER,ID_FONT_SEGOE,
                                                 "Chess Board Viewer",
                                                 COL_TXT_LIGHT,
-                                                1280, 0);
+                                                DIM_WINDOW_WIDTH, 0);
 }
 
 void ChessBoard::prepStaticImageTextures()
@@ -96,6 +103,8 @@ void ChessBoard::prepStaticImageTextures()
     TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_DISABLED, ID_BTN_VIEWER_DISABLED);
     TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_UP, ID_BTN_SIMULATOR_UP);
     TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_DOWN, ID_BTN_SIMULATOR_DOWN);
+    TextureFactory::instance()->textureFromImage(IMG_SLIDER_SLIT, ID_SLIDER_SLIT);
+    TextureFactory::instance()->textureFromImage(IMG_SLIDER_KNOB, ID_SLIDER_KNOB);
 }
 
 void ChessBoard::prepChessPieceTextures()
@@ -144,6 +153,26 @@ void ChessBoard::prepBoardLabelsTextures()
     }
 }
 
+void ChessBoard::setButtonViewerTexID(std::string texture_id)
+{
+    m_ButtonViewerTexID = texture_id;
+}
+
+void ChessBoard::setButtonSimulatorTexID(std::string texture_id)
+{
+    m_ButtonSimulatorTexID = texture_id;
+}
+
+void ChessBoard::setButtonStartTexID(std::string texture_id)
+{
+    m_ButtonStartTexID = texture_id;
+}
+
+void ChessBoard::setButtonStopTexID(std::string texture_id)
+{
+    m_buttonStopTexID = texture_id;
+}
+
 bool ChessBoard::isSimulating() const
 {
     return ChessBoard::m_simulating;
@@ -166,13 +195,18 @@ void ChessBoard::setSimulating(const bool state)
 
 void ChessBoard::setPiecesToRemove(int amount)
 {
-    if (amount < 0 || amount > 30)
+    if (amount < 0 || amount > 29)
     {
         m_piecesToRemove = 8; //default
     } else
     {
         m_piecesToRemove = amount;
     }
+}
+
+int ChessBoard::getPiecesToRemove()
+{
+    return m_piecesToRemove;
 }
 
 /*
@@ -552,6 +586,11 @@ SDL_Rect* ChessBoard::getRectButtonSimulator()
     return &m_RectButtonSimulator;
 }
 
+SDL_Rect* ChessBoard::getRectSliderKnob()
+{
+    return &m_Rect_SliderKnob;
+}
+
 SDL_Rect* ChessBoard::getRectWindow()
 {
     return &m_RectWindow;
@@ -639,18 +678,18 @@ void ChessBoard::drawModeToggleButtons()
     {
         if (isSimulating())
         {
-            TextureFactory::instance()->drawTexture(ID_BTN_STOP_UP, NULL, &m_RectButtonSimulator);
+            TextureFactory::instance()->drawTexture(m_buttonStopTexID, NULL, &m_RectButtonSimulator);
             TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_RectButtonViewer);
         }
         else
         {
-            TextureFactory::instance()->drawTexture(ID_BTN_START_UP, NULL, &m_RectButtonSimulator);
-            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_UP, NULL, &m_RectButtonViewer);
+            TextureFactory::instance()->drawTexture(m_ButtonStartTexID, NULL, &m_RectButtonSimulator);
+            TextureFactory::instance()->drawTexture(m_ButtonViewerTexID, NULL, &m_RectButtonViewer);
         }
     }
     else
     {
-        TextureFactory::instance()->drawTexture(ID_BTN_SIMULATOR_UP, NULL, &m_RectButtonViewer);
+        TextureFactory::instance()->drawTexture(m_ButtonSimulatorTexID, NULL, &m_RectButtonViewer);
     }
 
 }
@@ -713,7 +752,7 @@ void ChessBoard::drawFENDescription()
                                                 ID_FONT_SEGOE28,
                                                 dynamic_fen.c_str(),
                                                 Constants::COL_TXT_LIGHT,
-                                                1280, 0);
+                                                DIM_WINDOW_WIDTH, 0);
 
     TextureFactory::instance()->drawTexture(ID_TXT_FEN,
                                             NULL, &m_RectTextFEN);
@@ -725,17 +764,62 @@ void ChessBoard::drawFENDescription()
 void ChessBoard::drawStatistics()
 {
     // Statistics for the simulation time
-    std::string dynamic_text_Times = getSimulationSummary();
+    std::string dynamic_text = getSimulationSummary();
 
     TextureFactory::instance()->textureFromFont(ID_TXT_STATS,
                                                 ID_FONT_SEGOE28,
-                                                dynamic_text_Times.c_str(),
-                                                Constants::COL_TXT_LIGHT, 640, 0);
+                                                dynamic_text.c_str(),
+                                                Constants::COL_TXT_LIGHT,
+                                                DIM_WINDOW_WIDTH / 2, 0);
 
     TextureFactory::instance()->drawTexture(ID_TXT_STATS,
                                             NULL, &m_RectTextStats);
 
     TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
+}
+
+void ChessBoard::drawSlider(const int& offsetX)
+{
+    TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_Rect_SliderSlit);
+    TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_Rect_SliderKnob);
+    if (offsetX >= 0)
+    {
+        int msx, msy;
+        SDL_GetMouseState(&msx, &msy);
+        m_Rect_SliderKnob.x = msx - offsetX;
+        if (m_Rect_SliderKnob.x < m_Rect_SliderSlit.x)
+            m_Rect_SliderKnob.x = m_Rect_SliderSlit.x;
+        if (m_Rect_SliderKnob.x > m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w))
+            m_Rect_SliderKnob.x = m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w);
+    }
+    int  val = (
+                (
+                    (m_Rect_SliderKnob.x - m_Rect_SliderSlit.x)/
+                    ((m_Rect_SliderSlit.w)/ 33)
+                ) % 34
+               )+3;
+
+    (val > 32)? val = 32 : val;
+
+    setPiecesToRemove(32-val);
+
+    SDL_Rect label = m_Rect_SliderSlit;
+    label.h /= 2;
+    label.y = m_Rect_SliderSlit.y - label.h;
+    label.w /= 2;
+
+    std::string label_text = "Number of chess pieces: ";
+
+    (val < 10)? label_text += " " : label_text;
+
+    label_text.append(std::to_string(val));
+
+    TextureFactory::instance()->textureFromFont(
+        "label", Constants::ID_FONT_SEGOE,
+        label_text.c_str(),
+        Constants::COL_TXT_LIGHT, 1280, 0);
+    TextureFactory::instance()->drawTexture("label", NULL, &label);
+    TextureFactory::instance()->destroyTexture("label");
 }
 
 void ChessBoard::drawBoardOverlay()

@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Game.h"
 #include "TextureFactory.h"
-
+#include "Constants.h"
 
 
 Game::Game()
@@ -67,8 +67,8 @@ bool Game::init(const char* title,
 
     std::cout << "init success\n";
     m_running = true;
-    //m_chessBoard.setSimulating(false);
-    //m_chessBoard.initBoard();
+
+    m_offsetX = -1;
 
     prepTextures();
 
@@ -97,7 +97,7 @@ void Game::update()
                     << std::endl;
 
     //Slow down visual shuffling
-    SDL_Delay(6);
+    //SDL_Delay(6);
 }
 
 void Game::handleEvents()
@@ -162,20 +162,46 @@ void Game::handleEvents()
 		}; break;
         case SDL_MOUSEBUTTONDOWN:
         {
+            using namespace Constants;
 			int msx, msy;
+
             if (event.button.button == SDL_BUTTON_LEFT)
             {
 				SDL_GetMouseState(&msx, &msy);
                 m_mouseDownX = msx;
                 m_mouseDownY = msy;
+
+                if(buttonFocus(m_chessBoard.getRectSliderKnob(), msx, msy))
+                {
+                    m_offsetX = m_mouseDownX - m_chessBoard.getRectSliderKnob()->x;
+                }
+
+                if(buttonFocus(m_chessBoard.getRectButtonViewer(),msx, msy))
+                {
+                    m_chessBoard.setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
+                    m_chessBoard.setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
+                }
+
+                if(buttonFocus(m_chessBoard.getRectButtonSimulator(), msx, msy))
+                {
+                    m_chessBoard.setButtonStartTexID(Constants::ID_BTN_START_DOWN);
+                    m_chessBoard.setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
+                }
 			}
 		}; break;
         case SDL_MOUSEBUTTONUP:
         {
 			int msx, msy;
+            m_offsetX = -1;
+            std::cout << "SimPieces: " << m_chessBoard.getPiecesToRemove() << std::endl;
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
+                m_chessBoard.setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_UP);
+                m_chessBoard.setButtonViewerTexID(Constants::ID_BTN_VIEWER_UP);
+                m_chessBoard.setButtonStartTexID(Constants::ID_BTN_START_UP);
+                m_chessBoard.setButtonStopTexID(Constants::ID_BTN_STOP_UP);
+
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
                 if(buttonClicked(m_chessBoard.getRectButtonSimulator(),
@@ -307,6 +333,17 @@ bool Game::buttonClicked(const SDL_Rect* r,
     return false; //click coordinates outside inside  SDL_Rect r
 }
 
+bool Game::buttonFocus(const SDL_Rect* r,
+                         int x, int y) const
+{
+    if(((x > r->x) && (x < r->x +r->w)) &&
+       ((y > r->y) && (y < r->y +r->h)))
+    {
+        return true; //click coordinates inside  SDL_Rect r
+    }
+    return false; //click coordinates outside inside  SDL_Rect r
+}
+
 void Game::draw()
 {
     m_chessBoard.drawWindowBackground();
@@ -316,6 +353,9 @@ void Game::draw()
     m_chessBoard.drawModeToggleButtons();
     m_chessBoard.drawFENDescription();
     m_chessBoard.drawStatistics();
+
+    m_chessBoard.drawSlider(m_offsetX);
+
     m_chessBoard.drawBoardOverlay();
     m_chessBoard.drawPieces();
 }

@@ -38,7 +38,13 @@ public:
     void prepChessPieceTextures();
     void prepBoardLabelsTextures();
 
+    void setButtonViewerTexID(std::string texture_id);
+    void setButtonSimulatorTexID(std::string texture_id);
+    void setButtonStartTexID(std::string texture_id);
+    void setButtonStopTexID(std::string texture_id);
+
     void setPiecesToRemove(int amount);
+    int getPiecesToRemove();
 
     void shufflePieces(const bool shuff,
                        std::string& custDescription,
@@ -62,18 +68,20 @@ public:
     SDL_Rect* getRectTextFEN();
     SDL_Rect* getRectButtonViewer();
     SDL_Rect* getRectButtonSimulator();
+    SDL_Rect* getRectSliderKnob();
     SDL_Rect* getRectWindow();
 
     std::string getSimulationSummary() const;
     void resetSimulationSummary();
 
     void initBoardRects();
-    void drawTitle();
-    void drawModeToggleButtons();
     void drawWindowBackground();
-	void drawBoard();
-    void drawFENDescription();
+    void drawTitle();
+    void drawBoard();
     void drawStatistics();
+    void drawSlider(const int& offsetX);
+    void drawModeToggleButtons();
+    void drawFENDescription();
 	void drawBoardOverlay();
     void drawPieces();
 
@@ -104,6 +112,13 @@ private:
     SDL_Rect m_RectButtonViewer;
     SDL_Rect m_RectTextTitle;
     SDL_Rect m_RectWindow;
+    SDL_Rect m_Rect_SliderSlit;
+    SDL_Rect m_Rect_SliderKnob;
+
+    std::string m_ButtonViewerTexID {};
+    std::string m_ButtonSimulatorTexID {};
+    std::string m_ButtonStartTexID {};
+    std::string m_buttonStopTexID {};
 
     //colors of the black and white squares and the overlay color
     SDL_Color m_ColorChessBoard[3];

@@ -11,6 +11,7 @@ namespace Constants
     const int DIM_CB_SIZE = DIM_WINDOW_WIDTH / 2;
     const int DIM_CB_TILE_SIZE = DIM_CB_SIZE / 8;
     const int DIM_PADDING = 40;
+    const int DIM_CP_TO_REMOVE = 16;
 
     //file paths
     const char* TTF_DEJAVUSANS = "fonts/DejaVuSans.ttf";
@@ -26,6 +27,8 @@ namespace Constants
     const char* IMG_BUTTON_VIEWER_DISABLED = "images/button_viewer_disabled.png";
     const char* IMG_BUTTON_SIMULATOR_UP = "images/button_simulator_up.png";
     const char* IMG_BUTTON_SIMULATOR_DOWN = "images/button_simulator_down.png";
+    const char* IMG_SLIDER_SLIT = "images/slider_slit.png";
+    const char* IMG_SLIDER_KNOB = "images/slider_knob.png";
 
     //texture IDs
     const std::string ID_BACKGROUND = "background";
@@ -43,6 +46,8 @@ namespace Constants
     const std::string ID_TXT_FEN = "textFEN";
     const std::string ID_TXT_TITLE_VIEWER = "textTitleViewer";
     const std::string ID_TXT_TITLE_SIMULATOR = "textTitleSimulator";
+    const std::string ID_SLIDER_SLIT = "slider_slit";
+    const std::string ID_SLIDER_KNOB = "slider_knob";
 
     // font IDs
     const std::string ID_FONT_DEJAVU = "DejaVu";
