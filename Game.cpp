@@ -93,7 +93,8 @@ void Game::update()
     if(data_stream.is_open())
         data_stream << m_chessBoard.getCurrentDescription().Custom << " "
                     << m_chessBoard.getCurrentDescription().FEN << " "
-                    << m_chessBoard.getCurrentDescription().simulationTime
+                    << m_chessBoard.getCurrentDescription().simulationTime << " "
+                    << m_chessBoard.getCurrentDescription().chess_pieces
                     << std::endl;
 
     //Slow down visual shuffling
@@ -120,11 +121,13 @@ void Game::handleEvents()
                     m_chessBoard.setChessPieceIdx(-1);
                     if(!m_chessBoard.isViewing())
                     {
-                        std::string tempCustDescr, tempFENDescr;
+                        std::string tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs;
                         tempCustDescr = m_chessBoard.getMutableDescriptionsQueue().front().Custom;
                         tempFENDescr = m_chessBoard.getMutableDescriptionsQueue().front().FEN;
+                        tempSimTime = m_chessBoard.getMutableDescriptionsQueue().front().simulationTime;
+                        tempChessPcs = m_chessBoard.getMutableDescriptionsQueue().front().chess_pieces;
                         m_chessBoard.getMutableDescriptionsQueue().pop();
-                        m_chessBoard.getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr});
+                        m_chessBoard.getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs});
                         m_chessBoard.setBoardDescriptionFromQueueBack();
                     }
                     else
@@ -193,7 +196,6 @@ void Game::handleEvents()
         {
 			int msx, msy;
             m_offsetX = -1;
-            std::cout << "SimPieces: " << m_chessBoard.getPiecesToRemove() << std::endl;
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {

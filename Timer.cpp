@@ -35,13 +35,16 @@ void Timer::updateStats()
 /*
 * Statistics for dynamic text display in Simulator Mode
 */
-std::string Timer::simulationTimeStatistics() const
+std::string Timer::simulationTimeStatistics(std::string chess_pieces) const
 {
-	std::string timeStatsString = "";
+    std::string timeStatsString = "";
+    timeStatsString.append("Chess pieces: ");
+    timeStatsString.append(chess_pieces);
+    timeStatsString.append("\n");
 	timeStatsString.append("Number of simulations: ");
     timeStatsString.append(std::to_string(m_numberOfSimulations));
 	timeStatsString.append("\n");
-	timeStatsString.append("Current Simulation Time: ");
+    timeStatsString.append("Last Simulation Time: ");
     timeStatsString.append(std::to_string(m_simulationTime));
 	timeStatsString.append(" ns\n");
 	timeStatsString.append("Total Simulation Time: ");

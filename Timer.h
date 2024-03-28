@@ -11,7 +11,7 @@ public:
     void markEnd();
     void setDurationInNanoseconds();
     void updateStats();
-    std::string simulationTimeStatistics() const;
+    std::string simulationTimeStatistics(std::string chess_pieces) const;
     double getSimulationTime() const;
     void reset();
 

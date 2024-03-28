@@ -9,12 +9,14 @@ struct ChessBoardDescriptions {
     std::string Custom {};
     std::string FEN {};
     std::string simulationTime {};
+    std::string chess_pieces {};
 
     friend auto operator >>(std::istream& input_stream, ChessBoardDescriptions& rhs) -> std::istream&
     {
         input_stream    >> rhs.Custom
                         >> rhs.FEN
-                        >> rhs.simulationTime;;
+                        >> rhs.simulationTime
+                        >> rhs.chess_pieces;
 
         return input_stream;
     }
@@ -84,6 +86,8 @@ public:
     void drawFENDescription();
 	void drawBoardOverlay();
     void drawPieces();
+
+    void simBishopCheck(char chess_set);
 
 private:
 

@@ -46,7 +46,7 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_current_CB_Description = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0"};
+    m_current_CB_Description = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0", std::to_string(32 - m_piecesToRemove)};
     m_CB_Descriptions.push(m_current_CB_Description);
 }
 
@@ -285,7 +285,7 @@ void ChessBoard::shufflePieces(const bool shuff,
             //remove all pawns if foud on end rows - keep count of removed pieces
             int pieces_to_remove = m_piecesToRemove; // !!! this variable controls how many pieces to see on the board
 
-            while(pieces_to_remove > 0)
+            while(pieces_to_remove >= 0)
             {
                 for(int i = 0; i < 64; i++)
                 {
@@ -293,6 +293,8 @@ void ChessBoard::shufflePieces(const bool shuff,
                     {
                         if(chess_set[i] == 'p' || chess_set[i] == 'P')
                         {
+                            if (pieces_to_remove - 1 < 0)
+                                continue;
                             chess_set[i] = '-';
                             pieces_to_remove -= 1;
                         }
@@ -304,6 +306,7 @@ void ChessBoard::shufflePieces(const bool shuff,
                         chess_set[i] = '-';
                     }
                 }
+
                 /*Keep removing randomly selected pieces until m_piecesToRemove pieces in total are removed
                 not counting the the removed kings*/
                 if(pieces_to_remove > 0)
@@ -316,13 +319,31 @@ void ChessBoard::shufflePieces(const bool shuff,
                         pieces_to_remove -= 1;
                     }
                 }
+                else
+                {
+                    break;
+                }
             }
+
+            bool false_pawn = false;
+            for(int i = 0; i < 64; i++)
+            {
+                if(i < 8 || i > (64 - 9))
+                {
+                    if(chess_set[i] == 'p' || chess_set[i] == 'P')
+                    {
+                        false_pawn = true;
+                        break;
+                    }
+                }
+            }
+
             /*
              * pieces_to_remove could be also negative - more pawns on
              * end rows than m_piecesToRemove
              * break the main while loop - start over
             */
-            if (pieces_to_remove < 0)
+            if (pieces_to_remove < 0 || false_pawn)
             {
                 continue;
             }
@@ -448,7 +469,7 @@ void ChessBoard::shufflePieces(const bool shuff,
             fenDescription = FEN;
 
             //converting chess_set and FEN to string and push to queue
-            m_current_CB_Description = {std::string(chess_set), std::string(FEN), std::to_string(m_timer.getSimulationTime())};
+            m_current_CB_Description = {std::string(chess_set), std::string(FEN), std::to_string(m_timer.getSimulationTime()), std::to_string(32 - m_piecesToRemove)};
 
             m_CB_Descriptions.push(m_current_CB_Description);
 
@@ -459,6 +480,7 @@ void ChessBoard::shufflePieces(const bool shuff,
             }
 
             //terminate while loop
+
             rep_sim = false;
         }
     }
@@ -532,6 +554,7 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
     m_current_CB_Description.Custom = m_CB_Descriptions.back().Custom;
+    m_current_CB_Description.chess_pieces = m_CB_Descriptions.back().chess_pieces;
 }
 
 void ChessBoard::setBoardDescriptionFromVector()
@@ -540,6 +563,7 @@ void ChessBoard::setBoardDescriptionFromVector()
     m_current_CB_Description.Custom = m_CB_Descriptions_Vec.at(idx).Custom;
     m_current_CB_Description.FEN = m_CB_Descriptions_Vec.at(idx).FEN;
     m_current_CB_Description.simulationTime = m_CB_Descriptions_Vec.at(idx).simulationTime;
+    m_current_CB_Description.chess_pieces = m_CB_Descriptions_Vec.at(idx).chess_pieces;
 }
 
 int& ChessBoard::getMutable_CB_Descriptions_Vec_Seek()
@@ -600,7 +624,7 @@ std::string ChessBoard::getSimulationSummary() const
 {
     if(!isViewing())
     {
-    return m_timer.simulationTimeStatistics();
+        return m_timer.simulationTimeStatistics(m_current_CB_Description.chess_pieces);
     }
     else
     {
@@ -612,7 +636,10 @@ std::string ChessBoard::getSimulationSummary() const
         file_stat.append("\n");
         file_stat.append("Simulation Time: ");
         file_stat.append(m_current_CB_Description.simulationTime);
-        file_stat.append("\n\n\n");
+        file_stat.append("\n");
+        file_stat.append("Number of pieces: ");
+        file_stat.append(m_current_CB_Description.chess_pieces);
+        file_stat.append("\n\n");
 
         return file_stat;
     }
@@ -808,7 +835,7 @@ void ChessBoard::drawSlider(const int& offsetX)
     label.y = m_Rect_SliderSlit.y - label.h;
     label.w /= 2;
 
-    std::string label_text = "Number of chess pieces: ";
+    std::string label_text = "Set Chess pieces: ";
 
     (val < 10)? label_text += " " : label_text;
 
