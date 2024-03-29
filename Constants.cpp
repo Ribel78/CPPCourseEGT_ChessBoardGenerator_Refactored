@@ -16,6 +16,7 @@ namespace Constants
     //file paths
     const char* TTF_DEJAVUSANS = "fonts/DejaVuSans.ttf";
     const char* TTF_SEGOEPR = "fonts/segoepr.ttf";
+    const char* TTF_FREESERIF = "fonts/FreeSerif.ttf";
     const char* IMG_BACKGROUND = "images/background.jpg";
     const char* IMG_CHESS_TILE = "images/chess_board.jpg";
     const char* IMG_BUTTON_START_UP = "images/button_start_up.png";
@@ -53,6 +54,8 @@ namespace Constants
     const std::string ID_FONT_DEJAVU = "DejaVu";
     const std::string ID_FONT_SEGOE = "Segoe";
     const std::string ID_FONT_SEGOE28 = "Segoe28";
+    const std::string ID_FONT_FREESERIF = "FreeMono";
+
 
     // Colors
 

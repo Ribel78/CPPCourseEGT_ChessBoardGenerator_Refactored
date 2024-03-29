@@ -6,7 +6,6 @@
 #include "Constants.h"
 #include "Utilities.h"
 #include "TextureFactory.h"
-#include <iostream>
 
 using namespace Constants;
 
@@ -15,7 +14,6 @@ ChessBoard::ChessBoard()
     m_simulating = false;
     m_viewing = false;
 
-    //Posible UI feature
     setPiecesToRemove(DIM_CP_TO_REMOVE);
 
     //Chess Board Size and Colors
@@ -37,7 +35,6 @@ ChessBoard::ChessBoard()
     m_RectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
     m_Rect_SliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
     m_Rect_SliderKnob = {m_Rect_SliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_Rect_SliderSlit.w)/ 33), m_Rect_SliderSlit.y, m_Rect_SliderSlit.h, m_Rect_SliderSlit.h};
-
 
     setButtonViewerTexID(ID_BTN_VIEWER_UP);
     setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
@@ -68,49 +65,11 @@ ChessBoard::~ChessBoard()
 
 }
 
-void ChessBoard::prepFonts()
-{
-    // Loading fonts
-    TextureFactory::instance()->loadFont(TTF_DEJAVUSANS, ID_FONT_DEJAVU, 48);
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR, ID_FONT_SEGOE, 72);
-    TextureFactory::instance()->loadFont(TTF_SEGOEPR, ID_FONT_SEGOE28, 28);
-}
-
-void ChessBoard::prepStaticFontTextures()
-{
-    // Title textures
-    TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_SIMULATOR,ID_FONT_SEGOE,
-                                                "Chess Board Simulator",
-                                                COL_TXT_LIGHT,
-                                                DIM_WINDOW_WIDTH, 0);
-    TextureFactory::instance()->textureFromFont(ID_TXT_TITLE_VIEWER,ID_FONT_SEGOE,
-                                                "Chess Board Viewer",
-                                                COL_TXT_LIGHT,
-                                                DIM_WINDOW_WIDTH, 0);
-}
-
-void ChessBoard::prepStaticImageTextures()
-{
-    // Loading image textures
-    TextureFactory::instance()->textureFromImage(IMG_BACKGROUND, ID_BACKGROUND);
-    TextureFactory::instance()->textureFromImage(IMG_CHESS_TILE, ID_CHESS_TILE);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_START_UP, ID_BTN_START_UP);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_START_DOWN, ID_BTN_START_DOWN);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_STOP_UP, ID_BTN_STOP_UP);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_STOP_DOWN, ID_BTN_STOP_DOWN);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_UP, ID_BTN_VIEWER_UP);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_DOWN, ID_BTN_VIEWER_DOWN);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_VIEWER_DISABLED, ID_BTN_VIEWER_DISABLED);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_UP, ID_BTN_SIMULATOR_UP);
-    TextureFactory::instance()->textureFromImage(IMG_BUTTON_SIMULATOR_DOWN, ID_BTN_SIMULATOR_DOWN);
-    TextureFactory::instance()->textureFromImage(IMG_SLIDER_SLIT, ID_SLIDER_SLIT);
-    TextureFactory::instance()->textureFromImage(IMG_SLIDER_KNOB, ID_SLIDER_KNOB);
-}
-
 void ChessBoard::prepChessPieceTextures()
 {
 	// Create textures from font chess characters - only the black pieces (6)
     TTF_Font* DejaVu = TextureFactory::instance()->getFont(ID_FONT_DEJAVU);
+    //TTF_Font* DejaVu = TextureFactory::instance()->getFont(ID_FONT_FREESERIF);
 
     SDL_Surface* tempSurfaceText = NULL;
 
@@ -234,234 +193,51 @@ void ChessBoard::shufflePieces(const bool shuff,
     {
         while(rep_sim == true)
         {
-            //Shuffle all 32 pieces
-            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-            std::default_random_engine rand_en;
-            rand_en.seed(seed);
-            //random chess board with all pieces
-            std::shuffle(chess_set, chess_set+64, rand_en);
-            //new seed for each subsequent use of rand in the code
-            srand(time(NULL));
+            simRandomizeChessSet(chess_set);
 
-            // Check if bishops are on different colors if not re-shuffle
-            int blackBishopOnBlack = 0;
-            int blackBishopOnWhite = 0;
-            int whiteBishopOnBlack = 0;
-            int whiteBishopOnWhite = 0;
-
-            for (int i = 0; i < 64; i++)
-            {
-                if(chess_set[i]=='b'){ // black bishop found
-                    if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
-                        (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
-                    { // check if color of square is black
-                        blackBishopOnBlack += 1;
-                    } else {
-                        blackBishopOnWhite += 1;
-                    }
-                }
-                if(chess_set[i]=='B')
-                { // white bishop found
-                    if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
-                        (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
-                    { // check if color of square is black
-                        whiteBishopOnBlack += 1;
-                    } else
-                    {
-                        whiteBishopOnWhite += 1;
-                    }
-                }
-            }
-
-            if (blackBishopOnBlack > 1 ||
-                blackBishopOnWhite > 1 ||
-                whiteBishopOnBlack > 1 ||
-                whiteBishopOnWhite > 1 )
-            {
-                //if Bishops of a kind on same color square - start a new cycle
+            if(isIllegalBishops(chess_set))
                 continue;
-            }
 
-            //remove all pawns if foud on end rows - keep count of removed pieces
-            int pieces_to_remove = m_piecesToRemove; // !!! this variable controls how many pieces to see on the board
+            int pieces_to_remove = m_piecesToRemove;
 
             while(pieces_to_remove >= 0)
             {
-                for(int i = 0; i < 64; i++)
-                {
-                    if(i < 8 || i > (64 - 9))
-                    {
-                        if(chess_set[i] == 'p' || chess_set[i] == 'P')
-                        {
-                            if (pieces_to_remove - 1 < 0)
-                                continue;
-                            chess_set[i] = '-';
-                            pieces_to_remove -= 1;
-                        }
-                    }
+                removeIllegalPawnsAndKings(chess_set, pieces_to_remove);
 
-                    //Remove both Kings to reintroduce back when board is processed
-                    if((chess_set[i] == 'k' || chess_set[i] == 'K'))
-                    {
-                        chess_set[i] = '-';
-                    }
-                }
-
-                /*Keep removing randomly selected pieces until m_piecesToRemove pieces in total are removed
-                not counting the the removed kings*/
-                if(pieces_to_remove > 0)
-                {
-                    int rand_index = rand()%64;
-
-                    if(chess_set[rand_index]!= '-')
-                    {
-                        chess_set[rand_index] = '-';
-                        pieces_to_remove -= 1;
-                    }
-                }
-                else
-                {
+                if(!isExtraPiecesToRemove(chess_set, pieces_to_remove))
                     break;
-                }
             }
 
-            bool false_pawn = false;
+            bool illegal_pawn = false;
             for(int i = 0; i < 64; i++)
             {
                 if(i < 8 || i > (64 - 9))
                 {
                     if(chess_set[i] == 'p' || chess_set[i] == 'P')
                     {
-                        false_pawn = true;
+                        illegal_pawn = true;
                         break;
                     }
                 }
             }
 
-            /*
-             * pieces_to_remove could be also negative - more pawns on
-             * end rows than m_piecesToRemove
-             * break the main while loop - start over
-            */
-            if (pieces_to_remove < 0 || false_pawn)
+            if (pieces_to_remove < 0 || illegal_pawn)
             {
                 continue;
             }
 
-            // Reintroduce Kings
-            // Add  Black King
-            bool isSafeSquare = false;
-
-            std::string emptySquaresLookup(chess_set);
-
-            //while isSafeSquare is false
-            while(!isSafeSquare)
-            {
-                // random index
-                int rand_index = rand()%64;
-
-                //if not empty start new cycle
-                if (chess_set[rand_index] != '-')
-                {
-                    continue;
-                }
-                for (int b_p = 0; b_p < 6; b_p++)
-                { //test each black piece
-                    std::string attackedPieces = attackSquares(emptySquaresLookup,
-                                                               rand_index % 8,
-                                                               rand_index / 8,
-                                                               Constants::CP_LABELS_BLACK[b_p]);
-
-                    //for cell in attack board
-                    for (char piece : attackedPieces)
-                    {
-                        //if white piece is oposite of current black piece
-                        if (piece == Constants::CP_LABELS_WHITE[b_p])
-                        {
-                            isSafeSquare = false;
-                            break;
-                        } else
-                        {
-                            isSafeSquare = true;
-                        }
-                    }
-                    if (isSafeSquare == false)
-                    {
-                        break;
-                    } else
-                    {
-                        isSafeSquare = true;
-                    }
-                }
-                if (isSafeSquare == true)
-                {
-                    chess_set[rand_index] = 'k';
-                }
-            }
-
-            // Add  White King
-            isSafeSquare = false;
-
-            emptySquaresLookup =std::string(chess_set);
-
-            //while isSafeSquare is false
-            while(!isSafeSquare)
-            {
-                // random index
-                int rand_index = rand()%64;
-
-                //if not empty start new cycle
-                if (chess_set[rand_index] != '-')
-                {
-                    continue;
-                }
-
-                //test each black piece
-                for (int w_p = 0; w_p < 6; w_p++)
-                {
-                    std::string attackedPieces = attackSquares(emptySquaresLookup,
-                                                               rand_index % 8,
-                                                               rand_index / 8,
-                                                               Constants::CP_LABELS_WHITE[w_p]);
-                    //for cell in attack board
-                    for (char piece : attackedPieces)
-                    {
-                        //if white piece is oposite of current black piece
-                        if (piece == Constants::CP_LABELS_BLACK[w_p])
-                        {
-
-                            isSafeSquare = false;
-                            break;
-                        } else
-                        {
-                            isSafeSquare = true;
-                        }
-                    }
-                    if (isSafeSquare == false)
-                    {
-                        break;
-                    } else
-                    {
-                        isSafeSquare = true;
-                    }
-                }
-                if (isSafeSquare == true)
-                {
-                    chess_set[rand_index] = 'K';
-                }
-            }
+            // // Reintroduce Kings
+            addKingsToBoard(chess_set);
 
             //End simulation - caclulate simulation duration in ns
             m_timer.markEnd();
+
             m_timer.setDurationInNanoseconds();
             m_timer.updateStats();
 
-            /*Parsing the randomized custom chess board description to FEN notation
-            More info here:
-            https://www.chess.com/terms/fen-chess */
-
-            //char array to hold the pieces including separators in FEN Format
-            char FEN[71] = {'0',};
+            /*Parsing the chess board description to FEN notation: https://www.chess.com/terms/fen-chess */
+            //char FEN[71] = {'0',};
+            char FEN[71] {};
             parseFEN(chess_set, FEN);
 
             //update external variables
@@ -469,7 +245,11 @@ void ChessBoard::shufflePieces(const bool shuff,
             fenDescription = FEN;
 
             //converting chess_set and FEN to string and push to queue
-            m_current_CB_Description = {std::string(chess_set), std::string(FEN), std::to_string(m_timer.getSimulationTime()), std::to_string(32 - m_piecesToRemove)};
+
+            setCurrentDescription(  std::string(chess_set),
+                                    std::string(FEN),
+                                    std::to_string(m_timer.getSimulationTime()),
+                                    std::to_string(32 - m_piecesToRemove));
 
             m_CB_Descriptions.push(m_current_CB_Description);
 
@@ -586,6 +366,14 @@ ChessBoardDescriptions ChessBoard::getCurrentDescription() const
     return m_current_CB_Description;
 }
 
+void ChessBoard::setCurrentDescription(std::string cd,
+                                       std::string fen,
+                                       std::string sim_time,
+                                       std::string n_pieces)
+{
+    m_current_CB_Description = {cd, fen, sim_time, n_pieces};
+}
+
 void ChessBoard::setChessPieceIdx(int idx){
     m_chessPieceIdx = idx;
 }
@@ -629,7 +417,7 @@ std::string ChessBoard::getSimulationSummary() const
     else
     {
         std::string file_stat {};
-        file_stat.append("Record ");
+        file_stat.append("Board ");
         file_stat.append(std::to_string(m_CB_Descriptions_Vec_Seek + 1));
         file_stat.append(" of ");
         file_stat.append(std::to_string(m_CB_Descriptions_Vec.size()));
@@ -807,46 +595,49 @@ void ChessBoard::drawStatistics()
 
 void ChessBoard::drawSlider(const int& offsetX)
 {
-    TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_Rect_SliderSlit);
-    TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_Rect_SliderKnob);
-    if (offsetX >= 0)
+    if(!m_viewing)
     {
-        int msx, msy;
-        SDL_GetMouseState(&msx, &msy);
-        m_Rect_SliderKnob.x = msx - offsetX;
-        if (m_Rect_SliderKnob.x < m_Rect_SliderSlit.x)
-            m_Rect_SliderKnob.x = m_Rect_SliderSlit.x;
-        if (m_Rect_SliderKnob.x > m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w))
-            m_Rect_SliderKnob.x = m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w);
+        TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_Rect_SliderSlit);
+        TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_Rect_SliderKnob);
+        if (offsetX >= 0)
+        {
+            int msx, msy;
+            SDL_GetMouseState(&msx, &msy);
+            m_Rect_SliderKnob.x = msx - offsetX;
+            if (m_Rect_SliderKnob.x < m_Rect_SliderSlit.x)
+                m_Rect_SliderKnob.x = m_Rect_SliderSlit.x;
+            if (m_Rect_SliderKnob.x > m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w))
+                m_Rect_SliderKnob.x = m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w);
+        }
+        int  val = (
+                    (
+                        (m_Rect_SliderKnob.x - m_Rect_SliderSlit.x)/
+                        ((m_Rect_SliderSlit.w)/ 33)
+                    ) % 34
+                   )+3;
+
+        (val > 32)? val = 32 : val;
+
+        setPiecesToRemove(32-val);
+
+        SDL_Rect label = m_Rect_SliderSlit;
+        label.h /= 2;
+        label.y = m_Rect_SliderSlit.y - label.h;
+        label.w /= 2;
+
+        std::string label_text = "Set chess pieces: ";
+
+        (val < 10)? label_text += " " : label_text;
+
+        label_text.append(std::to_string(val));
+
+        TextureFactory::instance()->textureFromFont(
+            "label", Constants::ID_FONT_SEGOE,
+            label_text.c_str(),
+            Constants::COL_TXT_LIGHT, 1280, 0);
+        TextureFactory::instance()->drawTexture("label", NULL, &label);
+        TextureFactory::instance()->destroyTexture("label");
     }
-    int  val = (
-                (
-                    (m_Rect_SliderKnob.x - m_Rect_SliderSlit.x)/
-                    ((m_Rect_SliderSlit.w)/ 33)
-                ) % 34
-               )+3;
-
-    (val > 32)? val = 32 : val;
-
-    setPiecesToRemove(32-val);
-
-    SDL_Rect label = m_Rect_SliderSlit;
-    label.h /= 2;
-    label.y = m_Rect_SliderSlit.y - label.h;
-    label.w /= 2;
-
-    std::string label_text = "Set Chess pieces: ";
-
-    (val < 10)? label_text += " " : label_text;
-
-    label_text.append(std::to_string(val));
-
-    TextureFactory::instance()->textureFromFont(
-        "label", Constants::ID_FONT_SEGOE,
-        label_text.c_str(),
-        Constants::COL_TXT_LIGHT, 1280, 0);
-    TextureFactory::instance()->drawTexture("label", NULL, &label);
-    TextureFactory::instance()->destroyTexture("label");
 }
 
 void ChessBoard::drawBoardOverlay()
@@ -898,7 +689,7 @@ void ChessBoard::drawPieces()
 		}
         for (int j = 0; j < 12; j++)
         {
-            if (chessBoardShuffle[i] == Constants::STR_CB_LOOKUPREF[j])
+            if (chessBoardShuffle[i] == STR_CB_LOOKUPREF[j])
             {
                 SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                                m_chessPieces[j],
@@ -910,4 +701,201 @@ void ChessBoard::drawPieces()
 	}
 }
 
+void ChessBoard::simRandomizeChessSet(char (&char_array)[65])
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine rand_en;
+    rand_en.seed(seed);
+    //random chess board with all pieces
+    std::shuffle(char_array, char_array+64, rand_en);
+
+    srand(time(NULL));
+}
+
+bool ChessBoard::isIllegalBishops(char (&char_array)[65])
+{
+    int blackBishopOnBlack = 0;
+    int blackBishopOnWhite = 0;
+    int whiteBishopOnBlack = 0;
+    int whiteBishopOnWhite = 0;
+
+    for (int i = 0; i < 64; i++)
+    {
+        if(char_array[i]=='b'){ // black bishop found
+            if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
+                (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
+            { // check if color of square is black
+                blackBishopOnBlack += 1;
+            } else {
+                blackBishopOnWhite += 1;
+            }
+        }
+        if(char_array[i]=='B')
+        { // white bishop found
+            if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
+                (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
+            { // check if color of square is black
+                whiteBishopOnBlack += 1;
+            } else
+            {
+                whiteBishopOnWhite += 1;
+            }
+        }
+    }
+
+    return (blackBishopOnBlack > 1 ||
+        blackBishopOnWhite > 1 ||
+        whiteBishopOnBlack > 1 ||
+            whiteBishopOnWhite > 1 );
+
+}
+
+void ChessBoard::removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable_int)
+{
+    for(int i = 0; i < 64; i++)
+    {
+        if(i < 8 || i > (64 - 9))
+        {
+            if(char_array[i] == 'p' || char_array[i] == 'P')
+            {
+                if (mutable_int - 1 < 0)
+                    continue;
+                char_array[i] = '-';
+                mutable_int -= 1;
+            }
+        }
+
+        //Remove both Kings to reintroduce back when board is processed
+        if((char_array[i] == 'k' || char_array[i] == 'K'))
+        {
+            char_array[i] = '-';
+        }
+    }
+}
+
+bool ChessBoard::isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int)
+{
+    if(mutable_int > 0)
+    {
+        int rand_index = rand()%64;
+
+        if(char_array[rand_index]!= '-')
+        {
+            char_array[rand_index] = '-';
+            mutable_int -= 1;
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void ChessBoard::addKingsToBoard(char (&char_arr)[65])
+{
+    // Reintroduce Kings
+    // Add  Black King
+    bool isSafeSquare = false;
+
+    std::string emptySquaresLookup(char_arr);
+
+    //while isSafeSquare is false
+    while(!isSafeSquare)
+    {
+        // random index
+        int rand_index = rand()%64;
+
+        //if not empty start new cycle
+        if (char_arr[rand_index] != '-')
+        {
+            continue;
+        }
+        for (int b_p = 0; b_p < 6; b_p++)
+        { //test each black piece
+            std::string attackedPieces = attackSquares(emptySquaresLookup,
+                                                       rand_index % 8,
+                                                       rand_index / 8,
+                                                       CP_LABELS_BLACK[b_p]);
+
+            //for cell in attack board
+            for (char piece : attackedPieces)
+            {
+                //if white piece is oposite of current black piece
+                if (piece == CP_LABELS_WHITE[b_p])
+                {
+                    isSafeSquare = false;
+                    break;
+                } else
+                {
+                    isSafeSquare = true;
+                }
+            }
+            if (isSafeSquare == false)
+            {
+                break;
+            } else
+            {
+                isSafeSquare = true;
+            }
+        }
+        if (isSafeSquare == true)
+        {
+            char_arr[rand_index] = 'k';
+        }
+    }
+
+    // Add  White King
+    isSafeSquare = false;
+
+    emptySquaresLookup = std::string(char_arr);
+
+    //while isSafeSquare is false
+    while(!isSafeSquare)
+    {
+        // random index
+        int rand_index = rand()%64;
+
+        //if not empty start new cycle
+        if (char_arr[rand_index] != '-')
+        {
+            continue;
+        }
+
+        //test each black piece
+        for (int w_p = 0; w_p < 6; w_p++)
+        {
+            std::string attackedPieces = attackSquares(emptySquaresLookup,
+                                                       rand_index % 8,
+                                                       rand_index / 8,
+                                                       CP_LABELS_WHITE[w_p]);
+            //for cell in attack board
+            for (char piece : attackedPieces)
+            {
+                //if white piece is oposite of current black piece
+                if (piece == CP_LABELS_BLACK[w_p])
+                {
+
+                    isSafeSquare = false;
+                    break;
+                } else
+                {
+                    isSafeSquare = true;
+                }
+            }
+            if (isSafeSquare == false)
+            {
+                break;
+            } else
+            {
+                isSafeSquare = true;
+            }
+        }
+        if (isSafeSquare == true)
+        {
+            char_arr[rand_index] = 'K';
+        }
+    }
+}
 

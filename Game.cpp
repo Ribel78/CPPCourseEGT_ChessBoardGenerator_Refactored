@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Game.h"
 #include "TextureFactory.h"
+#include "Resources.h"
 #include "Constants.h"
 
 
@@ -75,12 +76,14 @@ bool Game::init(const char* title,
 	return true;
 }
 
-// Prepare textures for rendering
 void Game::prepTextures()
 {
-    m_chessBoard.prepFonts();
-    m_chessBoard.prepStaticFontTextures();
-    m_chessBoard.prepStaticImageTextures();
+    //Prepare resources
+    prepFonts();
+    prepStaticFontTextures();
+    prepStaticImageTextures();
+
+    //Try moving to Resources
     m_chessBoard.prepChessPieceTextures();
     m_chessBoard.prepBoardLabelsTextures();
 }

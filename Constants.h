@@ -18,6 +18,7 @@ namespace Constants
     // file paths
     extern const char* TTF_DEJAVUSANS;
     extern const char* TTF_SEGOEPR;
+    extern const char* TTF_FREESERIF;
     extern const char* IMG_BACKGROUND;
     extern const char* IMG_CHESS_TILE;
     extern const char* IMG_BUTTON_START_UP;
@@ -55,6 +56,7 @@ namespace Constants
     extern const std::string ID_FONT_DEJAVU;
     extern const std::string ID_FONT_SEGOE;
     extern const std::string ID_FONT_SEGOE28;
+    extern const std::string ID_FONT_FREESERIF;
 
     // colors
 

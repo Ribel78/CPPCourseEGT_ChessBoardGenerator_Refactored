@@ -34,9 +34,6 @@ public:
     void setSimulating(const bool state);
     void setViewing(const bool state);
 
-    void prepFonts();
-    void prepStaticFontTextures();
-    void prepStaticImageTextures();
     void prepChessPieceTextures();
     void prepBoardLabelsTextures();
 
@@ -63,6 +60,10 @@ public:
     std::vector<ChessBoardDescriptions>& getMutableDescriptionsVector();
 
     ChessBoardDescriptions getCurrentDescription() const;
+    void setCurrentDescription(std::string cd,
+                               std::string fen,
+                               std::string sim_time,
+                               std::string n_pieces);
 
     void setChessPieceIdx(int idx);
 
@@ -87,9 +88,16 @@ public:
 	void drawBoardOverlay();
     void drawPieces();
 
-    void simBishopCheck(char chess_set);
+
 
 private:
+
+    //shifflePieces helper functions
+    void simRandomizeChessSet(char (&char_array)[65]);
+    bool isIllegalBishops(char (&char_array)[65]);
+    void removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable_int);
+    bool isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int);
+    void addKingsToBoard(char (&char_arr)[65]);
 
     //parse result from shufflePieces to valid FEN notation for dispaly
     void parseFEN(const char chess_set[65], char FEN[71]);
