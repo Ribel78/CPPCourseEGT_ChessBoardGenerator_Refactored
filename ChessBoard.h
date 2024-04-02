@@ -28,14 +28,11 @@ public:
     ChessBoard();
     ~ChessBoard();
 
-    bool isSimulating() const;
-    bool isViewing() const;
+    auto isSimulating() const -> bool;
+    auto isViewing() const -> bool;
 
     void setSimulating(const bool state);
     void setViewing(const bool state);
-
-    void prepChessPieceTextures();
-    void prepBoardLabelsTextures();
 
     void setButtonViewerTexID(std::string texture_id);
     void setButtonSimulatorTexID(std::string texture_id);
@@ -43,23 +40,22 @@ public:
     void setButtonStopTexID(std::string texture_id);
 
     void setPiecesToRemove(int amount);
-    int getPiecesToRemove();
+    auto getPiecesToRemove() -> int;
 
     void shufflePieces(const bool shuff,
                        std::string& custDescription,
                        std::string& fenDescription);
 
-    //sets boardDescription from the queue back (last simulation) used in overlay display
     void setBoardDescriptionFromQueueBack();
     void setBoardDescriptionFromVector();
 
-    int& getMutable_CB_Descriptions_Vec_Seek();
+    auto getMutable_CB_Descriptions_Vec_Seek() -> int&;
 
-    std::queue<ChessBoardDescriptions>& getMutableDescriptionsQueue();
+    auto getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&;
 
-    std::vector<ChessBoardDescriptions>& getMutableDescriptionsVector();
+    auto getMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&;
 
-    ChessBoardDescriptions getCurrentDescription() const;
+    auto getCurrentDescription() const -> ChessBoardDescriptions;
     void setCurrentDescription(std::string cd,
                                std::string fen,
                                std::string sim_time,
@@ -67,14 +63,14 @@ public:
 
     void setChessPieceIdx(int idx);
 
-    SDL_Rect* getRectChessBoardTile(int idx) const;
-    SDL_Rect* getRectTextFEN();
-    SDL_Rect* getRectButtonViewer();
-    SDL_Rect* getRectButtonSimulator();
-    SDL_Rect* getRectSliderKnob();
-    SDL_Rect* getRectWindow();
+    auto getRectChessBoardTile(int idx) const -> SDL_Rect*;
+    auto getRectTextFEN() -> SDL_Rect*;
+    auto getRectButtonViewer() -> SDL_Rect*;
+    auto getRectButtonSimulator() -> SDL_Rect*;
+    auto getRectSliderKnob() -> SDL_Rect*;
+    auto getRectWindow() -> SDL_Rect*;
 
-    std::string getSimulationSummary() const;
+    auto getSimulationSummary() const -> std::string;
     void resetSimulationSummary();
 
     void initBoardRects();
@@ -94,9 +90,9 @@ private:
 
     //shifflePieces helper functions
     void simRandomizeChessSet(char (&char_array)[65]);
-    bool isIllegalBishops(char (&char_array)[65]);
+    auto isIllegalBishops(char (&char_array)[65]) -> bool;
     void removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable_int);
-    bool isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int);
+    auto isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int) -> bool;
     void addKingsToBoard(char (&char_arr)[65]);
 
     //parse result from shufflePieces to valid FEN notation for dispaly

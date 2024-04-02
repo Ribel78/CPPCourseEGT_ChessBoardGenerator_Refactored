@@ -3,6 +3,9 @@
 #include <string>
 #include <chrono>
 
+using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
+using TimeDuration = std::chrono::duration<double>;
+
 class Timer{
 
 public:
@@ -11,14 +14,14 @@ public:
     void markEnd();
     void setDurationInNanoseconds();
     void updateStats();
-    std::string simulationTimeStatistics(std::string chess_pieces) const;
-    double getSimulationTime() const;
+    auto simulationTimeStatistics(std::string chess_pieces) const -> std::string;
+    auto getSimulationTime() const -> double;
     void reset();
 
 private:
-    std::chrono::time_point<std::chrono::steady_clock> m_startTime;
-    std::chrono::time_point<std::chrono::steady_clock> m_endTime;
-    std::chrono::duration<double> m_simTime;
+    TimePoint m_startTime;
+    TimePoint m_endTime;
+    TimeDuration m_simTime;
     int m_numberOfSimulations;
     double m_totalSimulationTime;
     double m_averageSimulationTime;

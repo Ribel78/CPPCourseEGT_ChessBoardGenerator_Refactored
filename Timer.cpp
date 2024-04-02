@@ -35,7 +35,7 @@ void Timer::updateStats()
 /*
 * Statistics for dynamic text display in Simulator Mode
 */
-std::string Timer::simulationTimeStatistics(std::string chess_pieces) const
+auto Timer::simulationTimeStatistics(std::string chess_pieces) const -> std::string
 {
     std::string timeStatsString = "";
     timeStatsString.append("Chess pieces: ");
@@ -57,7 +57,7 @@ std::string Timer::simulationTimeStatistics(std::string chess_pieces) const
 	return 	timeStatsString;
 }
 
-double Timer::getSimulationTime() const
+auto Timer::getSimulationTime() const -> double
 {
     return m_simulationTime;
 }

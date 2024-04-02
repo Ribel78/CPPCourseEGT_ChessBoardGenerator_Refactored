@@ -29,15 +29,15 @@ void TextureFactory::setRenderer(SDL_Renderer *renderer)
     m_renderer = renderer;
 }
 
-SDL_Renderer *TextureFactory::getRenderer()
+auto TextureFactory::getRenderer() const -> SDL_Renderer*
 {
     return m_renderer;
 }
 
 //Produce static textures ttf fonts and store into a map
-bool TextureFactory::loadFont(const char* fileName,
+auto TextureFactory::loadFont(const char* fileName,
                               const std::string& font_id,
-                              int font_size)
+                              int font_size) -> bool
 {
     if(TTF_Init() == -1)
     {
@@ -56,7 +56,7 @@ bool TextureFactory::loadFont(const char* fileName,
     }
 }
 
-TTF_Font* TextureFactory::getFont(const std::string& font_id) const
+auto TextureFactory::getFont(const std::string& font_id) const -> TTF_Font*
 {
     auto it = m_fonts.find(font_id);
     if(it != m_fonts.end())
@@ -68,8 +68,9 @@ TTF_Font* TextureFactory::getFont(const std::string& font_id) const
 }
 
 //Produce static textures from images files and store into a map
-bool TextureFactory::textureFromImage(const char* fileName,
-                                      const std::string& texture_id){
+auto TextureFactory::textureFromImage(const char* fileName,
+                                      const std::string& texture_id) -> bool
+{
 
     SDL_Texture* tex = NULL;
 
@@ -128,6 +129,41 @@ bool TextureFactory::textureFromFont(const std::string& texture_id,
         return true;
     else
         return false;
+}
+//_unicode - of type "\u265A"
+auto TextureFactory::textureFromUnicode(const std::string& texture_id,
+                                         const std::string& font_id,
+                                         const char* unicode,
+                                         const SDL_Color& fg) -> bool
+{
+    TTF_Font* font = getFont(font_id);
+
+    SDL_Surface* tempSurfaceText = NULL;
+
+    tempSurfaceText = TTF_RenderUTF8_Blended(font, unicode, fg);
+
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
+
+    SDL_FreeSurface(tempSurfaceText);
+
+    m_textures[texture_id] = tex;
+    if(tex)
+        return true;
+    else
+        return false;
+}
+//UNUSED
+void TextureFactory::packTexture(const std::string& texture_id, const std::string& pack_id)
+{
+    m_texture_pack[pack_id].push_back(m_textures[texture_id]);
+}
+//UNUSED
+auto TextureFactory::getTextureFromPack(const std::string& pack_id, int tex_idx) -> SDL_Texture*
+{
+    if (tex_idx < m_texture_pack[pack_id].size())
+        return m_texture_pack[pack_id][tex_idx];
+    else
+        return NULL;
 }
 
 void TextureFactory::drawTexture(const std::string& texture_id,

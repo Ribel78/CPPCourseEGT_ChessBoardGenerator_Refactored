@@ -20,10 +20,10 @@ Game::~Game()
 }
 
 //Initialize SDL library
-bool Game::init(const char* title,
+auto Game::init(const char* title,
                 int xpos, int ypos,
                 int width, int height,
-                int flags)
+                int flags) -> bool
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
     {
@@ -82,10 +82,8 @@ void Game::prepTextures()
     prepFonts();
     prepStaticFontTextures();
     prepStaticImageTextures();
-
-    //Try moving to Resources
-    m_chessBoard.prepChessPieceTextures();
-    m_chessBoard.prepBoardLabelsTextures();
+    prepChessPieceTextures();
+    prepBoardLabelsTextures();
 }
 
 void Game::update()
@@ -101,7 +99,7 @@ void Game::update()
                     << std::endl;
 
     //Slow down visual shuffling
-    //SDL_Delay(6);
+    SDL_Delay(6);
 }
 
 void Game::handleEvents()
@@ -218,11 +216,11 @@ void Game::handleEvents()
                     {
                         m_chessBoard.setSimulating(false);
                         data_stream.close();
-
                     }
                     else
                     {
                         m_chessBoard.setSimulating(true);
+                        m_chessBoard.setChessPieceIdx(-1);
                         m_chessBoard.resetSimulationSummary();
 
                         data_stream.open("data/descriptions.csv", std::ios::out);
@@ -319,7 +317,7 @@ void Game::clean()
     SDL_Quit();
 }
 
-bool Game::isRunning() const
+auto Game::isRunning() const -> bool
 {
     return Game::m_running;
 }
@@ -338,8 +336,8 @@ bool Game::buttonClicked(const SDL_Rect* r,
     return false; //click coordinates outside inside  SDL_Rect r
 }
 
-bool Game::buttonFocus(const SDL_Rect* r,
-                         int x, int y) const
+auto Game::buttonFocus(const SDL_Rect* r,
+                       int x, int y) const -> bool
 {
     if(((x > r->x) && (x < r->x +r->w)) &&
        ((y > r->y) && (y < r->y +r->h)))

@@ -65,53 +65,6 @@ ChessBoard::~ChessBoard()
 
 }
 
-void ChessBoard::prepChessPieceTextures()
-{
-	// Create textures from font chess characters - only the black pieces (6)
-    TTF_Font* DejaVu = TextureFactory::instance()->getFont(ID_FONT_DEJAVU);
-    //TTF_Font* DejaVu = TextureFactory::instance()->getFont(ID_FONT_FREESERIF);
-
-    SDL_Surface* tempSurfaceText = NULL;
-
-    for (int i = 0; i < 12; i++)
-    {
-        if (i / 6 == 0)
-        { // white chess glyphs - K, Q, R, B, N, P
-
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), COL_CP_LIGHT);
-            m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
-                                                            tempSurfaceText);
-        }
-        else
-        { // black chess glyphs - k, q, r, b, n, p
-            tempSurfaceText = TTF_RenderUTF8_Blended(DejaVu, CPB_UNICODE[i % 6].c_str(), COL_CP_DARK);
-            m_chessPieces[i] = SDL_CreateTextureFromSurface(TextureFactory::instance()->getRenderer(),
-                                                            tempSurfaceText);
-        }
-    }
-    SDL_FreeSurface(tempSurfaceText);
-}
-
-void ChessBoard::prepBoardLabelsTextures()
-{
-    for(int i = 0; i < 8; i++)
-    {
-        std::string h_label = std::string(1, ('a' + i));
-        TextureFactory::instance()->textureFromFont(h_label,
-                                                    ID_FONT_DEJAVU,
-                                                    h_label.c_str(),
-                                                    (i%2)?COL_CB_DARK : COL_CB_LIGHT,
-                                                    64, 32);
-
-        std::string v_label = std::string(1, ('8' - i));
-        TextureFactory::instance()->textureFromFont(v_label,
-                                                    ID_FONT_DEJAVU,
-                                                    v_label.c_str(),
-                                                    (i%2)?COL_CB_LIGHT : COL_CB_DARK,
-                                                    64, 32);
-    }
-}
-
 void ChessBoard::setButtonViewerTexID(std::string texture_id)
 {
     m_ButtonViewerTexID = texture_id;
@@ -132,12 +85,12 @@ void ChessBoard::setButtonStopTexID(std::string texture_id)
     m_buttonStopTexID = texture_id;
 }
 
-bool ChessBoard::isSimulating() const
+auto ChessBoard::isSimulating() const -> bool
 {
     return ChessBoard::m_simulating;
 }
 
-bool ChessBoard::isViewing() const
+auto ChessBoard::isViewing() const -> bool
 {
     return ChessBoard::m_viewing;
 }
@@ -163,7 +116,7 @@ void ChessBoard::setPiecesToRemove(int amount)
     }
 }
 
-int ChessBoard::getPiecesToRemove()
+auto ChessBoard::getPiecesToRemove() -> int
 {
     return m_piecesToRemove;
 }
@@ -346,22 +299,22 @@ void ChessBoard::setBoardDescriptionFromVector()
     m_current_CB_Description.chess_pieces = m_CB_Descriptions_Vec.at(idx).chess_pieces;
 }
 
-int& ChessBoard::getMutable_CB_Descriptions_Vec_Seek()
+auto ChessBoard::getMutable_CB_Descriptions_Vec_Seek() -> int&
 {
     return m_CB_Descriptions_Vec_Seek;
 }
 
-std::queue<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsQueue()
+auto ChessBoard::getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&
 {
     return m_CB_Descriptions;
 }
 
-std::vector<ChessBoardDescriptions>& ChessBoard::getMutableDescriptionsVector()
+auto ChessBoard::getMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&
 {
     return m_CB_Descriptions_Vec;
 }
 
-ChessBoardDescriptions ChessBoard::getCurrentDescription() const
+auto ChessBoard::getCurrentDescription() const -> ChessBoardDescriptions
 {
     return m_current_CB_Description;
 }
@@ -378,37 +331,37 @@ void ChessBoard::setChessPieceIdx(int idx){
     m_chessPieceIdx = idx;
 }
 
-SDL_Rect* ChessBoard::getRectChessBoardTile(int idx) const
+auto ChessBoard::getRectChessBoardTile(int idx) const -> SDL_Rect*
 {
     return m_RectPtrChessBoardTile[idx];
 }
 
-SDL_Rect* ChessBoard::getRectTextFEN()
+auto ChessBoard::getRectTextFEN() -> SDL_Rect*
 {
     return &m_RectTextFEN;
 }
 
-SDL_Rect* ChessBoard::getRectButtonViewer()
+auto ChessBoard::getRectButtonViewer() -> SDL_Rect*
 {
     return &m_RectButtonViewer;
 }
 
-SDL_Rect* ChessBoard::getRectButtonSimulator()
+auto ChessBoard::getRectButtonSimulator() -> SDL_Rect*
 {
     return &m_RectButtonSimulator;
 }
 
-SDL_Rect* ChessBoard::getRectSliderKnob()
+auto ChessBoard::getRectSliderKnob() -> SDL_Rect*
 {
     return &m_Rect_SliderKnob;
 }
 
-SDL_Rect* ChessBoard::getRectWindow()
+auto ChessBoard::getRectWindow() -> SDL_Rect*
 {
     return &m_RectWindow;
 }
 
-std::string ChessBoard::getSimulationSummary() const
+auto ChessBoard::getSimulationSummary() const -> std::string
 {
     if(!isViewing())
     {
@@ -691,10 +644,14 @@ void ChessBoard::drawPieces()
         {
             if (chessBoardShuffle[i] == STR_CB_LOOKUPREF[j])
             {
-                SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
-                               m_chessPieces[j],
-                               NULL,
-                               m_RectPtrChessBoardTile[i]);
+                TextureFactory::instance()->drawTexture(std::to_string(STR_CB_LOOKUPREF[j]),
+                                                        NULL,
+                                                        m_RectPtrChessBoardTile[i]);
+                //Variant 2 get from texture pack with index number
+                // SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
+                //                TextureFactory::instance()->getTextureFromPack("chess_pack", j),
+                //                NULL,
+                //                m_RectPtrChessBoardTile[i]);
 				continue;
 			}
 		}

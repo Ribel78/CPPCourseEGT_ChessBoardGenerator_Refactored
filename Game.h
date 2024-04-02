@@ -9,19 +9,19 @@ public:
 	Game();
 	~Game();
 
-    bool init(const char* title,
+    auto init(const char* title,
               int xpos, int ypos,
               int width, int height,
-              int flags);
+              int flags) -> bool;
     void prepTextures();
     void update();
     void handleEvents();
     void clean();
-    bool isRunning() const;
+    auto isRunning() const -> bool;
     bool buttonClicked(const SDL_Rect* r,
                        int xDown, int yDown,
                        int xUp, int yUp) const;
-    bool buttonFocus(const SDL_Rect* r, int x, int y) const;
+    auto buttonFocus(const SDL_Rect* r, int x, int y) const -> bool;
     void draw();
 
 private:

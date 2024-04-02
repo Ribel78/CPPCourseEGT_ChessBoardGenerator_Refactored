@@ -45,3 +45,50 @@ void prepStaticImageTextures()
     TextureFactory::instance()->textureFromImage(IMG_SLIDER_SLIT, ID_SLIDER_SLIT);
     TextureFactory::instance()->textureFromImage(IMG_SLIDER_KNOB, ID_SLIDER_KNOB);
 }
+
+void prepChessPieceTextures()
+{
+    // Create textures from font chess characters !Important id's are ASCII char values
+    // to avoid overlapping with labels texture id's
+    for (int i = 0; i < 12; i++)
+    {
+        if (i / 6 == 0)
+        { // white chess glyphs - K, Q, R, B, N, P
+            TextureFactory::instance()->textureFromUnicode(std::to_string(STR_CB_LOOKUPREF[i]),
+                                                           ID_FONT_DEJAVU,
+                                                           CPB_UNICODE[i % 6].c_str(),
+                                                           COL_CP_LIGHT);
+            // TextureFactory::instance()->packTexture(std::to_string(STR_CB_LOOKUPREF[i]),
+            //                                         "chess_pack");
+        }
+        else
+        { // black chess glyphs - k, q, r, b, n, p
+            TextureFactory::instance()->textureFromUnicode(std::to_string(STR_CB_LOOKUPREF[i]),
+                                                           ID_FONT_DEJAVU,
+                                                           CPB_UNICODE[i % 6].c_str(),
+                                                           COL_CP_DARK);
+            // TextureFactory::instance()->packTexture(std::to_string(STR_CB_LOOKUPREF[i]),
+            //                                         "chess_pack");
+        }
+    }
+}
+
+void prepBoardLabelsTextures()
+{
+    for(int i = 0; i < 8; i++)
+    {
+        std::string h_label = std::string(1, ('a' + i));
+        TextureFactory::instance()->textureFromFont(h_label,
+                                                    ID_FONT_DEJAVU,
+                                                    h_label.c_str(),
+                                                    (i%2)?COL_CB_DARK : COL_CB_LIGHT,
+                                                    64, 32);
+
+        std::string v_label = std::string(1, ('8' - i));
+        TextureFactory::instance()->textureFromFont(v_label,
+                                                    ID_FONT_DEJAVU,
+                                                    v_label.c_str(),
+                                                    (i%2)?COL_CB_LIGHT : COL_CB_DARK,
+                                                    64, 32);
+    }
+}
