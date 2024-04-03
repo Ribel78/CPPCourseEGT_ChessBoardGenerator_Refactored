@@ -82,7 +82,7 @@ public:
     void drawTitle();
     void drawBoard();
     void drawStatistics();
-    void drawSlider(const int& offsetX);
+    void drawSlider();
     void drawModeToggleButtons();
     void drawFENDescription();
 	void drawBoardOverlay();
@@ -91,6 +91,20 @@ public:
     void viewDescriptionNext();
     void viewDescriptionPrevious();
     void copyFENtoClipboard();
+
+    //TODO think of better names potentially a Button object
+    bool isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const;
+    auto buttonFocus(const SDL_Rect* r) const -> bool;
+    void setMouseDownCoords(int x, int y);
+    void updateBtnTexturesOnFocus();
+    //end TODO
+
+    void readDescriptionFile(std::fstream& dataStream);
+    void openDescriptionFileForWriting(std::fstream& dataStream);
+    void setCurrentBoardDescriptionSrc();
+
+    // TODO move as private
+    int m_offsetX = -1;
 
 private:
 
@@ -111,6 +125,11 @@ private:
     int m_chessBoardSize;
 
     int m_piecesToRemove;
+
+    //mouse parameters
+
+    int m_mouseDownX{}, m_mouseDownY{};
+
 
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];

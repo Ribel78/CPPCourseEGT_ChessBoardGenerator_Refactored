@@ -6,6 +6,8 @@
 #include "Constants.h"
 #include "Utilities.h"
 #include "TextureFactory.h"
+#include <iostream>
+#include <fstream>
 
 using namespace Constants;
 
@@ -564,17 +566,17 @@ void ChessBoard::drawStatistics()
     TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
 }
 
-void ChessBoard::drawSlider(const int& offsetX)
+void ChessBoard::drawSlider()
 {
     if(!m_viewing)
     {
         TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
         TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
-        if (offsetX >= 0)
+        if (m_offsetX >= 0)
         {
             int msx, msy;
             SDL_GetMouseState(&msx, &msy);
-            m_rectSliderKnob.x = msx - offsetX;
+            m_rectSliderKnob.x = msx - m_offsetX;
             if (m_rectSliderKnob.x < m_rectSliderSlit.x)
                 m_rectSliderKnob.x = m_rectSliderSlit.x;
             if (m_rectSliderKnob.x > m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w))
@@ -930,3 +932,95 @@ void ChessBoard::addKingsToBoard(char (&char_arr)[65])
     }
 }
 
+bool ChessBoard::isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const
+{
+    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
+        ((xUp > r->x) && (xUp < r->x +r->w))&&
+        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)) &&
+        ((yUp > r->y) && (yUp < r->y +r->h)))
+    {
+        return true; //click coordinates inside  SDL_Rect r
+    }
+    return false; //click coordinates outside inside  SDL_Rect r
+}
+
+auto ChessBoard::buttonFocus(const SDL_Rect* r) const -> bool
+{
+    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
+        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)))
+    {
+        return true; //click coordinates inside  SDL_Rect r
+    }
+    return false; //click coordinates outside inside  SDL_Rect r
+}
+
+void ChessBoard::setMouseDownCoords(int x, int y)
+{
+    m_mouseDownX = x;
+    m_mouseDownY = y;
+}
+
+void ChessBoard::updateBtnTexturesOnFocus()
+{
+
+    if(buttonFocus(getRectSliderKnob()))
+    {
+        m_offsetX = m_mouseDownX - getRectSliderKnob()->x;
+    }
+
+    if(buttonFocus(getRectButtonViewer()))
+    {
+        setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
+        setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
+    }
+
+    if(buttonFocus(getRectButtonSimulator()))
+    {
+        setButtonStartTexID(Constants::ID_BTN_START_DOWN);
+        setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
+    }
+}
+
+void ChessBoard::readDescriptionFile(std::fstream& dataStream)
+{
+    if (!isViewing())
+    {
+        getMutableDescriptionsVector().clear();
+
+        dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::in);
+
+        ChessBoardDescriptions temp_cb_descr;
+
+        while(dataStream >> temp_cb_descr)
+        {
+            getMutableDescriptionsVector().push_back(temp_cb_descr);
+        }
+        dataStream.close();
+    }
+}
+
+void ChessBoard::openDescriptionFileForWriting(std::fstream& dataStream)
+{
+    if (isSimulating())
+    {
+        dataStream.close();
+    }
+    else
+    {
+        dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::out);
+        if(!dataStream.is_open())
+            std::cout << "Failed to open data/descriptions.csv" << std::endl;
+    }
+}
+
+void ChessBoard::setCurrentBoardDescriptionSrc()
+{
+    if(!isViewing())
+    {
+        setBoardDescriptionFromQueueBack();
+    }
+    else
+    {
+        setBoardDescriptionFromVector();
+    }
+}

@@ -60,6 +60,13 @@ namespace Constants
     extern const std::string ID_FONT_SEGOE28;
     extern const std::string ID_FONT_FREESERIF;
 
+    // button IDs
+    extern const std::string ID_BTN_START;
+    extern const std::string ID_BTN_STOP;
+    extern const std::string ID_BTN_VIEWER;
+    extern const std::string ID_BTN_SIMULATOR;
+    extern const std::string ID_BTN_SLIDER;
+
     // colors
 
     extern const SDL_Color COL_WINDOW_BG;
