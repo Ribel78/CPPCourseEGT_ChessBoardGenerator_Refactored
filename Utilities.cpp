@@ -2,6 +2,7 @@
 
 #include "Utilities.h"
 #include "Constants.h"
+#include <iostream>
 
 /*
 _boardDescription - chess board description in custom format 
@@ -789,4 +790,16 @@ std::string attackSquares(const std::string& boardDescription,
     }     
 
     return boardOverlay;
+}
+
+void openURL(const char* url)
+{
+    try {
+        std::string command = std::string("x-www-browser ") + std::string(url);
+        //Ubuntu only - open URL in the default browser
+        system(command.c_str());
+
+    } catch (...) {
+        std::cout << "Error opening URL in browser." << std::endl;
+    }
 }

@@ -40,3 +40,6 @@ void pawnAttack(const std::string& boardDescription,
 std::string attackSquares(const std::string& boardDescription,
                           int x, int y,
                           char piece = '\0' );
+
+void openURL(const char* url);
+

@@ -30,6 +30,7 @@ namespace Constants
     const char* IMG_BUTTON_SIMULATOR_DOWN = "images/button_simulator_down.png";
     const char* IMG_SLIDER_SLIT = "images/slider_slit.png";
     const char* IMG_SLIDER_KNOB = "images/slider_knob.png";
+    const char* URL_365CHESS = "https://www.365chess.com/board_editor.php";
 
     //texture IDs
     const std::string ID_BACKGROUND = "background";

@@ -4,10 +4,10 @@
 
 Timer::Timer()
 {
-    m_numberOfSimulations = 0;
-    m_totalSimulationTime = 0;
-    m_averageSimulationTime = 0;
-    m_simulationTime = 0;
+    // m_numberOfSimulations = 0;
+    // m_totalSimulationTime = 0;
+    // m_averageSimulationTime = 0;
+    // m_simulationTime = 0;
 }
 
 void Timer::markStart()
@@ -21,12 +21,12 @@ void Timer::markEnd()
 
 void Timer::setDurationInNanoseconds()
 {
-    m_simTime = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
+    m_durationNanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
 }
 
 void Timer::updateStats()
 {
-    m_simulationTime = m_simTime.count();
+    m_simulationTime = m_durationNanoseconds.count();
     m_numberOfSimulations += 1;
     m_totalSimulationTime += m_simulationTime;
     m_averageSimulationTime = m_totalSimulationTime / m_numberOfSimulations;

@@ -18,23 +18,23 @@ ChessBoard::ChessBoard()
 
     //Chess Board Size and Colors
     m_chessBoardSize = DIM_CB_SIZE;
-    m_ColorChessBoard[0] = COL_CB_LIGHT;
-    m_ColorChessBoard[1] = COL_CB_DARK;
-    m_ColorChessBoard[2] = COL_CB_HIGHLIGHT;
+    m_colorChessBoard[0] = COL_CB_LIGHT;
+    m_colorChessBoard[1] = COL_CB_DARK;
+    m_colorChessBoard[2] = COL_CB_HIGHLIGHT;
 
     //Generate and place various chess board rectangles
     initBoardRects();
 
     //Set up UI Rectangles
 
-    m_RectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
-    m_RectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
-    m_RectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_RectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_RectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_RectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
-    m_Rect_SliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_Rect_SliderKnob = {m_Rect_SliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_Rect_SliderSlit.w)/ 33), m_Rect_SliderSlit.y, m_Rect_SliderSlit.h, m_Rect_SliderSlit.h};
+    m_rectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
+    m_rectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
+    m_rectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_rectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_rectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_rectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
+    m_rectSliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
 
     setButtonViewerTexID(ID_BTN_VIEWER_UP);
     setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
@@ -43,8 +43,8 @@ ChessBoard::ChessBoard()
 
     m_chessPieceIdx = -1;
 
-    m_current_CB_Description = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0", std::to_string(32 - m_piecesToRemove)};
-    m_CB_Descriptions.push(m_current_CB_Description);
+    m_currentCBDescription = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0", std::to_string(32 - m_piecesToRemove)};
+    m_cbDescriptions.push(m_currentCBDescription);
 }
 
 ChessBoard::~ChessBoard()
@@ -52,32 +52,32 @@ ChessBoard::~ChessBoard()
     // delete chess board rectangles
     for (int i = 0; i < 64; i++)
     {
-        delete m_RectPtrChessBoardTile[i];
+        delete m_rectPtrChessBoardTile[i];
     }
 
     // delete chess board labels
     for (int i = 0; i < 8; i++)
     {
-        delete m_RectPtrBoardLabelsV[i];
-        delete m_RectPtrBoardLabelsH[i];
+        delete m_rectPtrBoardLabelsV[i];
+        delete m_rectPtrBoardLabelsH[i];
     }
-    delete m_RectPtrFloatingChessTile;
+    delete m_rectPtrFloatingChessTile;
 
 }
 
 void ChessBoard::setButtonViewerTexID(std::string texture_id)
 {
-    m_ButtonViewerTexID = texture_id;
+    m_buttonViewerTexID = texture_id;
 }
 
 void ChessBoard::setButtonSimulatorTexID(std::string texture_id)
 {
-    m_ButtonSimulatorTexID = texture_id;
+    m_buttonSimulatorTexID = texture_id;
 }
 
 void ChessBoard::setButtonStartTexID(std::string texture_id)
 {
-    m_ButtonStartTexID = texture_id;
+    m_buttonStartTexID = texture_id;
 }
 
 void ChessBoard::setButtonStopTexID(std::string texture_id)
@@ -204,12 +204,12 @@ void ChessBoard::shufflePieces(const bool shuff,
                                     std::to_string(m_timer.getSimulationTime()),
                                     std::to_string(32 - m_piecesToRemove));
 
-            m_CB_Descriptions.push(m_current_CB_Description);
+            m_cbDescriptions.push(m_currentCBDescription);
 
             //if queue exceeds 20 pop one out
-            if(m_CB_Descriptions.size()==21)
+            if(m_cbDescriptions.size()==21)
             {
-                m_CB_Descriptions.pop();
+                m_cbDescriptions.pop();
             }
 
             //terminate while loop
@@ -220,8 +220,8 @@ void ChessBoard::shufflePieces(const bool shuff,
     else
     { //if shuff = false, display last board descriptions in queue
         if(!isViewing()){
-            custDescription = m_CB_Descriptions.back().Custom;
-            fenDescription = m_CB_Descriptions.back().FEN;
+            custDescription = m_cbDescriptions.back().Custom;
+            fenDescription = m_cbDescriptions.back().FEN;
         }
         else
         {
@@ -286,37 +286,37 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
 {
-    m_current_CB_Description.Custom = m_CB_Descriptions.back().Custom;
-    m_current_CB_Description.chess_pieces = m_CB_Descriptions.back().chess_pieces;
+    m_currentCBDescription.Custom = m_cbDescriptions.back().Custom;
+    m_currentCBDescription.chess_pieces = m_cbDescriptions.back().chess_pieces;
 }
 
 void ChessBoard::setBoardDescriptionFromVector()
 {
-    int idx = m_CB_Descriptions_Vec_Seek % m_CB_Descriptions_Vec.size();
-    m_current_CB_Description.Custom = m_CB_Descriptions_Vec.at(idx).Custom;
-    m_current_CB_Description.FEN = m_CB_Descriptions_Vec.at(idx).FEN;
-    m_current_CB_Description.simulationTime = m_CB_Descriptions_Vec.at(idx).simulationTime;
-    m_current_CB_Description.chess_pieces = m_CB_Descriptions_Vec.at(idx).chess_pieces;
+    int idx = m_cbDescriptionsVecSeek % m_cbDescriptionsVec.size();
+    m_currentCBDescription.Custom = m_cbDescriptionsVec.at(idx).Custom;
+    m_currentCBDescription.FEN = m_cbDescriptionsVec.at(idx).FEN;
+    m_currentCBDescription.simulationTime = m_cbDescriptionsVec.at(idx).simulationTime;
+    m_currentCBDescription.chess_pieces = m_cbDescriptionsVec.at(idx).chess_pieces;
 }
 
-auto ChessBoard::getMutable_CB_Descriptions_Vec_Seek() -> int&
+auto ChessBoard::getMutableCBDescriptionsVecSeek() -> int&
 {
-    return m_CB_Descriptions_Vec_Seek;
+    return m_cbDescriptionsVecSeek;
 }
 
 auto ChessBoard::getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&
 {
-    return m_CB_Descriptions;
+    return m_cbDescriptions;
 }
 
 auto ChessBoard::getMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&
 {
-    return m_CB_Descriptions_Vec;
+    return m_cbDescriptionsVec;
 }
 
 auto ChessBoard::getCurrentDescription() const -> ChessBoardDescriptions
 {
-    return m_current_CB_Description;
+    return m_currentCBDescription;
 }
 
 void ChessBoard::setCurrentDescription(std::string cd,
@@ -324,7 +324,7 @@ void ChessBoard::setCurrentDescription(std::string cd,
                                        std::string sim_time,
                                        std::string n_pieces)
 {
-    m_current_CB_Description = {cd, fen, sim_time, n_pieces};
+    m_currentCBDescription = {cd, fen, sim_time, n_pieces};
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
@@ -333,53 +333,53 @@ void ChessBoard::setChessPieceIdx(int idx){
 
 auto ChessBoard::getRectChessBoardTile(int idx) const -> SDL_Rect*
 {
-    return m_RectPtrChessBoardTile[idx];
+    return m_rectPtrChessBoardTile[idx];
 }
 
 auto ChessBoard::getRectTextFEN() -> SDL_Rect*
 {
-    return &m_RectTextFEN;
+    return &m_rectTextFEN;
 }
 
 auto ChessBoard::getRectButtonViewer() -> SDL_Rect*
 {
-    return &m_RectButtonViewer;
+    return &m_rectButtonViewer;
 }
 
 auto ChessBoard::getRectButtonSimulator() -> SDL_Rect*
 {
-    return &m_RectButtonSimulator;
+    return &m_rectButtonSimulator;
 }
 
 auto ChessBoard::getRectSliderKnob() -> SDL_Rect*
 {
-    return &m_Rect_SliderKnob;
+    return &m_rectSliderKnob;
 }
 
 auto ChessBoard::getRectWindow() -> SDL_Rect*
 {
-    return &m_RectWindow;
+    return &m_rectWindow;
 }
 
 auto ChessBoard::getSimulationSummary() const -> std::string
 {
     if(!isViewing())
     {
-        return m_timer.simulationTimeStatistics(m_current_CB_Description.chess_pieces);
+        return m_timer.simulationTimeStatistics(m_currentCBDescription.chess_pieces);
     }
     else
     {
         std::string file_stat {};
         file_stat.append("Board ");
-        file_stat.append(std::to_string(m_CB_Descriptions_Vec_Seek + 1));
+        file_stat.append(std::to_string(m_cbDescriptionsVecSeek + 1));
         file_stat.append(" of ");
-        file_stat.append(std::to_string(m_CB_Descriptions_Vec.size()));
+        file_stat.append(std::to_string(m_cbDescriptionsVec.size()));
         file_stat.append("\n");
         file_stat.append("Simulation Time: ");
-        file_stat.append(m_current_CB_Description.simulationTime);
+        file_stat.append(m_currentCBDescription.simulationTime);
         file_stat.append("\n");
         file_stat.append("Number of pieces: ");
-        file_stat.append(m_current_CB_Description.chess_pieces);
+        file_stat.append(m_currentCBDescription.chess_pieces);
         file_stat.append("\n\n");
 
         return file_stat;
@@ -396,20 +396,20 @@ void ChessBoard::initBoardRects()
     //init squares rects
     for (int i = 0; i < 64; i++)
     {
-        m_RectPtrChessBoardTile[i] = new SDL_Rect{0, 0, 0, 0};
+        m_rectPtrChessBoardTile[i] = new SDL_Rect{0, 0, 0, 0};
     }
     //init label rects
     for (int i = 0; i < 8; i++)
     {
-        m_RectPtrBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
-        m_RectPtrBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
+        m_rectPtrBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
+        m_rectPtrBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
     }
     //place square rects
     for (int i = 0; i < 64; i++)
     {
-        m_RectPtrChessBoardTile[i]->x = (i % 8)*(m_chessBoardSize / 8);
-        m_RectPtrChessBoardTile[i]->y = (i / 8)*(m_chessBoardSize / 8);
-        m_RectPtrChessBoardTile[i]->w = m_RectPtrChessBoardTile[i]->h = m_chessBoardSize / 8;
+        m_rectPtrChessBoardTile[i]->x = (i % 8)*(m_chessBoardSize / 8);
+        m_rectPtrChessBoardTile[i]->y = (i / 8)*(m_chessBoardSize / 8);
+        m_rectPtrChessBoardTile[i]->w = m_rectPtrChessBoardTile[i]->h = m_chessBoardSize / 8;
     }
     //place label rects
     int square_size = m_chessBoardSize / 8;
@@ -417,26 +417,26 @@ void ChessBoard::initBoardRects()
     for(int i = 0; i <8 ; i++)
     {
         //Labels
-        m_RectPtrBoardLabelsV[i]->x = 0;
-        m_RectPtrBoardLabelsV[i]->y = (i * square_size);
-        m_RectPtrBoardLabelsV[i]->w = m_RectPtrBoardLabelsV[i]->h = label_size;
+        m_rectPtrBoardLabelsV[i]->x = 0;
+        m_rectPtrBoardLabelsV[i]->y = (i * square_size);
+        m_rectPtrBoardLabelsV[i]->w = m_rectPtrBoardLabelsV[i]->h = label_size;
 
-        m_RectPtrBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
-        m_RectPtrBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
-        m_RectPtrBoardLabelsH[i]->w = m_RectPtrBoardLabelsH[i]->h = label_size;
+        m_rectPtrBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
+        m_rectPtrBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
+        m_rectPtrBoardLabelsH[i]->w = m_rectPtrBoardLabelsH[i]->h = label_size;
     }
 
     //init random board tile texture rect
-    m_RectPtrFloatingChessTile = new SDL_Rect{0, 0, 64, 64};
+    m_rectPtrFloatingChessTile = new SDL_Rect{0, 0, 64, 64};
 }
 
 void ChessBoard::drawTitle()
 {
     // Title
     if(isViewing())
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_RectTextTitle);
+        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
     else
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_RectTextTitle);
+        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_rectTextTitle);
 
 }
 
@@ -446,25 +446,25 @@ void ChessBoard::drawModeToggleButtons()
     {
         if (isSimulating())
         {
-            TextureFactory::instance()->drawTexture(m_buttonStopTexID, NULL, &m_RectButtonSimulator);
-            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_RectButtonViewer);
+            TextureFactory::instance()->drawTexture(m_buttonStopTexID, NULL, &m_rectButtonSimulator);
+            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_rectButtonViewer);
         }
         else
         {
-            TextureFactory::instance()->drawTexture(m_ButtonStartTexID, NULL, &m_RectButtonSimulator);
-            TextureFactory::instance()->drawTexture(m_ButtonViewerTexID, NULL, &m_RectButtonViewer);
+            TextureFactory::instance()->drawTexture(m_buttonStartTexID, NULL, &m_rectButtonSimulator);
+            TextureFactory::instance()->drawTexture(m_buttonViewerTexID, NULL, &m_rectButtonViewer);
         }
     }
     else
     {
-        TextureFactory::instance()->drawTexture(m_ButtonSimulatorTexID, NULL, &m_RectButtonViewer);
+        TextureFactory::instance()->drawTexture(m_buttonSimulatorTexID, NULL, &m_rectButtonViewer);
     }
 
 }
 
 void ChessBoard::drawWindowBackground(){
     //Window BG Texture
-    TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_RectWindow);
+    TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
 }
 
 void ChessBoard::drawBoard()
@@ -474,19 +474,19 @@ void ChessBoard::drawBoard()
     {
 		SDL_SetRenderDrawColor(
             TextureFactory::instance()->getRenderer(),
-            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2 ].r,
-            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].g,
-            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].b,
-            m_ColorChessBoard[(i + ( i / 8 ) % 2 ) %2].a
+            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2 ].r,
+            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].g,
+            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].b,
+            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].a
             );
 
         SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                           m_RectPtrChessBoardTile[i]);
+                           m_rectPtrChessBoardTile[i]);
         srand (i);
-        m_RectPtrFloatingChessTile->x = rand()%(640-64);
-        m_RectPtrFloatingChessTile->y = rand()%(640-64);
+        m_rectPtrFloatingChessTile->x = rand()%(640-64);
+        m_rectPtrFloatingChessTile->y = rand()%(640-64);
         TextureFactory::instance()->setTextureAlpha(ID_CHESS_TILE, 55);
-        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, m_RectPtrFloatingChessTile, m_RectPtrChessBoardTile[i]);
+        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, m_rectPtrFloatingChessTile, m_rectPtrChessBoardTile[i]);
 	}
 
     // Draw label textures for the board
@@ -497,10 +497,10 @@ void ChessBoard::drawBoard()
     for(int i = 0; i < 8 ; i++)
     {
         TextureFactory::instance()->drawTexture(std::string(1, ('a' + i)),
-                                                NULL, m_RectPtrBoardLabelsH[i]);
+                                                NULL, m_rectPtrBoardLabelsH[i]);
 
         TextureFactory::instance()->drawTexture(std::string(1, ('8' - i)),
-                                                NULL, m_RectPtrBoardLabelsV[i]);
+                                                NULL, m_rectPtrBoardLabelsV[i]);
     }
 }
 
@@ -523,7 +523,7 @@ void ChessBoard::drawFENDescription()
                                                 DIM_WINDOW_WIDTH, 0);
 
     TextureFactory::instance()->drawTexture(ID_TXT_FEN,
-                                            NULL, &m_RectTextFEN);
+                                            NULL, &m_rectTextFEN);
 
     TextureFactory::instance()->destroyTexture(ID_TXT_FEN);
 
@@ -541,7 +541,7 @@ void ChessBoard::drawStatistics()
                                                 DIM_WINDOW_WIDTH / 2, 0);
 
     TextureFactory::instance()->drawTexture(ID_TXT_STATS,
-                                            NULL, &m_RectTextStats);
+                                            NULL, &m_rectTextStats);
 
     TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
 }
@@ -550,22 +550,22 @@ void ChessBoard::drawSlider(const int& offsetX)
 {
     if(!m_viewing)
     {
-        TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_Rect_SliderSlit);
-        TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_Rect_SliderKnob);
+        TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
+        TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
         if (offsetX >= 0)
         {
             int msx, msy;
             SDL_GetMouseState(&msx, &msy);
-            m_Rect_SliderKnob.x = msx - offsetX;
-            if (m_Rect_SliderKnob.x < m_Rect_SliderSlit.x)
-                m_Rect_SliderKnob.x = m_Rect_SliderSlit.x;
-            if (m_Rect_SliderKnob.x > m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w))
-                m_Rect_SliderKnob.x = m_Rect_SliderSlit.x + (m_Rect_SliderSlit.w - m_Rect_SliderKnob.w);
+            m_rectSliderKnob.x = msx - offsetX;
+            if (m_rectSliderKnob.x < m_rectSliderSlit.x)
+                m_rectSliderKnob.x = m_rectSliderSlit.x;
+            if (m_rectSliderKnob.x > m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w))
+                m_rectSliderKnob.x = m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w);
         }
         int  val = (
                     (
-                        (m_Rect_SliderKnob.x - m_Rect_SliderSlit.x)/
-                        ((m_Rect_SliderSlit.w)/ 33)
+                       (m_rectSliderKnob.x - m_rectSliderSlit.x)/
+                       ((m_rectSliderSlit.w)/ 33)
                     ) % 34
                    )+3;
 
@@ -573,9 +573,9 @@ void ChessBoard::drawSlider(const int& offsetX)
 
         setPiecesToRemove(32-val);
 
-        SDL_Rect label = m_Rect_SliderSlit;
+        SDL_Rect label = m_rectSliderSlit;
         label.h /= 2;
-        label.y = m_Rect_SliderSlit.y - label.h;
+        label.y = m_rectSliderSlit.y - label.h;
         label.w /= 2;
 
         std::string label_text = "Set chess pieces: ";
@@ -601,7 +601,7 @@ void ChessBoard::drawBoardOverlay()
         int x = m_chessPieceIdx % 8;
         int y = m_chessPieceIdx / 8;
 
-        std::string overlay = attackSquares(m_current_CB_Description.Custom, x, y, '\0' );
+        std::string overlay = attackSquares(m_currentCBDescription.Custom, x, y, '\0' );
 
         for (int i = 0; i < 64; i++)
         {
@@ -610,19 +610,19 @@ void ChessBoard::drawBoardOverlay()
 
             //hide unused rectangles with 0 alpha value
             SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
-                                   m_ColorChessBoard[2].r,
-                                   m_ColorChessBoard[2].g,
-                                   m_ColorChessBoard[2].b,
+                                   m_colorChessBoard[2].r,
+                                   m_colorChessBoard[2].g,
+                                   m_colorChessBoard[2].b,
                                    ((overlay[i]!='-') ? 100 : 0));
 
             SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
-                               m_RectPtrChessBoardTile[i]);
+                               m_rectPtrChessBoardTile[i]);
 		}
 
     } else
     {
 		//Board descriptions is empty - no overlay
-        m_current_CB_Description.Custom = "----------------------------------------------------------------";
+        m_currentCBDescription.Custom = "----------------------------------------------------------------";
 	}
 }
 
@@ -646,7 +646,7 @@ void ChessBoard::drawPieces()
             {
                 TextureFactory::instance()->drawTexture(std::to_string(STR_CB_LOOKUPREF[j]),
                                                         NULL,
-                                                        m_RectPtrChessBoardTile[i]);
+                                                        m_rectPtrChessBoardTile[i]);
                 //Variant 2 get from texture pack with index number
                 // SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
                 //                TextureFactory::instance()->getTextureFromPack("chess_pack", j),
@@ -655,8 +655,64 @@ void ChessBoard::drawPieces()
 				continue;
 			}
 		}
-	}
+    }
 }
+
+void ChessBoard::viewDescriptionNext()
+{
+    if(!isViewing())
+    {
+        std::string tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs;
+        tempCustDescr = getMutableDescriptionsQueue().front().Custom;
+        tempFENDescr = getMutableDescriptionsQueue().front().FEN;
+        tempSimTime = getMutableDescriptionsQueue().front().simulationTime;
+        tempChessPcs = getMutableDescriptionsQueue().front().chess_pieces;
+        getMutableDescriptionsQueue().pop();
+        getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs});
+        setBoardDescriptionFromQueueBack();
+    }
+    else
+    {
+        getMutableCBDescriptionsVecSeek() += 1;
+        getMutableCBDescriptionsVecSeek() %= getMutableDescriptionsVector().size();
+        setBoardDescriptionFromVector();
+    }
+}
+
+void ChessBoard::viewDescriptionPrevious()
+{
+    if(!isViewing())
+    {
+        for (int i = 0; i < getMutableDescriptionsQueue().size()-1; i++)
+        {
+            ChessBoardDescriptions temp = getMutableDescriptionsQueue().front();
+            getMutableDescriptionsQueue().pop();
+            getMutableDescriptionsQueue().push(temp);
+        }
+    }
+    else
+    {
+        if (getMutableCBDescriptionsVecSeek() - 1 < 0)
+            getMutableCBDescriptionsVecSeek() = getMutableDescriptionsVector().size()-1;
+        else
+            getMutableCBDescriptionsVecSeek() -= 1;
+        setBoardDescriptionFromVector();
+    }
+}
+
+void ChessBoard::copyFENtoClipboard()
+{
+    std::string clipboard_text{};
+
+    if(!isViewing())
+        clipboard_text = getMutableDescriptionsQueue().back().FEN;
+    else
+        clipboard_text = getCurrentDescription().FEN;
+
+    SDL_SetClipboardText(clipboard_text.c_str());
+}
+
+
 
 void ChessBoard::simRandomizeChessSet(char (&char_array)[65])
 {

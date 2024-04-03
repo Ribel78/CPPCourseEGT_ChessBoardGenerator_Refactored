@@ -61,5 +61,5 @@ private:
     static TextureFactory* m_instance;
     std::map<std::string, TTF_Font*> m_fonts;
     std::map<std::string, SDL_Texture*> m_textures;
-    std::map<std::string, std::vector<SDL_Texture*>> m_texture_pack;
+    std::map<std::string, std::vector<SDL_Texture*>> m_texturePack;
 };

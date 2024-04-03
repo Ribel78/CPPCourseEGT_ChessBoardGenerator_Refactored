@@ -1,5 +1,6 @@
 project(ChessBoard)
 
+
 find_package(SDL2 REQUIRED)
 
 file( GLOB SRCS *.cpp *.h *.hpp )

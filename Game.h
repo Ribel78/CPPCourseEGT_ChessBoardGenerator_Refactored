@@ -33,6 +33,6 @@ private:
 
     ChessBoard m_chessBoard;
 
-    std::fstream data_stream;
+    std::fstream m_dataStream;
 
 };

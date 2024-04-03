@@ -19,12 +19,12 @@ public:
     void reset();
 
 private:
-    TimePoint m_startTime;
-    TimePoint m_endTime;
-    TimeDuration m_simTime;
-    int m_numberOfSimulations;
-    double m_totalSimulationTime;
-    double m_averageSimulationTime;
-    double m_simulationTime;
+    TimePoint m_startTime{};
+    TimePoint m_endTime{};
+    TimeDuration m_durationNanoseconds{};
+    int m_numberOfSimulations{};
+    double m_totalSimulationTime{};
+    double m_averageSimulationTime{};
+    double m_simulationTime{};
 
 };

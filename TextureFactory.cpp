@@ -155,13 +155,13 @@ auto TextureFactory::textureFromUnicode(const std::string& texture_id,
 //UNUSED
 void TextureFactory::packTexture(const std::string& texture_id, const std::string& pack_id)
 {
-    m_texture_pack[pack_id].push_back(m_textures[texture_id]);
+    m_texturePack[pack_id].push_back(m_textures[texture_id]);
 }
 //UNUSED
 auto TextureFactory::getTextureFromPack(const std::string& pack_id, int tex_idx) -> SDL_Texture*
 {
-    if (tex_idx < m_texture_pack[pack_id].size())
-        return m_texture_pack[pack_id][tex_idx];
+    if (tex_idx < m_texturePack[pack_id].size())
+        return m_texturePack[pack_id][tex_idx];
     else
         return NULL;
 }

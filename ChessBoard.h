@@ -49,7 +49,7 @@ public:
     void setBoardDescriptionFromQueueBack();
     void setBoardDescriptionFromVector();
 
-    auto getMutable_CB_Descriptions_Vec_Seek() -> int&;
+    auto getMutableCBDescriptionsVecSeek() -> int&;
 
     auto getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&;
 
@@ -84,7 +84,9 @@ public:
 	void drawBoardOverlay();
     void drawPieces();
 
-
+    void viewDescriptionNext();
+    void viewDescriptionPrevious();
+    void copyFENtoClipboard();
 
 private:
 
@@ -109,39 +111,39 @@ private:
     //store textures of the 12 unique chess pieces
     SDL_Texture* m_chessPieces[12];
 
-    SDL_Rect* m_RectPtrChessBoardTile[64];
-    SDL_Rect* m_RectPtrFloatingChessTile;
-    SDL_Rect* m_RectPtrBoardLabelsV[8];
-    SDL_Rect* m_RectPtrBoardLabelsH[8];
+    SDL_Rect* m_rectPtrChessBoardTile[64];
+    SDL_Rect* m_rectPtrFloatingChessTile;
+    SDL_Rect* m_rectPtrBoardLabelsV[8];
+    SDL_Rect* m_rectPtrBoardLabelsH[8];
 
-    SDL_Rect m_RectTextFEN;
-    SDL_Rect m_RectTextStats;
-    SDL_Rect m_RectButtonSimulator;
-    SDL_Rect m_RectButtonViewer;
-    SDL_Rect m_RectTextTitle;
-    SDL_Rect m_RectWindow;
-    SDL_Rect m_Rect_SliderSlit;
-    SDL_Rect m_Rect_SliderKnob;
+    SDL_Rect m_rectTextFEN;
+    SDL_Rect m_rectTextStats;
+    SDL_Rect m_rectButtonSimulator;
+    SDL_Rect m_rectButtonViewer;
+    SDL_Rect m_rectTextTitle;
+    SDL_Rect m_rectWindow;
+    SDL_Rect m_rectSliderSlit;
+    SDL_Rect m_rectSliderKnob;
 
-    std::string m_ButtonViewerTexID {};
-    std::string m_ButtonSimulatorTexID {};
-    std::string m_ButtonStartTexID {};
+    std::string m_buttonViewerTexID {};
+    std::string m_buttonSimulatorTexID {};
+    std::string m_buttonStartTexID {};
     std::string m_buttonStopTexID {};
 
     //colors of the black and white squares and the overlay color
-    SDL_Color m_ColorChessBoard[3];
+    SDL_Color m_colorChessBoard[3];
 
 	//Used in drawing the Board Overlay
     //the index of the clicked square, -1 if board overlay is off
     int m_chessPieceIdx;
 
-    std::queue<ChessBoardDescriptions> m_CB_Descriptions;
+    std::queue<ChessBoardDescriptions> m_cbDescriptions;
 
-    std::vector<ChessBoardDescriptions> m_CB_Descriptions_Vec;
-    int m_CB_Descriptions_Vec_Seek {};
+    std::vector<ChessBoardDescriptions> m_cbDescriptionsVec;
+    int m_cbDescriptionsVecSeek {};
 
     //current chess board description
-    ChessBoardDescriptions m_current_CB_Description;
+    ChessBoardDescriptions m_currentCBDescription;
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;
