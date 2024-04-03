@@ -36,10 +36,11 @@ ChessBoard::ChessBoard()
     m_rectSliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
     m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
 
-    setButtonViewerTexID(ID_BTN_VIEWER_UP);
-    setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
-    setButtonStartTexID(ID_BTN_START_UP);
-    setButtonStopTexID(ID_BTN_STOP_UP);
+    resetAllButtonsTexID();
+    // setButtonViewerTexID(ID_BTN_VIEWER_UP);
+    // setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
+    // setButtonStartTexID(ID_BTN_START_UP);
+    // setButtonStopTexID(ID_BTN_STOP_UP);
 
     m_chessPieceIdx = -1;
 
@@ -98,6 +99,15 @@ auto ChessBoard::isViewing() const -> bool
 void ChessBoard::setViewing(const bool state)
 {
     ChessBoard::m_viewing = state;
+}
+
+void ChessBoard::toggleSimulating()
+{
+    (isSimulating()) ? setSimulating(false) : setSimulating(true);
+}
+void ChessBoard::toggleViewing()
+{
+    (isViewing()) ? setViewing(false) : setViewing(true);
 }
 
 void ChessBoard::setSimulating(const bool state)
@@ -282,6 +292,14 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
             empty_space = 0;
         }
     }
+}
+
+void ChessBoard::resetAllButtonsTexID()
+{
+    setButtonViewerTexID(ID_BTN_VIEWER_UP);
+    setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
+    setButtonStartTexID(ID_BTN_START_UP);
+    setButtonStopTexID(ID_BTN_STOP_UP);
 }
 
 void ChessBoard::setBoardDescriptionFromQueueBack()

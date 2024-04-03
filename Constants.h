@@ -33,6 +33,7 @@ namespace Constants
     extern const char* IMG_SLIDER_SLIT;
     extern const char* IMG_SLIDER_KNOB;
     extern const char* URL_365CHESS;
+    extern const char* FILE_DESCRIPTIONS;
 
     // texture IDs
     extern const std::string ID_BACKGROUND;

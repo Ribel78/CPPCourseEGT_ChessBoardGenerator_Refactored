@@ -18,7 +18,7 @@ namespace Constants
     const char* TTF_SEGOEPR = "fonts/segoepr.ttf";
     const char* TTF_FREESERIF = "fonts/FreeSerif.ttf";
     const char* IMG_BACKGROUND = "images/background.jpg";
-    const char* IMG_CHESS_TILE = "images/chess_board.jpg";
+    const char* IMG_CHESS_TILE = "images/chess_board_wood.jpg";
     const char* IMG_BUTTON_START_UP = "images/button_start_up.png";
     const char* IMG_BUTTON_START_DOWN = "images/button_start_down.png";
     const char* IMG_BUTTON_STOP_UP = "images/button_stop_up.png";
@@ -31,7 +31,7 @@ namespace Constants
     const char* IMG_SLIDER_SLIT = "images/slider_slit.png";
     const char* IMG_SLIDER_KNOB = "images/slider_knob.png";
     const char* URL_365CHESS = "https://www.365chess.com/board_editor.php";
-
+    const char* FILE_DESCRIPTIONS = "data/descriptions.csv";
     //texture IDs
     const std::string ID_BACKGROUND = "background";
     const std::string ID_CHESS_TILE = "chess_tile";
@@ -68,9 +68,9 @@ namespace Constants
     const SDL_Color COL_CP_DARK {0, 0, 0 , 255};
 
     // chess board colors
-    const SDL_Color COL_CB_LIGHT {150, 200, 255, 255};
-    const SDL_Color COL_CB_DARK {0, 100, 150, 255};
-    const SDL_Color COL_CB_HIGHLIGHT {50, 255, 180, 120};
+    const SDL_Color COL_CB_LIGHT {230, 170, 100, 255};
+    const SDL_Color COL_CB_DARK {160, 90, 30, 255};
+    const SDL_Color COL_CB_HIGHLIGHT {50, 255, 90, 120};
 
     //text colors
     const SDL_Color COL_TXT_LIGHT {235 ,235 ,255 ,255};

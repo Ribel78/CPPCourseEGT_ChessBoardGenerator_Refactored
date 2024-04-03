@@ -18,10 +18,14 @@ public:
     void handleEvents();
     void clean();
     auto isRunning() const -> bool;
-    bool buttonClicked(const SDL_Rect* r,
-                       int xDown, int yDown,
-                       int xUp, int yUp) const;
-    auto buttonFocus(const SDL_Rect* r, int x, int y) const -> bool;
+    bool isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const;
+    auto buttonFocus(const SDL_Rect* r) const -> bool;
+    void setMouseDownCoords(int x, int y);
+    void updateBtnTexturesOnFocus();
+    void readDescriptionFile();
+    void openDescriptionFileForWriting();
+    void setCurrentBoardDescriptionSrc();
+
     void draw();
 
 private:

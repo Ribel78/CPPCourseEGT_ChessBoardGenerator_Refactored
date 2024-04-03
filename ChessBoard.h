@@ -34,10 +34,14 @@ public:
     void setSimulating(const bool state);
     void setViewing(const bool state);
 
+    void toggleSimulating();
+    void toggleViewing();
+
     void setButtonViewerTexID(std::string texture_id);
     void setButtonSimulatorTexID(std::string texture_id);
     void setButtonStartTexID(std::string texture_id);
     void setButtonStopTexID(std::string texture_id);
+    void resetAllButtonsTexID();
 
     void setPiecesToRemove(int amount);
     auto getPiecesToRemove() -> int;
@@ -147,4 +151,5 @@ private:
 
 	//Simulation time stats are retrieved from this object.
     Timer m_timer;
+
 };

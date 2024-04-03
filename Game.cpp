@@ -93,10 +93,10 @@ void Game::update()
 
     if(m_dataStream.is_open())
         m_dataStream << m_chessBoard.getCurrentDescription().Custom << " "
-                    << m_chessBoard.getCurrentDescription().FEN << " "
-                    << m_chessBoard.getCurrentDescription().simulationTime << " "
-                    << m_chessBoard.getCurrentDescription().chess_pieces
-                    << std::endl;
+                     << m_chessBoard.getCurrentDescription().FEN << " "
+                     << m_chessBoard.getCurrentDescription().simulationTime << " "
+                     << m_chessBoard.getCurrentDescription().chess_pieces
+                     << std::endl;
 
     //Slow down visual shuffling
     SDL_Delay(6);
@@ -115,11 +115,13 @@ void Game::handleEvents()
          * seek trough the simulations using Down and Up Arrow Keys
         */
         case SDL_KEYUP:{
+
+            m_chessBoard.setChessPieceIdx(-1);
+
             if(event.key.keysym.sym == SDLK_DOWN)
             {
                 if(!m_chessBoard.isSimulating())
                 {
-                    m_chessBoard.setChessPieceIdx(-1);
                     m_chessBoard.viewDescriptionNext();
 				}
 			}
@@ -127,38 +129,21 @@ void Game::handleEvents()
             {
                 if(!m_chessBoard.isSimulating())
                 {
-                    m_chessBoard.setChessPieceIdx(-1);
                     m_chessBoard.viewDescriptionPrevious();
                 }
             }
 		}; break;
         case SDL_MOUSEBUTTONDOWN:
         {
-            using namespace Constants;
 			int msx, msy;
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
 				SDL_GetMouseState(&msx, &msy);
-                m_mouseDownX = msx;
-                m_mouseDownY = msy;
 
-                if(buttonFocus(m_chessBoard.getRectSliderKnob(), msx, msy))
-                {
-                    m_offsetX = m_mouseDownX - m_chessBoard.getRectSliderKnob()->x;
-                }
+                setMouseDownCoords(msx, msy);
 
-                if(buttonFocus(m_chessBoard.getRectButtonViewer(),msx, msy))
-                {
-                    m_chessBoard.setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
-                    m_chessBoard.setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
-                }
-
-                if(buttonFocus(m_chessBoard.getRectButtonSimulator(), msx, msy))
-                {
-                    m_chessBoard.setButtonStartTexID(Constants::ID_BTN_START_DOWN);
-                    m_chessBoard.setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
-                }
+                updateBtnTexturesOnFocus();
 			}
 		}; break;
         case SDL_MOUSEBUTTONUP:
@@ -168,70 +153,51 @@ void Game::handleEvents()
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                m_chessBoard.setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_UP);
-                m_chessBoard.setButtonViewerTexID(Constants::ID_BTN_VIEWER_UP);
-                m_chessBoard.setButtonStartTexID(Constants::ID_BTN_START_UP);
-                m_chessBoard.setButtonStopTexID(Constants::ID_BTN_STOP_UP);
+                m_chessBoard.resetAllButtonsTexID();
 
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
-                if(buttonClicked(m_chessBoard.getRectButtonSimulator(),
-                                  m_mouseDownX,m_mouseDownY,
-                                  msx, msy) &&
+                if(isButtonClicked(m_chessBoard.getRectButtonSimulator(), msx, msy) &&
                                 !m_chessBoard.isViewing())
                 {
-                    if (m_chessBoard.isSimulating())
+                    openDescriptionFileForWriting();
+                    // if (m_chessBoard.isSimulating())
+                    // {
+                    //     m_dataStream.close();
+                    // }
+                    // else
+                    // {
+                    //     m_dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::out);
+                    //     if(!m_dataStream.is_open())
+                    //         std::cout << "Failed to open data/descriptions.csv" << std::endl;
+                    // }
+
+                    if (!m_chessBoard.isSimulating())
                     {
-                        m_chessBoard.setSimulating(false);
-                        m_dataStream.close();
-                    }
-                    else
-                    {
-                        m_chessBoard.setSimulating(true);
                         m_chessBoard.setChessPieceIdx(-1);
                         m_chessBoard.resetSimulationSummary();
-
-                        m_dataStream.open("data/descriptions.csv", std::ios::out);
-                        if(!m_dataStream.is_open())
-                            std::cout << "Failed to open data/descriptions.csv" << std::endl;
                     }
+
+                    m_chessBoard.toggleSimulating();
 				}
 
                 //viewer button clicked
-                if(buttonClicked(m_chessBoard.getRectButtonViewer(),
-                                  m_mouseDownX,m_mouseDownY,
-                                  msx, msy) &&
+                if(isButtonClicked(m_chessBoard.getRectButtonViewer(), msx, msy) &&
                                 !m_chessBoard.isSimulating())
                 {
                     if (m_chessBoard.isViewing())
                     {
-                        m_chessBoard.setViewing(false);
-
                         m_chessBoard.getMutableCBDescriptionsVecSeek() = 0;
                     }
-                    else
-                    {
-                        m_chessBoard.setViewing(true);
 
-                        m_chessBoard.getMutableDescriptionsVector().clear();
+                    readDescriptionFile();
 
-                        m_dataStream.open("data/descriptions.csv", std::ios::in);
-
-                        ChessBoardDescriptions temp_cb_descr;
-
-                        while(m_dataStream >> temp_cb_descr)
-                        {
-                            m_chessBoard.getMutableDescriptionsVector().push_back(temp_cb_descr);
-                        }
-                        m_dataStream.close();
-                    }
+                    m_chessBoard.toggleViewing();
 
                     m_chessBoard.setChessPieceIdx(-1);
 				}
 
-                if(buttonClicked(m_chessBoard.getRectTextFEN(),
-                                  m_mouseDownX,m_mouseDownY,
-                                  msx, msy) &&
+                if(isButtonClicked(m_chessBoard.getRectTextFEN(), msx, msy) &&
                     !m_chessBoard.isSimulating())
                 {
 
@@ -243,21 +209,13 @@ void Game::handleEvents()
 
                 for (int i = 0; i < 64; i++)
                 {
-                    if(buttonClicked(m_chessBoard.getRectChessBoardTile(i),
-                                      m_mouseDownX, m_mouseDownY,
-                                      msx, msy) &&
+                    if(isButtonClicked(m_chessBoard.getRectChessBoardTile(i), msx, msy) &&
                         !m_chessBoard.isSimulating())
                     {
                         m_chessBoard.setChessPieceIdx(i);
 
-                        if(!m_chessBoard.isViewing())
-                        {
-                            m_chessBoard.setBoardDescriptionFromQueueBack();
-                        }
-                        else
-                        {
-                            m_chessBoard.setBoardDescriptionFromVector();
-                        }
+                        setCurrentBoardDescriptionSrc();
+
                         break;
                     }
                 }
@@ -281,13 +239,11 @@ auto Game::isRunning() const -> bool
     return Game::m_running;
 }
 
-bool Game::buttonClicked(const SDL_Rect* r,
-                         int xDown, int yDown,
-                         int xUp, int yUp) const
+bool Game::isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const
 {
-    if(((xDown > r->x) && (xDown < r->x +r->w)) &&
+    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
         ((xUp > r->x) && (xUp < r->x +r->w))&&
-        ((yDown > r->y) && (yDown < r->y +r->h)) &&
+        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)) &&
         ((yUp > r->y) && (yUp < r->y +r->h)))
     {
         return true; //click coordinates inside  SDL_Rect r
@@ -295,15 +251,85 @@ bool Game::buttonClicked(const SDL_Rect* r,
     return false; //click coordinates outside inside  SDL_Rect r
 }
 
-auto Game::buttonFocus(const SDL_Rect* r,
-                       int x, int y) const -> bool
+auto Game::buttonFocus(const SDL_Rect* r) const -> bool
 {
-    if(((x > r->x) && (x < r->x +r->w)) &&
-       ((y > r->y) && (y < r->y +r->h)))
+    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
+        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)))
     {
         return true; //click coordinates inside  SDL_Rect r
     }
     return false; //click coordinates outside inside  SDL_Rect r
+}
+
+void Game::setMouseDownCoords(int x, int y)
+{
+    m_mouseDownX = x;
+    m_mouseDownY = y;
+}
+
+void Game::updateBtnTexturesOnFocus()
+{
+
+    if(buttonFocus(m_chessBoard.getRectSliderKnob()))
+    {
+        m_offsetX = m_mouseDownX - m_chessBoard.getRectSliderKnob()->x;
+    }
+
+    if(buttonFocus(m_chessBoard.getRectButtonViewer()))
+    {
+        m_chessBoard.setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
+        m_chessBoard.setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
+    }
+
+    if(buttonFocus(m_chessBoard.getRectButtonSimulator()))
+    {
+        m_chessBoard.setButtonStartTexID(Constants::ID_BTN_START_DOWN);
+        m_chessBoard.setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
+    }
+}
+
+void Game::readDescriptionFile()
+{
+    if (!m_chessBoard.isViewing())
+    {
+        m_chessBoard.getMutableDescriptionsVector().clear();
+
+        m_dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::in);
+
+        ChessBoardDescriptions temp_cb_descr;
+
+        while(m_dataStream >> temp_cb_descr)
+        {
+            m_chessBoard.getMutableDescriptionsVector().push_back(temp_cb_descr);
+        }
+        m_dataStream.close();
+    }
+}
+
+void Game::openDescriptionFileForWriting()
+{
+    if (m_chessBoard.isSimulating())
+    {
+        m_dataStream.close();
+    }
+    else
+    {
+        m_dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::out);
+        if(!m_dataStream.is_open())
+            std::cout << "Failed to open data/descriptions.csv" << std::endl;
+    }
+}
+
+void Game::setCurrentBoardDescriptionSrc()
+{
+    if(!m_chessBoard.isViewing())
+    {
+        m_chessBoard.setBoardDescriptionFromQueueBack();
+    }
+    else
+    {
+        m_chessBoard.setBoardDescriptionFromVector();
+    }
 }
 
 void Game::draw()
