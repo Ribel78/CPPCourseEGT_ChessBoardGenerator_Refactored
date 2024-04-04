@@ -10,9 +10,20 @@ You can find the initial version [here](https://github.com/Ribel78/CPPCourseEGT_
 - Chess pieces must be 75% (24 pieces). No illegal positions allowed. No checks.
 - Buttons to Start/Stop the chess board generation/simulation.
 - Display of time statistics for the board generation part of the code.
-- Click on FEN notation (bottom text) to copy it in clipboard
-- On paused simulation - highlghting of allowed positions when clicked on a chess piece.
-- On paused simulation - pressing down arrow key seeks through the last 20 generated chess boards.
+- Click on FEN notation (bottom text) to copy it in clipboard and open a website to explore the chess board further
+- Simulator Mode - start/stop simulation, save board descriptions to file, highlight legal moves of selected piece, review last 20 simulations.
+- Viewer Mode - read board descriptions from file using UP/DOWN arrow keys,  highlight legal moves of selected piece.
+
+  ## **Refactoring update - 04.04.2024**
+  **New look and functionalities**. Option to change the number of simulated pieces and writing/reading the simulated chess boards to file.
+  ![StartView](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator_Refactored/blob/main/screenshots/Screenshot_20240404_145352.png)
+
+  **Simulator Mode** 
+  ![Simulator](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator_Refactored/blob/main/screenshots/Screenshot_20240404_145509.png)
+
+  **Viewer Mode** - reads the chess boards saved to file during the Simulation
+  ![Viewer](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator_Refactored/blob/main/screenshots/Screenshot_20240404_145610.png)
+  
 
   ## **Finished Project before refactoring**
 
