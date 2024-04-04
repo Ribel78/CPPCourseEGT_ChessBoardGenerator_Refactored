@@ -197,8 +197,7 @@ void ChessBoard::shufflePieces(const bool shuff,
             //End simulation - caclulate simulation duration in ns
             m_timer.markEnd();
 
-            m_timer.setDurationInNanoseconds();
-            m_timer.updateStats();
+            m_timer.updateStatistics();
 
             /*Parsing the chess board description to FEN notation: https://www.chess.com/terms/fen-chess */
             //char FEN[71] = {'0',};
@@ -211,10 +210,10 @@ void ChessBoard::shufflePieces(const bool shuff,
 
             //converting chess_set and FEN to string and push to queue
 
-            setCurrentDescription(  std::string(chess_set),
-                                    std::string(FEN),
-                                    std::to_string(m_timer.getSimulationTime()),
-                                    std::to_string(32 - m_piecesToRemove));
+            setCurrentDescription(std::string(chess_set),
+                                  std::string(FEN),
+                                  std::to_string(m_timer.getDuration()),
+                                  std::to_string(32 - m_piecesToRemove));
 
             m_cbDescriptions.push(m_currentCBDescription);
 
@@ -385,7 +384,7 @@ auto ChessBoard::getSimulationSummary() const -> std::string
 {
     if(!isViewing())
     {
-        return m_timer.simulationTimeStatistics(m_currentCBDescription.chess_pieces);
+        return m_timer.simulationStatistics(m_currentCBDescription.chess_pieces);
     }
     else
     {
@@ -408,7 +407,7 @@ auto ChessBoard::getSimulationSummary() const -> std::string
 
 void ChessBoard::resetSimulationSummary()
 {
-    m_timer.reset();
+    m_timer.resetSimulationStatistics();
 }
 
 void ChessBoard::initBoardRects()

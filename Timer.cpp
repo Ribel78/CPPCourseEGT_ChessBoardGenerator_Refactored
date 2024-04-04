@@ -4,10 +4,6 @@
 
 Timer::Timer()
 {
-    // m_numberOfSimulations = 0;
-    // m_totalSimulationTime = 0;
-    // m_averageSimulationTime = 0;
-    // m_simulationTime = 0;
 }
 
 void Timer::markStart()
@@ -17,25 +13,28 @@ void Timer::markStart()
 void Timer::markEnd()
 {
     m_endTime = std::chrono::steady_clock::now();
+    std::chrono::duration<double> tempDuration = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
+    m_duration = tempDuration.count();
+
 }
 
-void Timer::setDurationInNanoseconds()
-{
-    m_durationNanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
-}
+// void Timer::setDurationInNanoseconds()
+// {
+//     m_durationNanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
+// }
 
-void Timer::updateStats()
+void Timer::updateStatistics()
 {
-    m_simulationTime = m_durationNanoseconds.count();
+    //m_simulationTime = m_durationNanoseconds.count();
     m_numberOfSimulations += 1;
-    m_totalSimulationTime += m_simulationTime;
+    m_totalSimulationTime += m_duration;
     m_averageSimulationTime = m_totalSimulationTime / m_numberOfSimulations;
 }
 
 /*
 * Statistics for dynamic text display in Simulator Mode
 */
-auto Timer::simulationTimeStatistics(std::string chess_pieces) const -> std::string
+auto Timer::simulationStatistics(std::string chess_pieces) const -> std::string
 {
     std::string timeStatsString = "";
     timeStatsString.append("Chess pieces: ");
@@ -45,7 +44,7 @@ auto Timer::simulationTimeStatistics(std::string chess_pieces) const -> std::str
     timeStatsString.append(std::to_string(m_numberOfSimulations));
 	timeStatsString.append("\n");
     timeStatsString.append("Last Simulation Time: ");
-    timeStatsString.append(std::to_string(m_simulationTime));
+    timeStatsString.append(std::to_string(m_duration));
 	timeStatsString.append(" ns\n");
 	timeStatsString.append("Total Simulation Time: ");
     timeStatsString.append(std::to_string(m_totalSimulationTime));
@@ -57,15 +56,14 @@ auto Timer::simulationTimeStatistics(std::string chess_pieces) const -> std::str
 	return 	timeStatsString;
 }
 
-auto Timer::getSimulationTime() const -> double
+auto Timer::getDuration() const -> double
 {
-    return m_simulationTime;
+    return m_duration;
 }
 
-void Timer::reset()
+void Timer::resetSimulationStatistics()
 {
     m_numberOfSimulations = 0;
     m_totalSimulationTime = 0;
     m_averageSimulationTime = 0;
-    m_simulationTime = 0;
 }
