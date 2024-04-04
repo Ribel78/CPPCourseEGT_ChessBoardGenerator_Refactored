@@ -46,29 +46,31 @@ void prepStaticImageTextures()
     TextureFactory::instance()->textureFromImage(IMG_SLIDER_KNOB, ID_SLIDER_KNOB);
 }
 
-void prepChessPieceTextures()
+//@use_texture - use images or unicode glyphs as chess piece textures
+void prepChessPieceTextures(bool use_texture)
 {
-    // Create textures from font chess characters !Important id's are ASCII char values
-    // to avoid overlapping with labels texture id's
+    // !Important id's are ASCII char values to avoid overlapping with labels texture id's
+    // Texture ID's are the same - use this function only once on initialization
+
     for (int i = 0; i < 12; i++)
     {
-        if (i / 6 == 0)
-        { // white chess glyphs - K, Q, R, B, N, P
-            TextureFactory::instance()->textureFromUnicode(std::to_string(STR_CB_LOOKUPREF[i]),
-                                                           ID_FONT_DEJAVU,
-                                                           CPB_UNICODE[i % 6].c_str(),
-                                                           COL_CP_LIGHT);
-            // TextureFactory::instance()->packTexture(std::to_string(STR_CB_LOOKUPREF[i]),
-            //                                         "chess_pack");
+        SDL_Color color[2] = {COL_CP_LIGHT, COL_CP_DARK};
+
+        if(use_texture)
+        {
+            std::string filepath{};
+            filepath.append(IMG_CHESS_FIGURES);
+            filepath += STR_CB_LOOKUPREF[i];
+            filepath.append(".png");
+            TextureFactory::instance()->textureFromImage(filepath.c_str(), std::to_string(STR_CB_LOOKUPREF[i]));
+
         }
         else
-        { // black chess glyphs - k, q, r, b, n, p
+        {
             TextureFactory::instance()->textureFromUnicode(std::to_string(STR_CB_LOOKUPREF[i]),
                                                            ID_FONT_DEJAVU,
                                                            CPB_UNICODE[i % 6].c_str(),
-                                                           COL_CP_DARK);
-            // TextureFactory::instance()->packTexture(std::to_string(STR_CB_LOOKUPREF[i]),
-            //                                         "chess_pack");
+                                                           color[i/6]);
         }
     }
 }

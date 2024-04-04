@@ -82,7 +82,7 @@ void Game::prepTextures()
     prepFonts();
     prepStaticFontTextures();
     prepStaticImageTextures();
-    prepChessPieceTextures();
+    prepChessPieceTextures(true);
     prepBoardLabelsTextures();
 }
 

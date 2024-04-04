@@ -32,6 +32,7 @@ namespace Constants
     const char* IMG_SLIDER_KNOB = "images/slider_knob.png";
     const char* URL_365CHESS = "https://www.365chess.com/board_editor.php";
     const char* FILE_DESCRIPTIONS = "data/descriptions.csv";
+    const char* IMG_CHESS_FIGURES = "images/pieces/";
 
     //texture IDs
     const std::string ID_BACKGROUND = "background";

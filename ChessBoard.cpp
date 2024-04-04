@@ -372,7 +372,6 @@ auto ChessBoard::getSimulationSummary() const -> std::string
     }
     else
     {
-        //std::string file_stat {};
         timeStatsString.append("Board ");
         timeStatsString.append(std::to_string(m_cbDescriptionsVecSeek + 1));
         timeStatsString.append(" of ");
