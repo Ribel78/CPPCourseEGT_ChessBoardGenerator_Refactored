@@ -165,7 +165,7 @@ void Game::handleEvents()
                     if (!m_chessBoard.isSimulating())
                     {
                         m_chessBoard.setChessPieceIdx(-1);
-                        m_chessBoard.resetSimulationSummary();
+                        m_chessBoard.resetSimulationStatistics();
                     }
 
                     m_chessBoard.toggleSimulating();

@@ -32,6 +32,7 @@ namespace Constants
     const char* IMG_SLIDER_KNOB = "images/slider_knob.png";
     const char* URL_365CHESS = "https://www.365chess.com/board_editor.php";
     const char* FILE_DESCRIPTIONS = "data/descriptions.csv";
+
     //texture IDs
     const std::string ID_BACKGROUND = "background";
     const std::string ID_CHESS_TILE = "chess_tile";
@@ -56,7 +57,6 @@ namespace Constants
     const std::string ID_FONT_SEGOE = "Segoe";
     const std::string ID_FONT_SEGOE28 = "Segoe28";
     const std::string ID_FONT_FREESERIF = "FreeMono";
-
 
     // Colors
 

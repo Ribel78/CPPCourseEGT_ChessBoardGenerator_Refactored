@@ -4,6 +4,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "Timer.h"
+#include <string>
+#include "Constants.h"
+
+using namespace Constants;
 
 struct ChessBoardDescriptions {
     std::string Custom {};
@@ -75,7 +79,8 @@ public:
     auto getRectWindow() -> SDL_Rect*;
 
     auto getSimulationSummary() const -> std::string;
-    void resetSimulationSummary();
+    void updateStatistics();
+    void resetSimulationStatistics();
 
     void initBoardRects();
     void drawWindowBackground();
@@ -118,24 +123,23 @@ private:
     //parse result from shufflePieces to valid FEN notation for dispaly
     void parseFEN(const char chess_set[65], char FEN[71]);
 
-    bool m_simulating; //check if board is currently being simulated
-    bool m_viewing; //check if board is in viewer mode
+    bool m_simulating = false; //simulating mode
+    bool m_viewing = false; //viewing mode
 
 	//size of the chess board in pixels 
-    int m_chessBoardSize;
+    int m_chessBoardSize = DIM_CB_SIZE;
 
-    int m_piecesToRemove;
+    int m_piecesToRemove = DIM_CP_TO_REMOVE;
 
-    //mouse parameters
+    int m_chessPieceIdx = -1;
+
+    int m_numberOfSimulations{};
+    double m_totalSimulationTime{};
+    double m_averageSimulationTime{};
 
     int m_mouseDownX{}, m_mouseDownY{};
 
-
-    //store textures of the 12 unique chess pieces
-    SDL_Texture* m_chessPieces[12];
-
-    SDL_Rect* m_rectPtrChessBoardTile[64];
-    SDL_Rect* m_rectPtrFloatingChessTile;
+    SDL_Rect* m_rectPtrChessBoardTile[64];   
     SDL_Rect* m_rectPtrBoardLabelsV[8];
     SDL_Rect* m_rectPtrBoardLabelsH[8];
 
@@ -147,28 +151,22 @@ private:
     SDL_Rect m_rectWindow;
     SDL_Rect m_rectSliderSlit;
     SDL_Rect m_rectSliderKnob;
+    SDL_Rect m_rectFloatingChessTile;
 
-    std::string m_buttonViewerTexID {};
-    std::string m_buttonSimulatorTexID {};
-    std::string m_buttonStartTexID {};
-    std::string m_buttonStopTexID {};
+    std::string m_buttonViewerTexID = ID_BTN_VIEWER_UP;
+    std::string m_buttonSimulatorTexID = ID_BTN_SIMULATOR_UP;
+    std::string m_buttonStartTexID = ID_BTN_START_UP;
+    std::string m_buttonStopTexID = ID_BTN_STOP_UP;
 
-    //colors of the black and white squares and the overlay color
-    SDL_Color m_colorChessBoard[3];
-
-	//Used in drawing the Board Overlay
-    //the index of the clicked square, -1 if board overlay is off
-    int m_chessPieceIdx;
+    SDL_Color m_colorChessBoard[3] = {COL_CB_LIGHT, COL_CB_DARK, COL_CB_HIGHLIGHT};
 
     std::queue<ChessBoardDescriptions> m_cbDescriptions;
 
     std::vector<ChessBoardDescriptions> m_cbDescriptionsVec;
     int m_cbDescriptionsVecSeek {};
 
-    //current chess board description
     ChessBoardDescriptions m_currentCBDescription;
 
-	//Simulation time stats are retrieved from this object.
     Timer m_timer;
 
 };

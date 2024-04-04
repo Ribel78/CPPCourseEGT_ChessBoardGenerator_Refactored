@@ -13,40 +13,11 @@ using namespace Constants;
 
 ChessBoard::ChessBoard()
 {
-    m_simulating = false;
-    m_viewing = false;
 
-    setPiecesToRemove(DIM_CP_TO_REMOVE);
-
-    //Chess Board Size and Colors
-    m_chessBoardSize = DIM_CB_SIZE;
-    m_colorChessBoard[0] = COL_CB_LIGHT;
-    m_colorChessBoard[1] = COL_CB_DARK;
-    m_colorChessBoard[2] = COL_CB_HIGHLIGHT;
-
-    //Generate and place various chess board rectangles
     initBoardRects();
 
-    //Set up UI Rectangles
-
-    m_rectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
-    m_rectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
-    m_rectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_rectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_rectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_rectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
-    m_rectSliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
-
-    resetAllButtonsTexID();
-    // setButtonViewerTexID(ID_BTN_VIEWER_UP);
-    // setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
-    // setButtonStartTexID(ID_BTN_START_UP);
-    // setButtonStopTexID(ID_BTN_STOP_UP);
-
-    m_chessPieceIdx = -1;
-
     m_currentCBDescription = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0", std::to_string(32 - m_piecesToRemove)};
+
     m_cbDescriptions.push(m_currentCBDescription);
 }
 
@@ -64,8 +35,6 @@ ChessBoard::~ChessBoard()
         delete m_rectPtrBoardLabelsV[i];
         delete m_rectPtrBoardLabelsH[i];
     }
-    delete m_rectPtrFloatingChessTile;
-
 }
 
 void ChessBoard::setButtonViewerTexID(std::string texture_id)
@@ -197,7 +166,7 @@ void ChessBoard::shufflePieces(const bool shuff,
             //End simulation - caclulate simulation duration in ns
             m_timer.markEnd();
 
-            m_timer.updateStatistics();
+            updateStatistics();
 
             /*Parsing the chess board description to FEN notation: https://www.chess.com/terms/fen-chess */
             //char FEN[71] = {'0',};
@@ -382,76 +351,100 @@ auto ChessBoard::getRectWindow() -> SDL_Rect*
 
 auto ChessBoard::getSimulationSummary() const -> std::string
 {
+    std::string timeStatsString {};
     if(!isViewing())
     {
-        return m_timer.simulationStatistics(m_currentCBDescription.chess_pieces);
+        timeStatsString.append("Chess pieces: ");
+        timeStatsString.append(m_currentCBDescription.chess_pieces);
+        timeStatsString.append("\n");
+        timeStatsString.append("Number of simulations: ");
+        timeStatsString.append(std::to_string(m_numberOfSimulations));
+        timeStatsString.append("\n");
+        timeStatsString.append("Last Simulation Time: ");
+        timeStatsString.append(std::to_string(m_timer.getDuration()));
+        timeStatsString.append(" ns\n");
+        timeStatsString.append("Total Simulation Time: ");
+        timeStatsString.append(std::to_string(m_totalSimulationTime));
+        timeStatsString.append(" ns\n");
+        timeStatsString.append("Average Simulation Time: ");
+        timeStatsString.append(std::to_string(m_averageSimulationTime));
+        timeStatsString.append(" ns");
     }
     else
     {
-        std::string file_stat {};
-        file_stat.append("Board ");
-        file_stat.append(std::to_string(m_cbDescriptionsVecSeek + 1));
-        file_stat.append(" of ");
-        file_stat.append(std::to_string(m_cbDescriptionsVec.size()));
-        file_stat.append("\n");
-        file_stat.append("Simulation Time: ");
-        file_stat.append(m_currentCBDescription.simulationTime);
-        file_stat.append("\n");
-        file_stat.append("Number of pieces: ");
-        file_stat.append(m_currentCBDescription.chess_pieces);
-        file_stat.append("\n\n");
-
-        return file_stat;
+        //std::string file_stat {};
+        timeStatsString.append("Board ");
+        timeStatsString.append(std::to_string(m_cbDescriptionsVecSeek + 1));
+        timeStatsString.append(" of ");
+        timeStatsString.append(std::to_string(m_cbDescriptionsVec.size()));
+        timeStatsString.append("\n");
+        timeStatsString.append("Simulation Time: ");
+        timeStatsString.append(m_currentCBDescription.simulationTime);
+        timeStatsString.append("\n");
+        timeStatsString.append("Number of pieces: ");
+        timeStatsString.append(m_currentCBDescription.chess_pieces);
+        timeStatsString.append("\n\n");
     }
+
+    return timeStatsString;
 }
 
-void ChessBoard::resetSimulationSummary()
+void ChessBoard::updateStatistics()
 {
-    m_timer.resetSimulationStatistics();
+    m_numberOfSimulations += 1;
+    m_totalSimulationTime += m_timer.getDuration();
+    m_averageSimulationTime = m_totalSimulationTime / m_numberOfSimulations;
+}
+
+void ChessBoard::resetSimulationStatistics()
+{
+    m_numberOfSimulations = 0;
+    m_totalSimulationTime = 0;
+    m_averageSimulationTime = 0;
 }
 
 void ChessBoard::initBoardRects()
 {
-    //init squares rects
+    //init and position squares rects
     for (int i = 0; i < 64; i++)
     {
         m_rectPtrChessBoardTile[i] = new SDL_Rect{0, 0, 0, 0};
+        m_rectPtrChessBoardTile[i]->x = (i % 8)*(m_chessBoardSize / 8);
+        m_rectPtrChessBoardTile[i]->y = (i / 8)*(m_chessBoardSize / 8);
+        m_rectPtrChessBoardTile[i]->w = m_rectPtrChessBoardTile[i]->h = m_chessBoardSize / 8;
     }
     //init label rects
     for (int i = 0; i < 8; i++)
     {
         m_rectPtrBoardLabelsV[i] = new SDL_Rect{0, 0, 0, 0};
         m_rectPtrBoardLabelsH[i] = new SDL_Rect{0, 0, 0, 0};
-    }
-    //place square rects
-    for (int i = 0; i < 64; i++)
-    {
-        m_rectPtrChessBoardTile[i]->x = (i % 8)*(m_chessBoardSize / 8);
-        m_rectPtrChessBoardTile[i]->y = (i / 8)*(m_chessBoardSize / 8);
-        m_rectPtrChessBoardTile[i]->w = m_rectPtrChessBoardTile[i]->h = m_chessBoardSize / 8;
-    }
-    //place label rects
-    int square_size = m_chessBoardSize / 8;
-    int label_size = square_size /4;
-    for(int i = 0; i <8 ; i++)
-    {
-        //Labels
+
         m_rectPtrBoardLabelsV[i]->x = 0;
-        m_rectPtrBoardLabelsV[i]->y = (i * square_size);
-        m_rectPtrBoardLabelsV[i]->w = m_rectPtrBoardLabelsV[i]->h = label_size;
+        m_rectPtrBoardLabelsV[i]->y = (i * DIM_CB_TILE_SIZE);
+        m_rectPtrBoardLabelsV[i]->w = m_rectPtrBoardLabelsV[i]->h = DIM_CB_TILE_SIZE/4;
 
-        m_rectPtrBoardLabelsH[i]->x = (i * square_size) + (square_size - label_size);
-        m_rectPtrBoardLabelsH[i]->y = (square_size * 7) + (square_size - label_size);
-        m_rectPtrBoardLabelsH[i]->w = m_rectPtrBoardLabelsH[i]->h = label_size;
+        m_rectPtrBoardLabelsH[i]->x = (i * DIM_CB_TILE_SIZE) + (DIM_CB_TILE_SIZE - DIM_CB_TILE_SIZE/4);
+        m_rectPtrBoardLabelsH[i]->y = (DIM_CB_TILE_SIZE * 7) + (DIM_CB_TILE_SIZE - DIM_CB_TILE_SIZE/4);
+        m_rectPtrBoardLabelsH[i]->w = m_rectPtrBoardLabelsH[i]->h = DIM_CB_TILE_SIZE/4;
     }
 
-    //init random board tile texture rect
-    m_rectPtrFloatingChessTile = new SDL_Rect{0, 0, 64, 64};
+    //random tile for chess board texture variation
+    m_rectFloatingChessTile = {0, 0, 64, 64};
+
+    //Set up UI Rectangles
+
+    m_rectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
+    m_rectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
+    m_rectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_rectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
+    m_rectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_rectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
+    m_rectSliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
+    m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
 }
 
 void ChessBoard::drawTitle()
 {
-    // Title
     if(isViewing())
         TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
     else
@@ -481,8 +474,8 @@ void ChessBoard::drawModeToggleButtons()
 
 }
 
-void ChessBoard::drawWindowBackground(){
-    //Window BG Texture
+void ChessBoard::drawWindowBackground()
+{
     TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
 }
 
@@ -493,7 +486,7 @@ void ChessBoard::drawBoard()
     {
 		SDL_SetRenderDrawColor(
             TextureFactory::instance()->getRenderer(),
-            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2 ].r,
+            m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].r,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].g,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].b,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].a
@@ -501,17 +494,19 @@ void ChessBoard::drawBoard()
 
         SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
                            m_rectPtrChessBoardTile[i]);
+
         srand (i);
-        m_rectPtrFloatingChessTile->x = rand()%(640-64);
-        m_rectPtrFloatingChessTile->y = rand()%(640-64);
+
+        m_rectFloatingChessTile.x = rand()%(640-64);
+        m_rectFloatingChessTile.y = rand()%(640-64);
+
         TextureFactory::instance()->setTextureAlpha(ID_CHESS_TILE, 55);
-        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, m_rectPtrFloatingChessTile, m_rectPtrChessBoardTile[i]);
+        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, &m_rectFloatingChessTile, m_rectPtrChessBoardTile[i]);
 	}
 
-    // Draw label textures for the board
+    // label textures
 
-    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(),
-                               SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(), SDL_BLENDMODE_BLEND);
 
     for(int i = 0; i < 8 ; i++)
     {
@@ -614,7 +609,6 @@ void ChessBoard::drawSlider()
 
 void ChessBoard::drawBoardOverlay()
 {
-	//bool showOverlay = true;
     if (!m_simulating && m_chessPieceIdx > -1)
     {
         int x = m_chessPieceIdx % 8;
@@ -638,11 +632,7 @@ void ChessBoard::drawBoardOverlay()
                                m_rectPtrChessBoardTile[i]);
 		}
 
-    } else
-    {
-		//Board descriptions is empty - no overlay
-        m_currentCBDescription.Custom = "----------------------------------------------------------------";
-	}
+    }
 }
 
 void ChessBoard::drawPieces()
