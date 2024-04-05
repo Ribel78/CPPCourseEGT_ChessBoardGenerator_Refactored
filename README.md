@@ -24,7 +24,10 @@ You can find the initial version [here](https://github.com/Ribel78/CPPCourseEGT_
   **Viewer Mode** - reads the chess boards saved to file during the Simulation
   ![Viewer](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator_Refactored/blob/main/screenshots/Screenshot_20240404_145610.png)
   
-
+  **Legal Moves Highlighting**
+  ![Legal Moves Highlighting](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator_Refactored/blob/main/screenshots/Screenshot_20240404_151236.png)
+  
+  
   ## **Finished Project before refactoring**
 
 ![Frame 107](https://github.com/Ribel78/CPPCourseEGT_ChessBoardGenerator/blob/main/screenshots/ChessBoardGenerator%20-%20WIP3.gif)
