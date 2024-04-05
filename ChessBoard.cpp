@@ -15,10 +15,10 @@ ChessBoard::ChessBoard()
 {
 
     initBoardRects();
-
-    m_currentCBDescription = {STR_CB_INIT_DESCR, STR_CB_INIT_FEN, "0.0", std::to_string(32 - m_piecesToRemove)};
-
-    m_cbDescriptions.push(m_currentCBDescription);
+    setAndPushCurrentDescription(STR_CB_INIT_DESCR,
+                          STR_CB_INIT_FEN,
+                          "0.0",
+                          std::to_string(32 - m_piecesToRemove));
 }
 
 ChessBoard::~ChessBoard()
@@ -35,26 +35,6 @@ ChessBoard::~ChessBoard()
         delete m_rectPtrBoardLabelsV[i];
         delete m_rectPtrBoardLabelsH[i];
     }
-}
-
-void ChessBoard::setButtonViewerTexID(std::string texture_id)
-{
-    m_buttonViewerTexID = texture_id;
-}
-
-void ChessBoard::setButtonSimulatorTexID(std::string texture_id)
-{
-    m_buttonSimulatorTexID = texture_id;
-}
-
-void ChessBoard::setButtonStartTexID(std::string texture_id)
-{
-    m_buttonStartTexID = texture_id;
-}
-
-void ChessBoard::setButtonStopTexID(std::string texture_id)
-{
-    m_buttonStopTexID = texture_id;
 }
 
 auto ChessBoard::isSimulating() const -> bool
@@ -74,11 +54,11 @@ void ChessBoard::setViewing(const bool state)
 
 void ChessBoard::toggleSimulating()
 {
-    (isSimulating()) ? setSimulating(false) : setSimulating(true);
+    setSimulating(!isSimulating());
 }
 void ChessBoard::toggleViewing()
 {
-    (isViewing()) ? setViewing(false) : setViewing(true);
+    setViewing(!isViewing());
 }
 
 void ChessBoard::setSimulating(const bool state)
@@ -88,13 +68,7 @@ void ChessBoard::setSimulating(const bool state)
 
 void ChessBoard::setPiecesToRemove(int amount)
 {
-    if (amount < 0 || amount > 29)
-    {
-        m_piecesToRemove = 8; //default
-    } else
-    {
-        m_piecesToRemove = amount;
-    }
+    m_piecesToRemove = (amount < 0 || amount > 29) ? DIM_CP_TO_REMOVE : amount;
 }
 
 auto ChessBoard::getPiecesToRemove() -> int
@@ -103,102 +77,33 @@ auto ChessBoard::getPiecesToRemove() -> int
 }
 
 /*
-Randomize a char string of 64 chars of modified FEN chess board description
-and update references to custom and FEN annotation string variables
+Update references to custom and FEN annotation description strings with
+random chess board description
 _shuff - bool to shuffle (1) or keep ordered chess set
 _&custDescription - string reference to write the chess board description to
 _&fenDescription - string reference to write the FEN notation of the chess board description
 */
-void ChessBoard::shufflePieces(const bool shuff,
+void ChessBoard::runChessBoardSimulator(const bool isSimulation,
                                std::string& custDescription,
                                std::string& fenDescription)
 {
-
-    //Mark start of simulation
-    m_timer.markStart();
-
-    //always initialize a chess set with all pieces
-    char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
-
-    //check if simulation needs to be repeated - cases - same colored bishops or exceeded piece removal
-    bool rep_sim = true;
-
-    if (shuff)
+    if (isSimulation)
     {
-        while(rep_sim == true)
-        {
-            simRandomizeChessSet(chess_set);
+        m_timer.markStart();
 
-            if(isIllegalBishops(chess_set))
-                continue;
+        generateRandomChessBoard(m_piecesToRemove, custDescription, fenDescription);
 
-            int pieces_to_remove = m_piecesToRemove;
+        m_timer.markEnd();
 
-            while(pieces_to_remove >= 0)
-            {
-                removeIllegalPawnsAndKings(chess_set, pieces_to_remove);
+        updateStatistics();
 
-                if(!isExtraPiecesToRemove(chess_set, pieces_to_remove))
-                    break;
-            }
-
-            bool illegal_pawn = false;
-            for(int i = 0; i < 64; i++)
-            {
-                if(i < 8 || i > (64 - 9))
-                {
-                    if(chess_set[i] == 'p' || chess_set[i] == 'P')
-                    {
-                        illegal_pawn = true;
-                        break;
-                    }
-                }
-            }
-
-            if (pieces_to_remove < 0 || illegal_pawn)
-            {
-                continue;
-            }
-
-            // // Reintroduce Kings
-            addKingsToBoard(chess_set);
-
-            //End simulation - caclulate simulation duration in ns
-            m_timer.markEnd();
-
-            updateStatistics();
-
-            /*Parsing the chess board description to FEN notation: https://www.chess.com/terms/fen-chess */
-            //char FEN[71] = {'0',};
-            char FEN[71] {};
-            parseFEN(chess_set, FEN);
-
-            //update external variables
-            custDescription = chess_set;
-            fenDescription = FEN;
-
-            //converting chess_set and FEN to string and push to queue
-
-            setCurrentDescription(std::string(chess_set),
-                                  std::string(FEN),
-                                  std::to_string(m_timer.getDuration()),
-                                  std::to_string(32 - m_piecesToRemove));
-
-            m_cbDescriptions.push(m_currentCBDescription);
-
-            //if queue exceeds 20 pop one out
-            if(m_cbDescriptions.size()==21)
-            {
-                m_cbDescriptions.pop();
-            }
-
-            //terminate while loop
-
-            rep_sim = false;
-        }
+        setAndPushCurrentDescription(custDescription,
+                              fenDescription,
+                              std::to_string(m_timer.getDuration()),
+                              std::to_string(32 - m_piecesToRemove));
     }
     else
-    { //if shuff = false, display last board descriptions in queue
+    {
         if(!isViewing()){
             custDescription = m_cbDescriptions.back().Custom;
             fenDescription = m_cbDescriptions.back().FEN;
@@ -209,17 +114,54 @@ void ChessBoard::shufflePieces(const bool shuff,
             custDescription = getCurrentDescription().Custom;
             fenDescription = getCurrentDescription().FEN;
         }
+    }
+}
 
+void ChessBoard::generateRandomChessBoard(int removePcs,
+                                          std::string& custDescription,
+                                          std::string& fenDescription)
+{
+    char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
+    bool repeatSimulation = true;
+
+    while(repeatSimulation == true)
+    {
+        shuffleChessSet(chess_set);
+
+        if(isIllegalBishops(chess_set))
+            continue;
+
+        int pieces_to_remove = removePcs;
+
+        while(pieces_to_remove >= 0)
+        {
+            removeIllegalPawnsAndKings(chess_set, pieces_to_remove);
+
+            if(!isExtraPiecesToRemove(chess_set, pieces_to_remove))
+                break;
+        }
+
+        if (pieces_to_remove < 0 || isIllegalPawn(chess_set))
+        {
+            continue;
+        }
+
+        addKingsToBoard(chess_set);
+
+        custDescription = chess_set;
+        fenDescription = parseFEN(chess_set);
+
+        repeatSimulation = false;
     }
 }
 
 /*
 Parse custom chess board description to FEN notation
-Click on the notation in the window to copy it in the clipboard
 */
-void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
+std::string ChessBoard::parseFEN(const char chess_set[65])
 {
     //char array to hold the positions including separators '/' (64+7)
+    char FEN[71] {};
     char tempFEN[71];
 
     int j = 0;
@@ -262,14 +204,7 @@ void ChessBoard::parseFEN(const char chess_set[65], char FEN[71])
             empty_space = 0;
         }
     }
-}
-
-void ChessBoard::resetAllButtonsTexID()
-{
-    setButtonViewerTexID(ID_BTN_VIEWER_UP);
-    setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
-    setButtonStartTexID(ID_BTN_START_UP);
-    setButtonStopTexID(ID_BTN_STOP_UP);
+    return std::string(FEN);
 }
 
 void ChessBoard::setBoardDescriptionFromQueueBack()
@@ -307,12 +242,19 @@ auto ChessBoard::getCurrentDescription() const -> ChessBoardDescriptions
     return m_currentCBDescription;
 }
 
-void ChessBoard::setCurrentDescription(std::string cd,
+void ChessBoard::setAndPushCurrentDescription(std::string cd,
                                        std::string fen,
                                        std::string sim_time,
                                        std::string n_pieces)
 {
     m_currentCBDescription = {cd, fen, sim_time, n_pieces};
+
+    m_cbDescriptions.push(m_currentCBDescription);
+
+    if(m_cbDescriptions.size() == DIM_QUEUE_LAST_SIMULATIONS + 1)
+    {
+        m_cbDescriptions.pop();
+    }
 }
 
 void ChessBoard::setChessPieceIdx(int idx){
@@ -324,30 +266,9 @@ auto ChessBoard::getRectChessBoardTile(int idx) const -> SDL_Rect*
     return m_rectPtrChessBoardTile[idx];
 }
 
-auto ChessBoard::getRectTextFEN() -> SDL_Rect*
-{
-    return &m_rectTextFEN;
-}
 
-auto ChessBoard::getRectButtonViewer() -> SDL_Rect*
-{
-    return &m_rectButtonViewer;
-}
 
-auto ChessBoard::getRectButtonSimulator() -> SDL_Rect*
-{
-    return &m_rectButtonSimulator;
-}
 
-auto ChessBoard::getRectSliderKnob() -> SDL_Rect*
-{
-    return &m_rectSliderKnob;
-}
-
-auto ChessBoard::getRectWindow() -> SDL_Rect*
-{
-    return &m_rectWindow;
-}
 
 auto ChessBoard::getSimulationSummary() const -> std::string
 {
@@ -429,53 +350,6 @@ void ChessBoard::initBoardRects()
 
     //random tile for chess board texture variation
     m_rectFloatingChessTile = {0, 0, 64, 64};
-
-    //Set up UI Rectangles
-
-    m_rectTextFEN = {DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 + 10, DIM_WINDOW_WIDTH / 2 - DIM_PADDING, DIM_CB_TILE_SIZE - DIM_PADDING / 2};
-    m_rectTextStats = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_CB_TILE_SIZE + DIM_PADDING , DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_WINDOW_HEIGHT / 3};
-    m_rectButtonSimulator = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_rectButtonViewer = {DIM_WINDOW_WIDTH / 2 + 2*DIM_PADDING + (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_WINDOW_WIDTH / 2 - DIM_CB_TILE_SIZE, (DIM_WINDOW_WIDTH / 2 - 3*DIM_PADDING)/2, DIM_CB_TILE_SIZE};
-    m_rectTextTitle = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_PADDING / 2, DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_rectWindow = {0, 0, DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT};
-    m_rectSliderSlit = {DIM_WINDOW_WIDTH / 2 + DIM_PADDING, DIM_WINDOW_WIDTH / 2 - (5 * DIM_CB_TILE_SIZE / 2), DIM_WINDOW_WIDTH / 2 - 2*DIM_PADDING, DIM_CB_TILE_SIZE};
-    m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
-}
-
-void ChessBoard::drawTitle()
-{
-    if(isViewing())
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
-    else
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_rectTextTitle);
-
-}
-
-void ChessBoard::drawModeToggleButtons()
-{
-    if (!isViewing())
-    {
-        if (isSimulating())
-        {
-            TextureFactory::instance()->drawTexture(m_buttonStopTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_rectButtonViewer);
-        }
-        else
-        {
-            TextureFactory::instance()->drawTexture(m_buttonStartTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::instance()->drawTexture(m_buttonViewerTexID, NULL, &m_rectButtonViewer);
-        }
-    }
-    else
-    {
-        TextureFactory::instance()->drawTexture(m_buttonSimulatorTexID, NULL, &m_rectButtonViewer);
-    }
-
-}
-
-void ChessBoard::drawWindowBackground()
-{
-    TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
 }
 
 void ChessBoard::drawBoard()
@@ -517,95 +391,6 @@ void ChessBoard::drawBoard()
     }
 }
 
-void ChessBoard::drawFENDescription()
-{
-    std::string dynamic_fen {};
-    if (!isViewing())
-    {
-        dynamic_fen = getMutableDescriptionsQueue().back().FEN;
-    }
-    else
-    {
-        setBoardDescriptionFromVector();
-        dynamic_fen = getCurrentDescription().FEN;
-    }
-    TextureFactory::instance()->textureFromFont(ID_TXT_FEN,
-                                                ID_FONT_SEGOE28,
-                                                dynamic_fen.c_str(),
-                                                Constants::COL_TXT_LIGHT,
-                                                DIM_WINDOW_WIDTH, 0);
-
-    TextureFactory::instance()->drawTexture(ID_TXT_FEN,
-                                            NULL, &m_rectTextFEN);
-
-    TextureFactory::instance()->destroyTexture(ID_TXT_FEN);
-
-}
-
-void ChessBoard::drawStatistics()
-{
-    // Statistics for the simulation time
-    std::string dynamic_text = getSimulationSummary();
-
-    TextureFactory::instance()->textureFromFont(ID_TXT_STATS,
-                                                ID_FONT_SEGOE28,
-                                                dynamic_text.c_str(),
-                                                Constants::COL_TXT_LIGHT,
-                                                DIM_WINDOW_WIDTH / 2, 0);
-
-    TextureFactory::instance()->drawTexture(ID_TXT_STATS,
-                                            NULL, &m_rectTextStats);
-
-    TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
-}
-
-void ChessBoard::drawSlider()
-{
-    if(!m_viewing)
-    {
-        TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
-        TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
-        if (m_offsetX >= 0)
-        {
-            int msx, msy;
-            SDL_GetMouseState(&msx, &msy);
-            m_rectSliderKnob.x = msx - m_offsetX;
-            if (m_rectSliderKnob.x < m_rectSliderSlit.x)
-                m_rectSliderKnob.x = m_rectSliderSlit.x;
-            if (m_rectSliderKnob.x > m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w))
-                m_rectSliderKnob.x = m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w);
-        }
-        int  val = (
-                    (
-                       (m_rectSliderKnob.x - m_rectSliderSlit.x)/
-                       ((m_rectSliderSlit.w)/ 33)
-                    ) % 34
-                   )+3;
-
-        (val > 32)? val = 32 : val;
-
-        setPiecesToRemove(32-val);
-
-        SDL_Rect label = m_rectSliderSlit;
-        label.h /= 2;
-        label.y = m_rectSliderSlit.y - label.h;
-        label.w /= 2;
-
-        std::string label_text = "Set chess pieces: ";
-
-        (val < 10)? label_text += " " : label_text;
-
-        label_text.append(std::to_string(val));
-
-        TextureFactory::instance()->textureFromFont(
-            "label", Constants::ID_FONT_SEGOE,
-            label_text.c_str(),
-            Constants::COL_TXT_LIGHT, 1280, 0);
-        TextureFactory::instance()->drawTexture("label", NULL, &label);
-        TextureFactory::instance()->destroyTexture("label");
-    }
-}
-
 void ChessBoard::drawBoardOverlay()
 {
     if (!m_simulating && m_chessPieceIdx > -1)
@@ -640,7 +425,7 @@ void ChessBoard::drawPieces()
     std::string fenChessBoard {};
 
     //init descriptions
-	shufflePieces(isSimulating(), chessBoardShuffle, fenChessBoard);
+    runChessBoardSimulator(isSimulating(), chessBoardShuffle, fenChessBoard);
 
     for (int i = 0; i < 64; i++)
     {
@@ -722,7 +507,7 @@ void ChessBoard::copyFENtoClipboard()
 
 
 
-void ChessBoard::simRandomizeChessSet(char (&char_array)[65])
+void ChessBoard::shuffleChessSet(char (&char_array)[65])
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine rand_en;
@@ -792,6 +577,23 @@ void ChessBoard::removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable
             char_array[i] = '-';
         }
     }
+}
+
+bool ChessBoard::isIllegalPawn(char (&char_array)[65]){
+
+    bool illegal_pawn = false;
+    for(int i = 0; i < 64; i++)
+    {
+        if(i < 8 || i > (64 - 9))
+        {
+            if(char_array[i] == 'p' || char_array[i] == 'P')
+            {
+                illegal_pawn = true;
+                break;
+            }
+        }
+    }
+    return illegal_pawn;
 }
 
 bool ChessBoard::isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int)
@@ -920,54 +722,6 @@ void ChessBoard::addKingsToBoard(char (&char_arr)[65])
     }
 }
 
-bool ChessBoard::isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const
-{
-    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
-        ((xUp > r->x) && (xUp < r->x +r->w))&&
-        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)) &&
-        ((yUp > r->y) && (yUp < r->y +r->h)))
-    {
-        return true; //click coordinates inside  SDL_Rect r
-    }
-    return false; //click coordinates outside inside  SDL_Rect r
-}
-
-auto ChessBoard::buttonFocus(const SDL_Rect* r) const -> bool
-{
-    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
-        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)))
-    {
-        return true; //click coordinates inside  SDL_Rect r
-    }
-    return false; //click coordinates outside inside  SDL_Rect r
-}
-
-void ChessBoard::setMouseDownCoords(int x, int y)
-{
-    m_mouseDownX = x;
-    m_mouseDownY = y;
-}
-
-void ChessBoard::updateBtnTexturesOnFocus()
-{
-
-    if(buttonFocus(getRectSliderKnob()))
-    {
-        m_offsetX = m_mouseDownX - getRectSliderKnob()->x;
-    }
-
-    if(buttonFocus(getRectButtonViewer()))
-    {
-        setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
-        setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
-    }
-
-    if(buttonFocus(getRectButtonSimulator()))
-    {
-        setButtonStartTexID(Constants::ID_BTN_START_DOWN);
-        setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
-    }
-}
 
 void ChessBoard::readDescriptionFile(std::fstream& dataStream)
 {

@@ -14,6 +14,7 @@ namespace Constants
     extern const int DIM_CB_TILE_SIZE;
     extern const int DIM_PADDING;
     extern const int DIM_CP_TO_REMOVE;
+    extern const int DIM_QUEUE_LAST_SIMULATIONS;
 
     // file paths
     extern const char* TTF_DEJAVUSANS;

@@ -6,9 +6,10 @@
 #include "Resources.h"
 #include "Constants.h"
 #include "Utilities.h"
+#include "Interface.h"
 
 
-Game::Game()
+Game::Game(): m_interface(m_chessBoard)
 {
     Game::m_window = NULL;
     Game::m_running = true;
@@ -18,7 +19,6 @@ Game::~Game()
 {
     std::cout << "Destructing Game Object." << std::endl;
 }
-
 //Initialize SDL library
 auto Game::init(const char* title,
                 int xpos, int ypos,
@@ -59,7 +59,6 @@ auto Game::init(const char* title,
 		std::cout << "SDL init fail\n";
 		return false;
 	}
-
 	//Init TTF library
     if(TTF_Init() == -1)
     {
@@ -68,8 +67,6 @@ auto Game::init(const char* title,
 
     std::cout << "init success\n";
     m_running = true;
-
-    //m_offsetX = -1;
 
     prepTextures();
 
@@ -110,10 +107,7 @@ void Game::handleEvents()
         switch (event.type)
         {
         case SDL_QUIT: m_running = false; break;
-        /*
-         * store last 20 generated chessboard descriptions - in queues.
-         * seek trough the simulations using Down and Up Arrow Keys
-        */
+
         case SDL_KEYUP:{
 
             m_chessBoard.setChessPieceIdx(-1);
@@ -141,23 +135,23 @@ void Game::handleEvents()
             {
 				SDL_GetMouseState(&msx, &msy);
 
-                m_chessBoard.setMouseDownCoords(msx, msy);
+                m_interface.setMouseDownCoords(msx, msy);
 
-                m_chessBoard.updateBtnTexturesOnFocus();
+                m_interface.updateBtnTexturesOnFocus();
 			}
 		}; break;
         case SDL_MOUSEBUTTONUP:
         {
 			int msx, msy;
-            m_chessBoard.m_offsetX = -1;
+            m_interface.m_offsetX = -1;
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                m_chessBoard.resetAllButtonsTexID();
+                m_interface.resetAllButtonsTexID();
 
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
-                if(m_chessBoard.isButtonClicked(m_chessBoard.getRectButtonSimulator(), msx, msy) &&
+                if(m_interface.isButtonClicked(m_interface.getRectButtonSimulator(), msx, msy) &&
                                 !m_chessBoard.isViewing())
                 {
                     m_chessBoard.openDescriptionFileForWriting(m_dataStream);
@@ -172,7 +166,7 @@ void Game::handleEvents()
 				}
 
                 //viewer button clicked
-                if(m_chessBoard.isButtonClicked(m_chessBoard.getRectButtonViewer(), msx, msy) &&
+                if(m_interface.isButtonClicked(m_interface.getRectButtonViewer(), msx, msy) &&
                                 !m_chessBoard.isSimulating())
                 {
                     if (m_chessBoard.isViewing())
@@ -187,19 +181,17 @@ void Game::handleEvents()
                     m_chessBoard.setChessPieceIdx(-1);
 				}
 
-                if(m_chessBoard.isButtonClicked(m_chessBoard.getRectTextFEN(), msx, msy) &&
+                if(m_interface.isButtonClicked(m_interface.getRectTextFEN(), msx, msy) &&
                     !m_chessBoard.isSimulating())
                 {
-
                     m_chessBoard.copyFENtoClipboard();
 
                     openURL(Constants::URL_365CHESS);
-
                 }
 
                 for (int i = 0; i < 64; i++)
                 {
-                    if(m_chessBoard.isButtonClicked(m_chessBoard.getRectChessBoardTile(i), msx, msy) &&
+                    if(m_interface.isButtonClicked(m_chessBoard.getRectChessBoardTile(i), msx, msy) &&
                         !m_chessBoard.isSimulating())
                     {
                         m_chessBoard.setChessPieceIdx(i);
@@ -229,19 +221,17 @@ auto Game::isRunning() const -> bool
     return Game::m_running;
 }
 
-
-
 void Game::draw()
 {
-    m_chessBoard.drawWindowBackground();
-    m_chessBoard.drawTitle();
+    m_interface.drawWindowBackground();
+    m_interface.drawTitle();
+
     m_chessBoard.drawBoard();
 
-    m_chessBoard.drawModeToggleButtons();
-    m_chessBoard.drawFENDescription();
-    m_chessBoard.drawStatistics();
-
-    m_chessBoard.drawSlider();
+    m_interface.drawModeToggleButtons();
+    m_interface.drawFENDescription();
+    m_interface.drawStatistics();
+    m_interface.drawSlider();
 
     m_chessBoard.drawBoardOverlay();
     m_chessBoard.drawPieces();

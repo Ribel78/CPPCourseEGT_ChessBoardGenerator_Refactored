@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Interface.h"
 #include "ChessBoard.h"
 #include <fstream>
 
@@ -21,12 +22,9 @@ public:
     void draw();
 
 private:
-
-    SDL_Window* m_window = NULL;
     bool m_running;
-
+    SDL_Window* m_window = NULL;
     ChessBoard m_chessBoard;
-
+    Interface m_interface;
     std::fstream m_dataStream;
-
 };

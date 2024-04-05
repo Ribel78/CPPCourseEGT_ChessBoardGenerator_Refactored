@@ -12,6 +12,7 @@ namespace Constants
     const int DIM_CB_TILE_SIZE = DIM_CB_SIZE / 8;
     const int DIM_PADDING = 40;
     const int DIM_CP_TO_REMOVE = 16;
+    const int DIM_QUEUE_LAST_SIMULATIONS = 20;
 
     //file paths
     const char* TTF_DEJAVUSANS = "fonts/DejaVuSans.ttf";
