@@ -8,9 +8,9 @@ class Timer{
 
 public:
     Timer();
-    void markStart();
-    void markEnd();
-    auto getDuration() const -> double;
+    void MarkStart();
+    void MarkEnd();
+    auto GetDuration() const -> double;
 
 private:
     TimePoint m_startTime{};

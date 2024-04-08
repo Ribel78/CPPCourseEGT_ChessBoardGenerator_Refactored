@@ -2,10 +2,10 @@
 #include "TextureFactory.h"
 
 Interface::Interface(ChessBoard& cb) : m_chessBoard(cb) {
-    initInterfaceRects();
+    InitInterfaceRects();
 }
 
-void Interface::initInterfaceRects()
+void Interface::InitInterfaceRects()
 {
     //Set up UI Rectangles
 
@@ -19,150 +19,150 @@ void Interface::initInterfaceRects()
     m_rectSliderKnob = {m_rectSliderSlit.x + (DIM_CP_TO_REMOVE - 3) *((m_rectSliderSlit.w)/ 33), m_rectSliderSlit.y, m_rectSliderSlit.h, m_rectSliderSlit.h};
 }
 
-void Interface::setButtonViewerTexID(std::string texture_id)
+void Interface::SetButtonViewerTexID(std::string textureId)
 {
-    m_buttonViewerTexID = texture_id;
+    m_buttonViewerTexID = textureId;
 }
 
-void Interface::setButtonSimulatorTexID(std::string texture_id)
+void Interface::SetButtonSimulatorTexID(std::string textureId)
 {
-    m_buttonSimulatorTexID = texture_id;
+    m_buttonSimulatorTexID = textureId;
 }
 
-void Interface::setButtonStartTexID(std::string texture_id)
+void Interface::SetButtonStartTexID(std::string textureId)
 {
-    m_buttonStartTexID = texture_id;
+    m_buttonStartTexID = textureId;
 }
 
-void Interface::setButtonStopTexID(std::string texture_id)
+void Interface::SetButtonStopTexID(std::string textureId)
 {
-    m_buttonStopTexID = texture_id;
+    m_buttonStopTexID = textureId;
 }
 
-void Interface::resetAllButtonsTexID()
+void Interface::ResetAllButtonsTexID()
 {
-    setButtonViewerTexID(ID_BTN_VIEWER_UP);
-    setButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
-    setButtonStartTexID(ID_BTN_START_UP);
-    setButtonStopTexID(ID_BTN_STOP_UP);
+    SetButtonViewerTexID(ID_BTN_VIEWER_UP);
+    SetButtonSimulatorTexID(ID_BTN_SIMULATOR_UP);
+    SetButtonStartTexID(ID_BTN_START_UP);
+    SetButtonStopTexID(ID_BTN_STOP_UP);
 
 }
 
-auto Interface::getRectTextFEN() -> SDL_Rect*
+auto Interface::GetRectTextFEN() -> SDL_Rect*
 {
     return &m_rectTextFEN;
 }
 
-auto Interface::getRectButtonViewer() -> SDL_Rect*
+auto Interface::GetRectButtonViewer() -> SDL_Rect*
 {
     return &m_rectButtonViewer;
 }
 
-auto Interface::getRectButtonSimulator() -> SDL_Rect*
+auto Interface::GetRectButtonSimulator() -> SDL_Rect*
 {
     return &m_rectButtonSimulator;
 }
 
 
-auto Interface::getRectSliderKnob() -> SDL_Rect*
+auto Interface::GetRectSliderKnob() -> SDL_Rect*
 {
     return &m_rectSliderKnob;
 }
 
-auto Interface::getRectWindow() -> SDL_Rect*
+auto Interface::GetRectWindow() -> SDL_Rect*
 {
     return &m_rectWindow;
 }
 
-void Interface::drawTitle()
+void Interface::DrawTitle()
 {
-    if(m_chessBoard.isViewing())
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
+    if(m_chessBoard.IsViewing())
+        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
     else
-        TextureFactory::instance()->drawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_rectTextTitle);
+        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_rectTextTitle);
 
 }
 
-void Interface::drawModeToggleButtons()
+void Interface::DrawModeToggleButtons()
 {
-    if (!m_chessBoard.isViewing())
+    if (!m_chessBoard.IsViewing())
     {
-        if (m_chessBoard.isSimulating())
+        if (m_chessBoard.IsSimulating())
         {
-            TextureFactory::instance()->drawTexture(m_buttonStopTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::instance()->drawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_rectButtonViewer);
+            TextureFactory::Instance()->DrawTexture(m_buttonStopTexID, NULL, &m_rectButtonSimulator);
+            TextureFactory::Instance()->DrawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_rectButtonViewer);
         }
         else
         {
-            TextureFactory::instance()->drawTexture(m_buttonStartTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::instance()->drawTexture(m_buttonViewerTexID, NULL, &m_rectButtonViewer);
+            TextureFactory::Instance()->DrawTexture(m_buttonStartTexID, NULL, &m_rectButtonSimulator);
+            TextureFactory::Instance()->DrawTexture(m_buttonViewerTexID, NULL, &m_rectButtonViewer);
         }
     }
     else
     {
-        TextureFactory::instance()->drawTexture(m_buttonSimulatorTexID, NULL, &m_rectButtonViewer);
+        TextureFactory::Instance()->DrawTexture(m_buttonSimulatorTexID, NULL, &m_rectButtonViewer);
     }
 
 }
 
-void Interface::drawWindowBackground()
+void Interface::DrawWindowBackground()
 {
-    TextureFactory::instance()->drawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
+    TextureFactory::Instance()->DrawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
 }
 
-void Interface::drawFENDescription()
+void Interface::DrawFENDescription()
 {
-    std::string dynamic_fen {};
-    if (!m_chessBoard.isViewing())
+    std::string dynamicFEN {};
+    if (!m_chessBoard.IsViewing())
     {
-        dynamic_fen = m_chessBoard.getMutableDescriptionsQueue().back().FEN;
+        dynamicFEN = m_chessBoard.GetMutableDescriptionsQueue().back().m_fenDescription;
     }
     else
     {
-        m_chessBoard.setBoardDescriptionFromVector();
-        dynamic_fen = m_chessBoard.getCurrentDescription().FEN;
+        m_chessBoard.SetBoardDescriptionFromVector();
+        dynamicFEN = m_chessBoard.GetCurrentDescription().m_fenDescription;
     }
-    TextureFactory::instance()->textureFromFont(ID_TXT_FEN,
+    TextureFactory::Instance()->TextureFromFont(ID_TXT_FEN,
                                                 ID_FONT_SEGOE28,
-                                                dynamic_fen.c_str(),
+                                                dynamicFEN.c_str(),
                                                 Constants::COL_TXT_LIGHT,
                                                 DIM_WINDOW_WIDTH, 0);
 
-    TextureFactory::instance()->drawTexture(ID_TXT_FEN,
+    TextureFactory::Instance()->DrawTexture(ID_TXT_FEN,
                                             NULL, &m_rectTextFEN);
 
-    TextureFactory::instance()->destroyTexture(ID_TXT_FEN);
+    TextureFactory::Instance()->DestroyTexture(ID_TXT_FEN);
 
 }
 
-void Interface::drawStatistics()
+void Interface::DrawStatistics()
 {
     // Statistics for the simulation time
-    std::string dynamic_text = m_chessBoard.getSimulationSummary();
+    std::string dynamicText = m_chessBoard.GetSimulationSummary();
 
-    TextureFactory::instance()->textureFromFont(ID_TXT_STATS,
+    TextureFactory::Instance()->TextureFromFont(ID_TXT_STATS,
                                                 ID_FONT_SEGOE28,
-                                                dynamic_text.c_str(),
+                                                dynamicText.c_str(),
                                                 Constants::COL_TXT_LIGHT,
                                                 DIM_WINDOW_WIDTH / 2, 0);
 
-    TextureFactory::instance()->drawTexture(ID_TXT_STATS,
+    TextureFactory::Instance()->DrawTexture(ID_TXT_STATS,
                                             NULL, &m_rectTextStats);
 
-    TextureFactory::instance()->destroyTexture(ID_TXT_STATS);
+    TextureFactory::Instance()->DestroyTexture(ID_TXT_STATS);
 }
 
-void Interface::drawSlider()
+void Interface::DrawSlider()
 {
-    if(!m_chessBoard.isViewing())
+    if(!m_chessBoard.IsViewing())
     {
-        TextureFactory::instance()->drawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
-        TextureFactory::instance()->drawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
+        TextureFactory::Instance()->DrawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
+        TextureFactory::Instance()->DrawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
         if (m_offsetX >= 0)
         {
-            int msx, msy;
-            SDL_GetMouseState(&msx, &msy);
-            m_rectSliderKnob.x = msx - m_offsetX;
+            int mouseX, mouseY;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            m_rectSliderKnob.x = mouseX - m_offsetX;
             if (m_rectSliderKnob.x < m_rectSliderSlit.x)
                 m_rectSliderKnob.x = m_rectSliderSlit.x;
             if (m_rectSliderKnob.x > m_rectSliderSlit.x + (m_rectSliderSlit.w - m_rectSliderKnob.w))
@@ -177,74 +177,83 @@ void Interface::drawSlider()
 
         (val > 32)? val = 32 : val;
 
-        m_chessBoard.setPiecesToRemove(32-val);
+        m_chessBoard.SetPiecesToRemove(32-val);
 
         SDL_Rect label = m_rectSliderSlit;
         label.h /= 2;
         label.y = m_rectSliderSlit.y - label.h;
         label.w /= 2;
 
-        std::string label_text = "Set chess pieces: ";
+        std::string labelText = "Set chess pieces: ";
 
-        (val < 10)? label_text += " " : label_text;
+        (val < 10)? labelText += " " : labelText;
 
-        label_text.append(std::to_string(val));
+        labelText.append(std::to_string(val));
 
-        TextureFactory::instance()->textureFromFont(
+        TextureFactory::Instance()->TextureFromFont(
             "label", Constants::ID_FONT_SEGOE,
-            label_text.c_str(),
+            labelText.c_str(),
             Constants::COL_TXT_LIGHT, 1280, 0);
-        TextureFactory::instance()->drawTexture("label", NULL, &label);
-        TextureFactory::instance()->destroyTexture("label");
+        TextureFactory::Instance()->DrawTexture("label", NULL, &label);
+        TextureFactory::Instance()->DestroyTexture("label");
     }
 }
 
 
-bool Interface::isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const
+auto Interface::IsButtonClicked(const SDL_Rect* rect, int xUp, int yUp) const -> bool
 {
-    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
-        ((xUp > r->x) && (xUp < r->x +r->w))&&
-        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)) &&
-        ((yUp > r->y) && (yUp < r->y +r->h)))
+    if(((m_mouseDownX > rect->x) && (m_mouseDownX < rect->x + rect->w)) &&
+        ((xUp > rect->x) && (xUp < rect->x + rect->w))&&
+        ((m_mouseDownY > rect->y) && (m_mouseDownY < rect->y + rect->h)) &&
+        ((yUp > rect->y) && (yUp < rect->y + rect->h)))
+    {
+        return true; //click is inside  SDL_Rect r
+    }
+    return false; //click is outside SDL_Rect r
+}
+
+auto Interface::IsButtonOnFocus(const SDL_Rect* rect) const -> bool
+{
+    if(((m_mouseDownX > rect->x) && (m_mouseDownX < rect->x +rect->w)) &&
+        ((m_mouseDownY > rect->y) && (m_mouseDownY < rect->y +rect->h)))
     {
         return true; //click coordinates inside  SDL_Rect r
     }
     return false; //click coordinates outside inside  SDL_Rect r
 }
 
-auto Interface::buttonFocus(const SDL_Rect* r) const -> bool
-{
-    if(((m_mouseDownX > r->x) && (m_mouseDownX < r->x +r->w)) &&
-        ((m_mouseDownY > r->y) && (m_mouseDownY < r->y +r->h)))
-    {
-        return true; //click coordinates inside  SDL_Rect r
-    }
-    return false; //click coordinates outside inside  SDL_Rect r
-}
-
-void Interface::setMouseDownCoords(int x, int y)
+void Interface::SetMouseDownCoords(int x, int y)
 {
     m_mouseDownX = x;
     m_mouseDownY = y;
 }
 
-void Interface::updateBtnTexturesOnFocus()
+void Interface::UpdateBtnTexturesOnFocus()
 {
 
-    if(buttonFocus(getRectSliderKnob()))
+    if(IsButtonOnFocus(GetRectSliderKnob()))
     {
-        m_offsetX = m_mouseDownX - getRectSliderKnob()->x;
+        m_offsetX = m_mouseDownX - GetRectSliderKnob()->x;
     }
 
-    if(buttonFocus(getRectButtonViewer()))
+    if(IsButtonOnFocus(GetRectButtonViewer()))
     {
-        setButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
-        setButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
+        SetButtonSimulatorTexID(Constants::ID_BTN_SIMULATOR_DOWN);
+        SetButtonViewerTexID(Constants::ID_BTN_VIEWER_DOWN);
     }
 
-    if(buttonFocus(getRectButtonSimulator()))
+    if(IsButtonOnFocus(GetRectButtonSimulator()))
     {
-        setButtonStartTexID(Constants::ID_BTN_START_DOWN);
-        setButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
+        SetButtonStartTexID(Constants::ID_BTN_START_DOWN);
+        SetButtonStopTexID(Constants::ID_BTN_STOP_DOWN);
     }
+}
+
+void Interface::setMouseOffset(const int val)
+{
+    m_offsetX = val;
+}
+auto Interface::getMouseOffset() const -> int
+{
+    return m_offsetX;
 }

@@ -20,8 +20,8 @@ Game::~Game()
     std::cout << "Destructing Game Object." << std::endl;
 }
 //Initialize SDL library
-auto Game::init(const char* title,
-                int xpos, int ypos,
+auto Game::Init(const char* title,
+                int xPos, int yPos,
                 int width, int height,
                 int flags) -> bool
 {
@@ -29,7 +29,7 @@ auto Game::init(const char* title,
     {
 		std::cout << "SDL init success\n";
 
-        m_window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        m_window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
         if (m_window != 0)
 		{
             std::cout << "Window creation success\n";
@@ -37,7 +37,7 @@ auto Game::init(const char* title,
             SDL_Renderer* renderer = SDL_CreateRenderer(m_window, -1, 0);
             if (renderer != 0)
 			{
-                TextureFactory::instance()->setRenderer(renderer);
+                TextureFactory::Instance()->SetRenderer(renderer);
 
                 std::cout << "Renderer creation success\n";
 			}
@@ -68,38 +68,38 @@ auto Game::init(const char* title,
     std::cout << "init success\n";
     m_running = true;
 
-    prepTextures();
+    PrepareTextures();
 
 	return true;
 }
 
-void Game::prepTextures()
+void Game::PrepareTextures()
 {
     //Prepare resources
-    prepFonts();
-    prepStaticFontTextures();
-    prepStaticImageTextures();
-    prepChessPieceTextures(true);
-    prepBoardLabelsTextures();
+    PrepFonts();
+    PrepStaticFontTextures();
+    PrepStaticImageTextures();
+    PrepChessPieceTextures(true);
+    PrepBoardLabelsTextures();
 }
 
-void Game::update()
+void Game::Update()
 {
     //Render All
-    SDL_RenderPresent(TextureFactory::instance()->getRenderer());
+    SDL_RenderPresent(TextureFactory::Instance()->GetRenderer());
 
     if(m_dataStream.is_open())
-        m_dataStream << m_chessBoard.getCurrentDescription().Custom << " "
-                     << m_chessBoard.getCurrentDescription().FEN << " "
-                     << m_chessBoard.getCurrentDescription().simulationTime << " "
-                     << m_chessBoard.getCurrentDescription().chess_pieces
+        m_dataStream << m_chessBoard.GetCurrentDescription().m_customDescription << " "
+                     << m_chessBoard.GetCurrentDescription().m_fenDescription << " "
+                     << m_chessBoard.GetCurrentDescription().m_simulationTime << " "
+                     << m_chessBoard.GetCurrentDescription().m_chessPieces
                      << std::endl;
 
     //Slow down visual shuffling
     SDL_Delay(6);
 }
 
-void Game::handleEvents()
+void Game::HandleEvents()
 {
 	SDL_Event event;
     if (SDL_PollEvent(&event))
@@ -110,130 +110,131 @@ void Game::handleEvents()
 
         case SDL_KEYUP:{
 
-            m_chessBoard.setChessPieceIdx(-1);
+            m_chessBoard.SetChessPieceIdx(-1);
 
             if(event.key.keysym.sym == SDLK_DOWN)
             {
-                if(!m_chessBoard.isSimulating())
+                if(!m_chessBoard.IsSimulating())
                 {
-                    m_chessBoard.viewDescriptionNext();
+                    m_chessBoard.ViewDescriptionNext();
 				}
 			}
             if(event.key.keysym.sym == SDLK_UP)
             {
-                if(!m_chessBoard.isSimulating())
+                if(!m_chessBoard.IsSimulating())
                 {
-                    m_chessBoard.viewDescriptionPrevious();
+                    m_chessBoard.ViewDescriptionPrevious();
                 }
             }
 		}; break;
         case SDL_MOUSEBUTTONDOWN:
         {
-			int msx, msy;
+            int mouseX, mouseY;
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-				SDL_GetMouseState(&msx, &msy);
+                SDL_GetMouseState(&mouseX, &mouseY);
 
-                m_interface.setMouseDownCoords(msx, msy);
+                m_interface.SetMouseDownCoords(mouseX, mouseY);
 
-                m_interface.updateBtnTexturesOnFocus();
+                m_interface.UpdateBtnTexturesOnFocus();
 			}
 		}; break;
         case SDL_MOUSEBUTTONUP:
         {
 			int msx, msy;
-            m_interface.m_offsetX = -1;
+            m_interface.setMouseOffset(-1);
 
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                m_interface.resetAllButtonsTexID();
+                m_interface.ResetAllButtonsTexID();
 
 				SDL_GetMouseState(&msx, &msy);
                 // toggle simulation button
-                if(m_interface.isButtonClicked(m_interface.getRectButtonSimulator(), msx, msy) &&
-                                !m_chessBoard.isViewing())
+                if(m_interface.IsButtonClicked(m_interface.GetRectButtonSimulator(), msx, msy) &&
+                    !m_chessBoard.IsViewing())
                 {
-                    m_chessBoard.openDescriptionFileForWriting(m_dataStream);
+                    m_chessBoard.OpenDescriptionFileForWriting(m_dataStream);
 
-                    if (!m_chessBoard.isSimulating())
+                    if (!m_chessBoard.IsSimulating())
                     {
-                        m_chessBoard.setChessPieceIdx(-1);
-                        m_chessBoard.resetSimulationStatistics();
+                        m_chessBoard.SetChessPieceIdx(-1);
+                        m_chessBoard.ResetSimulationStatistics();
                     }
 
-                    m_chessBoard.toggleSimulating();
+                    m_chessBoard.ToggleSimulating();
 				}
 
                 //viewer button clicked
-                if(m_interface.isButtonClicked(m_interface.getRectButtonViewer(), msx, msy) &&
-                                !m_chessBoard.isSimulating())
+                if(m_interface.IsButtonClicked(m_interface.GetRectButtonViewer(), msx, msy) &&
+                    !m_chessBoard.IsSimulating())
                 {
-                    if (m_chessBoard.isViewing())
+                    if (m_chessBoard.IsViewing())
                     {
-                        m_chessBoard.getMutableCBDescriptionsVecSeek() = 0;
+                        m_chessBoard.GetMutableCBDescriptionsVecSeek() = 0;
                     }
 
-                    m_chessBoard.readDescriptionFile(m_dataStream);
+                    m_chessBoard.ReadDescriptionFile(m_dataStream);
 
-                    m_chessBoard.toggleViewing();
+                    m_chessBoard.ToggleViewing();
 
-                    m_chessBoard.setChessPieceIdx(-1);
+                    m_chessBoard.SetChessPieceIdx(-1);
 				}
 
-                if(m_interface.isButtonClicked(m_interface.getRectTextFEN(), msx, msy) &&
-                    !m_chessBoard.isSimulating())
+                if(m_interface.IsButtonClicked(m_interface.GetRectTextFEN(), msx, msy) &&
+                    !m_chessBoard.IsSimulating())
                 {
-                    m_chessBoard.copyFENtoClipboard();
+                    m_chessBoard.CopyFENtoClipboard();
 
-                    openURL(Constants::URL_365CHESS);
+                    OpenURL(Constants::URL_365CHESS);
                 }
 
                 for (int i = 0; i < 64; i++)
                 {
-                    if(m_interface.isButtonClicked(m_chessBoard.getRectChessBoardTile(i), msx, msy) &&
-                        !m_chessBoard.isSimulating())
+                    if(m_interface.IsButtonClicked(m_chessBoard.GetRectChessBoardTile(i), msx, msy) &&
+                        !m_chessBoard.IsSimulating())
                     {
-                        m_chessBoard.setChessPieceIdx(i);
+                        m_chessBoard.SetChessPieceIdx(i);
 
-                        m_chessBoard.setCurrentBoardDescriptionSrc();
+                        m_chessBoard.SetCurrentBoardDescriptionSrc();
 
                         break;
                     }
                 }
 			}
 		}; break;
+
 		default: break;
 		}
 	}
 }
 
-void Game::clean()
+void Game::Clean()
 {
     std::cout << "cleaning game\n";
     SDL_DestroyWindow(m_window);
-    SDL_DestroyRenderer(TextureFactory::instance()->getRenderer());
+    SDL_DestroyRenderer(TextureFactory::Instance()->GetRenderer());
     SDL_Quit();
 }
 
-auto Game::isRunning() const -> bool
+auto Game::IsRunning() const -> bool
 {
     return Game::m_running;
 }
 
-void Game::draw()
+void Game::Draw()
 {
-    m_interface.drawWindowBackground();
-    m_interface.drawTitle();
+    m_interface.DrawWindowBackground();
+    m_interface.DrawTitle();
 
-    m_chessBoard.drawBoard();
+    m_chessBoard.DrawBoard();
 
-    m_interface.drawModeToggleButtons();
-    m_interface.drawFENDescription();
-    m_interface.drawStatistics();
-    m_interface.drawSlider();
+    m_interface.DrawModeToggleButtons();
+    m_interface.DrawFENDescription();
+    m_interface.DrawStatistics();
+    m_interface.DrawSlider();
 
-    m_chessBoard.drawBoardOverlay();
-    m_chessBoard.drawPieces();
+    m_chessBoard.DrawBoardOverlay();
+    m_chessBoard.DrawPieces();
 }
 

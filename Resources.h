@@ -1,7 +1,7 @@
 #pragma once
 
-void prepFonts();
-void prepStaticFontTextures();
-void prepStaticImageTextures();
-void prepChessPieceTextures(bool use_texture);
-void prepBoardLabelsTextures();
+void PrepFonts();
+void PrepStaticFontTextures();
+void PrepStaticImageTextures();
+void PrepChessPieceTextures(bool use_texture);
+void PrepBoardLabelsTextures();

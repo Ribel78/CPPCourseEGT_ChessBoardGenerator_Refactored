@@ -11,20 +11,20 @@ Game* game = NULL;
 int main(int argc, char* argv[])
 {
     game = new Game();
-    game->init("Chess Board Generator",
+    game->Init("Chess Board Generator",
                 SDL_WINDOWPOS_CENTERED,
                 SDL_WINDOWPOS_CENTERED,
                 DIM_WINDOW_WIDTH, DIM_WINDOW_HEIGHT, 0);
 
-    while (game->isRunning())
+    while (game->IsRunning())
     {
-        game->handleEvents();
+        game->HandleEvents();
 
-        game -> draw();
+        game -> Draw();
 
-        game->update();
+        game->Update();
     }
-    game->clean();
+    game->Clean();
 
 	return 0;
 }

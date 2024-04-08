@@ -15,7 +15,7 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the rook (make sure it is either 'r' or 'R') from the _boardDescription at position x,y as attacking piece
 else puts the desired color rook at position x, y 
 */
-void rookAttack(const std::string& boardDescription,
+void RookAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
@@ -25,42 +25,42 @@ void rookAttack(const std::string& boardDescription,
 
     boardOverlay[(y * 8) + x] = attackingPiece; //mark init position
 
-    int pos_x = x; int pos_y = y;
+    int posX = x; int posY = y;
 
     bool isHit = false;
 
     //sweep up
-    while (!isHit && pos_y > 0)
+    while (!isHit && posY > 0)
     {
-        pos_y -= 1;
+        posY -= 1;
 
         //empty square on path
-        if (boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        if (boardDescription[ (posY * 8) + posX ] == '-')
         {
-            boardOverlay[ (pos_y * 8) + pos_x ] = 'X';
+            boardOverlay[ (posY * 8) + posX ] = 'X';
         }
 
-        for (char w_piece : whitePieces)
+        for (char wPiece : whitePieces)
         {
-            if (boardDescription[ (pos_y * 8) + pos_x ] == w_piece)
+            if (boardDescription[ (posY * 8) + posX ] == wPiece)
             {
                 //store the attacked white piece and end while
                 if(attackingPiece == 'r')
                 {
-                    boardOverlay[ (pos_y * 8) + pos_x ] = w_piece;
+                    boardOverlay[ (posY * 8) + posX ] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces)
+        for (char bPiece : blackPieces)
         {
-            if (boardDescription[ (pos_y * 8) + pos_x ] == b_piece)
+            if (boardDescription[ (posY * 8) + posX ] == bPiece)
             {
                 //store the attacked black piece and end while
                 if(attackingPiece == 'R')
                 {
-                    boardOverlay[ (pos_y * 8) + pos_x ] = b_piece;
+                    boardOverlay[ (posY * 8) + posX ] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -68,41 +68,41 @@ void rookAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep down
-    while (!isHit && pos_y < 7)
+    while (!isHit && posY < 7)
     {
-        pos_y += 1;
+        posY += 1;
 
         //empty square on path
-        if (boardDescription[(pos_y * 8) + pos_x] == '-')
+        if (boardDescription[(posY * 8) + posX] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces)
+        for (char wPiece : whitePieces)
         {
-            if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+            if (boardDescription[(posY * 8) + posX] == wPiece)
             {
                 //store the attacked white piece and end while
                 if(attackingPiece == 'r')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                    boardOverlay[(posY * 8) + posX] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces){
-            if ( boardDescription[(pos_y * 8) + pos_x] == b_piece)
+        for (char bPiece : blackPieces){
+            if ( boardDescription[(posY * 8) + posX] == bPiece)
             {
                 //store the attacked black piece and end while
                 if(attackingPiece == 'R')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                    boardOverlay[(posY * 8) + posX] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -110,39 +110,39 @@ void rookAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep left
-    while (!isHit && pos_x > 0)
+    while (!isHit && posX > 0)
     {
-        pos_x -= 1;
+        posX -= 1;
         //empty square
-        if (boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        if (boardDescription[ (posY * 8) + posX ] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces){
-            if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+        for (char wPiece : whitePieces){
+            if (boardDescription[(posY * 8) + posX] == wPiece)
             {
                 if(attackingPiece == 'r')
                 { //store the attacked white piece and end while
-                    boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                    boardOverlay[(posY * 8) + posX] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces)
+        for (char bPiece : blackPieces)
         {
-            if (boardDescription[(pos_y * 8) + pos_x] == b_piece)
+            if (boardDescription[(posY * 8) + posX] == bPiece)
             {
                 //store the attacked black piece and end while
                 if(attackingPiece == 'R')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                    boardOverlay[(posY * 8) + posX] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -150,35 +150,35 @@ void rookAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep right
-    while (!isHit && pos_x < 7)
+    while (!isHit && posX < 7)
     {
-        pos_x += 1;
+        posX += 1;
         //empty square on path
-        if (boardDescription[(pos_y * 8) + pos_x] == '-')
+        if (boardDescription[(posY * 8) + posX] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces)
+        for (char wPiece : whitePieces)
         {
-            if (boardDescription[ (pos_y * 8) + pos_x ] == w_piece){
+            if (boardDescription[ (posY * 8) + posX ] == wPiece){
                 if(attackingPiece == 'r')
                 { //store the attacked white piece and end while
-                    boardOverlay[(pos_y * 8) + pos_x ] = w_piece;
+                    boardOverlay[(posY * 8) + posX ] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces){
-            if ( boardDescription[ (pos_y * 8) + pos_x ] == b_piece){
+        for (char bPiece : blackPieces){
+            if ( boardDescription[ (posY * 8) + posX ] == bPiece){
                     if(attackingPiece == 'R'){ //store the attacked black piece and end while
-                        boardOverlay[ (pos_y * 8) + pos_x ] = b_piece;
+                        boardOverlay[ (posY * 8) + posX ] = bPiece;
                     }
                     isHit = true;
                     break;
@@ -196,7 +196,7 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the bishop (make sure it is either 'b' or 'B') from the _boardDescription at position x,y as attacking piece
 else puts the desired color bishop at position x, y 
 */
-void bishopAttack(const std::string& boardDescription,
+void BishopAttack(const std::string& boardDescription,
                   std::string& boardOverlay,
                   const char attackingPiece,
                   int x, int y,
@@ -206,39 +206,39 @@ void bishopAttack(const std::string& boardDescription,
     //mark bishop initial position
     boardOverlay[(y * 8) + x] = attackingPiece;
 
-    int pos_x = x; int pos_y = y;
+    int posX = x; int posY = y;
 
     bool isHit = false;
 
     //sweep left up
-    while (!isHit && ( pos_y > 0 && pos_x > 0 ))
+    while (!isHit && ( posY > 0 && posX > 0 ))
     {
-        pos_y -= 1;
-        pos_x -= 1;
-        if ( boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        posY -= 1;
+        posX -= 1;
+        if ( boardDescription[ (posY * 8) + posX ] == '-')
         { //empty square on path
-                boardOverlay[ (pos_y * 8) + pos_x ] = 'X';
+                boardOverlay[ (posY * 8) + posX ] = 'X';
         }
 
-        for (char w_piece : whitePieces)
+        for (char wPiece : whitePieces)
         {
-            if ( boardDescription[ (pos_y * 8) + pos_x ] == w_piece)
+            if ( boardDescription[ (posY * 8) + posX ] == wPiece)
             {
                 //store the attacked white piece and end while
                 if(attackingPiece == 'b')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                    boardOverlay[(posY * 8) + posX] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces){
-            if (boardDescription[(pos_y * 8) + pos_x] == b_piece)
+        for (char bPiece : blackPieces){
+            if (boardDescription[(posY * 8) + posX] == bPiece)
             {
                 if(attackingPiece == 'B')
                 { //store the attacked black piece and end while
-                    boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                    boardOverlay[(posY * 8) + posX] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -246,37 +246,37 @@ void bishopAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep right up
-    while (!isHit && ( pos_y > 0 && pos_x < 7 ))
+    while (!isHit && ( posY > 0 && posX < 7 ))
     {
-        pos_y -= 1;
-        pos_x += 1;
+        posY -= 1;
+        posX += 1;
 
         //empty square on path
-        if ( boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        if ( boardDescription[ (posY * 8) + posX ] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces){
-            if (boardDescription[ (pos_y * 8) + pos_x ] == w_piece){
+        for (char wPiece : whitePieces){
+            if (boardDescription[ (posY * 8) + posX ] == wPiece){
                 if(attackingPiece == 'b')
                 { //store the attacked white piece and end while
-                    boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                    boardOverlay[(posY * 8) + posX] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
 
-        for (char b_piece : blackPieces){
-            if (boardDescription[ (pos_y * 8) + pos_x] == b_piece){
+        for (char bPiece : blackPieces){
+            if (boardDescription[ (posY * 8) + posX] == bPiece){
                     if(attackingPiece == 'B'){  //store the attacked black piece and end while
-                        boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                        boardOverlay[(posY * 8) + posX] = bPiece;
                     }
                     isHit = true;
                     break;
@@ -284,42 +284,42 @@ void bishopAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep left down
-    while (!isHit && (pos_y < 7 && pos_x > 0))
+    while (!isHit && (posY < 7 && posX > 0))
     {
-        pos_y += 1;
-        pos_x -= 1;
+        posY += 1;
+        posX -= 1;
 
         //empty square
-        if (boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        if (boardDescription[ (posY * 8) + posX ] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces){
-            if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+        for (char wPiece : whitePieces){
+            if (boardDescription[(posY * 8) + posX] == wPiece)
             {
                 //store the attacked white piece and end while
                 if(attackingPiece == 'b')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                    boardOverlay[(posY * 8) + posX] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces)
+        for (char bPiece : blackPieces)
         {
-            if (boardDescription[(pos_y * 8) + pos_x] == b_piece)
+            if (boardDescription[(posY * 8) + posX] == bPiece)
             {
                 //store the attacked black piece and end while
                 if(attackingPiece == 'B')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                    boardOverlay[(posY * 8) + posX] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -327,41 +327,41 @@ void bishopAttack(const std::string& boardDescription,
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     isHit = false;
 
     //sweep right down
-    while (!isHit && ( pos_y < 7 && pos_x < 7 ))
+    while (!isHit && ( posY < 7 && posX < 7 ))
     {
-        pos_y += 1;
-        pos_x += 1;
+        posY += 1;
+        posX += 1;
 
         //empty square on path
-        if (boardDescription[ (pos_y * 8) + pos_x ] == '-')
+        if (boardDescription[ (posY * 8) + posX ] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
         }
 
-        for (char w_piece : whitePieces){
-            if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+        for (char wPiece : whitePieces){
+            if (boardDescription[(posY * 8) + posX] == wPiece)
             {
                 //store the attacked white piece and end while
                 if(attackingPiece == 'b')
                 {
-                    boardOverlay[ (pos_y * 8) + pos_x ] = w_piece;
+                    boardOverlay[ (posY * 8) + posX ] = wPiece;
                 }
                 isHit = true;
                 break;
             }
         }
-        for (char b_piece : blackPieces){
-            if (boardDescription[ (pos_y * 8) + pos_x] == b_piece)
+        for (char bPiece : blackPieces){
+            if (boardDescription[ (posY * 8) + posX] == bPiece)
             {
                 //store the attacked black piece and end while
                 if(attackingPiece == 'B')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                    boardOverlay[(posY * 8) + posX] = bPiece;
                 }
                 isHit = true;
                 break;
@@ -380,7 +380,7 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the queen (make sure it is either 'q' or 'Q') from the _boardDescription at position x,y as attacking piece
 else puts the desired color queen at position x, y 
 */
-void queenAttack(const std::string& boardDescription,
+void QueenAttack(const std::string& boardDescription,
                  std::string& boardOverlay,
                  const char attackingPiece,
                  int x, int y,
@@ -390,14 +390,14 @@ void queenAttack(const std::string& boardDescription,
     if(attackingPiece == 'q')
     {
         //call rookAttack
-        rookAttack (boardDescription,
+        RookAttack (boardDescription,
                    boardOverlay,
                    'r', x, y,
                    blackPieces,
                    whitePieces);
 
         //call bishopAttack
-        bishopAttack(
+        BishopAttack(
             boardDescription,
             boardOverlay,
             'b', x, y,
@@ -407,14 +407,14 @@ void queenAttack(const std::string& boardDescription,
     if(attackingPiece == 'Q')
     {
         //call rookAttack
-        rookAttack(boardDescription,
+        RookAttack(boardDescription,
                    boardOverlay,
                    'R', x, y,
                    blackPieces,
                    whitePieces);
 
         //call bishopAttack
-        bishopAttack(boardDescription,
+        BishopAttack(boardDescription,
                      boardOverlay,
                      'B', x, y,
                      blackPieces,
@@ -443,45 +443,45 @@ void knightAttack(const std::string& boardDescription,
     //mark bishop initial position
     boardOverlay[ (y * 8) + x ] = attackingPiece;
 
-    int pos_x = x; int pos_y = y;
+    int posX = x; int posY = y;
 
     bool isHit = false;
 
     //turn
-    int knight_point_x[] = {1, 2, 2, 1, -1, -2, -2, -1};
+    int knightPointX[] = {1, 2, 2, 1, -1, -2, -2, -1};
 
-    int knight_point_y[] = {2, 1, -1, -2, -2, -1, 1, 2};
+    int knightPointY[] = {2, 1, -1, -2, -2, -1, 1, 2};
 
     for (int p = 0; p < 8; p++)
     {
-        pos_y = y + knight_point_y[p];
-        pos_x = x + knight_point_x[p];
+        posY = y + knightPointY[p];
+        posX = x + knightPointX[p];
 
-        if((pos_y >= 0 && pos_y <= 7) && (pos_x >= 0 && pos_x <= 7))
+        if((posY >= 0 && posY <= 7) && (posX >= 0 && posX <= 7))
         {
             //empty square on path
-            if (boardDescription[(pos_y * 8) + pos_x] == '-')
+            if (boardDescription[(posY * 8) + posX] == '-')
             {
-                boardOverlay[(pos_y * 8) + pos_x] = 'X';
+                boardOverlay[(posY * 8) + posX] = 'X';
             }
-            for (char w_piece : whitePieces)
+            for (char wPiece : whitePieces)
             {
-                if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+                if (boardDescription[(posY * 8) + posX] == wPiece)
                 {
                     //store the attacked white piece and end while
                     if(attackingPiece == 'n')
                     {
-                        boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                        boardOverlay[(posY * 8) + posX] = wPiece;
                     }
                 }
             }
-            for (char b_piece : blackPieces){
-                if (boardDescription[(pos_y * 8) + pos_x ] == b_piece)
+            for (char bPiece : blackPieces){
+                if (boardDescription[(posY * 8) + posX ] == bPiece)
                 {
                     //store the attacked black piece and end while
                     if(attackingPiece == 'N')
                     {
-                        boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                        boardOverlay[(posY * 8) + posX] = bPiece;
                     }
                 }
             }
@@ -498,7 +498,7 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the king (make sure it is either 'k' or 'K') from the _boardDescription at position x,y as attacking piece
 else puts the desired color king at position x, y 
 */
-void kingAttack(const std::string& boardDescription,
+void KingAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
@@ -507,46 +507,46 @@ void kingAttack(const std::string& boardDescription,
 {
     boardOverlay[ (y * 8) + x ] = attackingPiece; //mark bishop initial position
 
-    int pos_x = x; int pos_y = y;
+    int posX = x; int posY = y;
 
     bool isHit = false;
 
     //turn
-    int king_point_x[] = {0, 1, 1, 1, 0, -1, -1, -1};
+    int kingPointX[] = {0, 1, 1, 1, 0, -1, -1, -1};
 
-    int king_point_y[] = {1, 1, 0, -1, -1, -1, 0, 1};
+    int kingPointY[] = {1, 1, 0, -1, -1, -1, 0, 1};
 
     for (int p = 0; p < 8; p++)
     {
-        pos_y = y + king_point_y[p];
-        pos_x = x + king_point_x[p];
+        posY = y + kingPointY[p];
+        posX = x + kingPointX[p];
 
-        if ((pos_y >= 0 && pos_y <= 7) && (pos_x >= 0 && pos_x <= 7))
+        if ((posY >= 0 && posY <= 7) && (posX >= 0 && posX <= 7))
         {
             //empty square on path
-            if ( boardDescription[ (pos_y * 8) + pos_x ] == '-')
+            if ( boardDescription[ (posY * 8) + posX ] == '-')
             {
-                boardOverlay[(pos_y * 8) + pos_x] = 'X';
+                boardOverlay[(posY * 8) + posX] = 'X';
             }
-            for (char w_piece : whitePieces)
+            for (char wPiece : whitePieces)
             {
-                if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+                if (boardDescription[(posY * 8) + posX] == wPiece)
                 {
                     //store the attacked white piece and end while
                     if(attackingPiece == 'k')
                     {
-                        boardOverlay[ (pos_y * 8) + pos_x ] = w_piece;
+                        boardOverlay[ (posY * 8) + posX ] = wPiece;
                     }
                 }
             }
-            for (char b_piece : blackPieces)
+            for (char bPiece : blackPieces)
             {
-                if (boardDescription[(pos_y * 8) + pos_x] == b_piece)
+                if (boardDescription[(posY * 8) + posX] == bPiece)
                 {
                     //store the attacked black piece and end while
                     if(attackingPiece == 'K')
                     {
-                        boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                        boardOverlay[(posY * 8) + posX] = bPiece;
                     }
                 }
             }
@@ -563,7 +563,7 @@ returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the pawn (make sure it is either 'p' or 'P') from the _boardDescription at position x,y as attacking piece
 else puts the desired color pawn at position x, y 
 */
-void pawnAttack(const std::string& boardDescription,
+void PawnAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
@@ -573,81 +573,81 @@ void pawnAttack(const std::string& boardDescription,
     //mark bishop initial position
     boardOverlay[(y * 8) + x] = attackingPiece;
 
-    int pos_x = x; int pos_y = y;
+    int posX = x; int posY = y;
 
     //attack
-    int pawn_point_x[] = {-1, 1};
+    int pawnPointX[] = {-1, 1};
 
     for (int p = 0; p < 2; p++)
     {
-        pos_y = y + ( ( attackingPiece == 'p') ? 1 : -1 );
-        pos_x = x + pawn_point_x[p];
+        posY = y + ( ( attackingPiece == 'p') ? 1 : -1 );
+        posX = x + pawnPointX[p];
 
-        if((pos_y >= 0 && pos_y <= 7) && (pos_x >= 0 && pos_x <= 7))
+        if((posY >= 0 && posY <= 7) && (posX >= 0 && posX <= 7))
         {
-            for (char w_piece : whitePieces)
+            for (char wPiece : whitePieces)
             {
-                if (boardDescription[(pos_y * 8) + pos_x] == w_piece)
+                if (boardDescription[(posY * 8) + posX] == wPiece)
                 {
                     //store the attacked white piece and end while
                     if(attackingPiece == 'p')
                     {
-                        boardOverlay[(pos_y * 8) + pos_x] = w_piece;
+                        boardOverlay[(posY * 8) + posX] = wPiece;
                     }
                 }
             }
-            for (char b_piece : blackPieces)
+            for (char bPiece : blackPieces)
             {
-                if (boardDescription[(pos_y * 8) + pos_x] == b_piece)
+                if (boardDescription[(posY * 8) + posX] == bPiece)
                 {
                     //store the attacked black piece and end while
                     if(attackingPiece == 'P')
                     {
-                        boardOverlay[(pos_y * 8) + pos_x] = b_piece;
+                        boardOverlay[(posY * 8) + posX] = bPiece;
                     }
                 }
             }
         }
     }
 
-    pos_x = x; pos_y = y;
+    posX = x; posY = y;
 
     //move
-    if (attackingPiece == 'p' && pos_y < 7)
+    if (attackingPiece == 'p' && posY < 7)
     {
-        pos_y += 1;
+        posY += 1;
 
-        if (boardDescription[ (pos_y * 8) + pos_x] == '-')
+        if (boardDescription[ (posY * 8) + posX] == '-')
         { //empty square on path
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
             if (y == 1)
             {
-                pos_y += 1;
+                posY += 1;
                 //empty square on path
-                if ( boardDescription[(pos_y * 8) + pos_x] == '-')
+                if ( boardDescription[(posY * 8) + posX] == '-')
                 {
-                    boardOverlay[(pos_y * 8) + pos_x] = 'X';
+                    boardOverlay[(posY * 8) + posX] = 'X';
                 }
             }
         }
     }
 
-    pos_y = y;
+    posY = y;
 
-    if (attackingPiece == 'P' && pos_y > 0)
+    if (attackingPiece == 'P' && posY > 0)
     {
-        pos_y -= 1;
+        posY -= 1;
         //empty square on path
-        if (boardDescription[(pos_y * 8) + pos_x] == '-')
+        if (boardDescription[(posY * 8) + posX] == '-')
         {
-            boardOverlay[(pos_y * 8) + pos_x] = 'X';
+            boardOverlay[(posY * 8) + posX] = 'X';
             if (y == 6)
             {
-                pos_y -= 1;
+                posY -= 1;
                 //empty square on path
-                if (boardDescription[ (pos_y * 8) + pos_x ] == '-')
+                if (boardDescription[ (posY * 8) + posX ] == '-')
                 {
-                    boardOverlay[ (pos_y * 8) + pos_x ] = 'X';
+                    boardOverlay[ (posY * 8) + posX ] = 'X';
                 }
             }
         }
@@ -662,9 +662,9 @@ Returns board with allowed positions ['X'] and attacked pieces of opposite color
 if default piece then it takes the piece from _boardDescription at position x,y
 else puts the desired piece at position x, y 
 */
-std::string attackSquares(const std::string& boardDescription,
+std::string AttackSquares(const std::string& boardDescription,
                           int x, int y,
-                          char piece)
+                          char attackingPiece)
 {
     //a string to write sequential results in
     std::string boardOverlay = "";
@@ -676,66 +676,66 @@ std::string attackSquares(const std::string& boardDescription,
     }
 
     // when default piece - take the piece with corrds x,y from the board
-    if(!piece)
+    if(!attackingPiece)
     {
-        piece = boardDescription[(y * 8 + x)]; 
+        attackingPiece = boardDescription[(y * 8 + x)];
     }
 
-    if (piece == 'r')
+    if (attackingPiece == 'r')
     {
-        rookAttack(boardDescription,
+        RookAttack(boardDescription,
                    boardOverlay,
                    'r', x, y,
                    Constants::CP_LABELS_BLACK,
                    Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'R')
+    if (attackingPiece == 'R')
     {
-        rookAttack(boardDescription,
+        RookAttack(boardDescription,
                    boardOverlay,
                    'R', x, y,
                    Constants::CP_LABELS_BLACK,
                    Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'b')
+    if (attackingPiece == 'b')
     {
-        bishopAttack(boardDescription,
+        BishopAttack(boardDescription,
                      boardOverlay,
                      'b', x, y,
                      Constants::CP_LABELS_BLACK,
                      Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'B')
+    if (attackingPiece == 'B')
     {
-        bishopAttack(boardDescription,
+        BishopAttack(boardDescription,
                      boardOverlay,
                      'B', x, y,
                      Constants::CP_LABELS_BLACK,
                      Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'q')
+    if (attackingPiece == 'q')
     {
-        queenAttack(boardDescription,
+        QueenAttack(boardDescription,
                     boardOverlay,
                     'q', x, y,
                     Constants::CP_LABELS_BLACK,
                     Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'Q')
+    if (attackingPiece == 'Q')
     {
-        queenAttack(boardDescription,
+        QueenAttack(boardDescription,
                     boardOverlay,
                     'Q', x, y,
                     Constants::CP_LABELS_BLACK,
                     Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'n')
+    if (attackingPiece == 'n')
     {
         knightAttack(boardDescription,
                      boardOverlay,
@@ -744,7 +744,7 @@ std::string attackSquares(const std::string& boardDescription,
                      Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'N')
+    if (attackingPiece == 'N')
     {
         knightAttack(boardDescription,
                      boardOverlay,
@@ -753,36 +753,36 @@ std::string attackSquares(const std::string& boardDescription,
                      Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'k')
+    if (attackingPiece == 'k')
     {
-        kingAttack (boardDescription,
+        KingAttack (boardDescription,
                    boardOverlay,
                    'k', x, y,
                    Constants::CP_LABELS_BLACK,
                    Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'K')
+    if (attackingPiece == 'K')
     {
-        kingAttack (boardDescription,
+        KingAttack (boardDescription,
                    boardOverlay,
                    'K', x, y,
                    Constants::CP_LABELS_BLACK,
                    Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'p')
+    if (attackingPiece == 'p')
     {
-        pawnAttack(boardDescription,
+        PawnAttack(boardDescription,
                    boardOverlay,
                    'p', x, y,
                    Constants::CP_LABELS_BLACK,
                    Constants::CP_LABELS_WHITE);
     }
 
-    if (piece == 'P')
+    if (attackingPiece == 'P')
     {
-        pawnAttack(boardDescription,
+        PawnAttack(boardDescription,
                    boardOverlay,
                    'P', x, y,
                    Constants::CP_LABELS_BLACK,
@@ -792,7 +792,7 @@ std::string attackSquares(const std::string& boardDescription,
     return boardOverlay;
 }
 
-void openURL(const char* url)
+void OpenURL(const char* url)
 {
     try {
         std::string command = std::string("x-www-browser ") + std::string(url);

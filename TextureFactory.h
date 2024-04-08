@@ -14,44 +14,44 @@ public:
     TextureFactory();
     ~TextureFactory();
 
-    void setRenderer(SDL_Renderer* renderer);
+    void SetRenderer(SDL_Renderer* renderer);
 
-    auto getRenderer() const -> SDL_Renderer*;
+    auto GetRenderer() const -> SDL_Renderer*;
 
-    auto loadFont(const char* fileName,
-                  const std::string& font_id,
-                  int font_size) -> bool;
+    auto LoadFont(const char* fileName,
+                  const std::string& fontId,
+                  int fontSize) -> bool;
 
-    auto getFont(const std::string& font_id) const -> TTF_Font*;
+    auto GetFont(const std::string& fontId) const -> TTF_Font*;
 
-    auto textureFromImage(const char* fileName,
-                          const std::string& texture_id) -> bool;
+    auto TextureFromImage(const char* fileName,
+                          const std::string& textureId) -> bool;
 
-    auto textureFromFont(const std::string& texture_id,
-                         const std::string& font_id,
+    auto TextureFromFont(const std::string& textureId,
+                         const std::string& fontId,
                          const char* text,
                          const SDL_Color& fg,
-                         Uint32 wrap_length,
-                         int font_size) -> bool;
+                         Uint32 wrapLength,
+                         int fontSize) -> bool;
 
-    auto textureFromUnicode(const std::string& texture_id,
-                         const std::string& font_id,
+    auto TextureFromUnicode(const std::string& textureId,
+                         const std::string& fontId,
                          const char* unicode,
                          const SDL_Color& fg) -> bool;
 
-    void packTexture(const std::string& texture_id, const std::string& pack_id);
+    void PackTexture(const std::string& textureId, const std::string& packId);
 
-    auto getTextureFromPack(const std::string& pack_id, int tex_idx) -> SDL_Texture*;
+    auto GetTextureFromPack(const std::string& packId, int texIdx) -> SDL_Texture*;
 
-    void drawTexture(const std::string& texture_id,
-                     const SDL_Rect* srcrect,
-                     const SDL_Rect* dstrect);
+    void DrawTexture(const std::string& textureId,
+                     const SDL_Rect* srcRect,
+                     const SDL_Rect* dstRect);
 
-    void setTextureAlpha(std::string texture_id, Uint8 alpha);
+    void SetTextureAlpha(std::string textureId, Uint8 alpha);
 
-    void destroyTexture(const std::string& texture_id);
+    void DestroyTexture(const std::string& textureId);
 
-    static TextureFactory* instance();
+    static TextureFactory* Instance();
 
 private:
 

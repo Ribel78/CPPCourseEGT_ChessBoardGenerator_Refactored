@@ -9,41 +9,44 @@ class Interface
 public:
     Interface(ChessBoard& cb);
 
-    void initInterfaceRects();
+    void InitInterfaceRects();
 
-    void setButtonViewerTexID(std::string texture_id);
-    void setButtonSimulatorTexID(std::string texture_id);
-    void setButtonStartTexID(std::string texture_id);
-    void setButtonStopTexID(std::string texture_id);
-    void resetAllButtonsTexID();
+    void SetButtonViewerTexID(std::string textureId);
+    void SetButtonSimulatorTexID(std::string textureId);
+    void SetButtonStartTexID(std::string textureId);
+    void SetButtonStopTexID(std::string textureId);
+    void ResetAllButtonsTexID();
 
-    auto getRectTextFEN() -> SDL_Rect*;
-    auto getRectButtonViewer() -> SDL_Rect*;
-    auto getRectButtonSimulator() -> SDL_Rect*;
-    auto getRectSliderKnob() -> SDL_Rect*;
-    auto getRectWindow() -> SDL_Rect*;
+    auto GetRectTextFEN() -> SDL_Rect*;
+    auto GetRectButtonViewer() -> SDL_Rect*;
+    auto GetRectButtonSimulator() -> SDL_Rect*;
+    auto GetRectSliderKnob() -> SDL_Rect*;
+    auto GetRectWindow() -> SDL_Rect*;
 
 
-    void drawTitle();
-    void drawModeToggleButtons();
-    void drawWindowBackground();
-    void drawFENDescription();
-    void drawStatistics();
-    void drawSlider();
+    void DrawTitle();
+    void DrawModeToggleButtons();
+    void DrawWindowBackground();
+    void DrawFENDescription();
+    void DrawStatistics();
+    void DrawSlider();
 
-    bool isButtonClicked(const SDL_Rect* r, int xUp, int yUp) const;
-    auto buttonFocus(const SDL_Rect* r) const -> bool;
-    void setMouseDownCoords(int x, int y);
-    void updateBtnTexturesOnFocus();
+    auto IsButtonClicked(const SDL_Rect* rect, int xUp, int yUp) const -> bool;
+    auto IsButtonOnFocus(const SDL_Rect* rect) const -> bool;
+    void SetMouseDownCoords(int x, int y);
+    void UpdateBtnTexturesOnFocus();
 
-    // TODO move as private
-    int m_offsetX = -1;
+    void setMouseOffset(const int val);
+    auto getMouseOffset() const -> int;
+
+
 
 private:
 
     ChessBoard& m_chessBoard;
 
     int m_mouseDownX{}, m_mouseDownY{};
+    int m_offsetX = -1;
 
     std::string m_buttonViewerTexID = ID_BTN_VIEWER_UP;
     std::string m_buttonSimulatorTexID = ID_BTN_SIMULATOR_UP;

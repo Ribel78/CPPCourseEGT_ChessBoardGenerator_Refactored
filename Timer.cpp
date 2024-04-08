@@ -6,11 +6,11 @@ Timer::Timer()
 {
 }
 
-void Timer::markStart()
+void Timer::MarkStart()
 {
     m_startTime = std::chrono::steady_clock::now();
 }
-void Timer::markEnd()
+void Timer::MarkEnd()
 {
     m_endTime = std::chrono::steady_clock::now();
     std::chrono::duration<double> tempDuration = std::chrono::duration_cast<std::chrono::nanoseconds> (m_endTime - m_startTime);
@@ -18,7 +18,7 @@ void Timer::markEnd()
 
 }
 
-auto Timer::getDuration() const -> double
+auto Timer::GetDuration() const -> double
 {
     return m_duration;
 }

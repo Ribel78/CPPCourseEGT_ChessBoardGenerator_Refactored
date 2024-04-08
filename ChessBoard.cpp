@@ -14,8 +14,8 @@ using namespace Constants;
 ChessBoard::ChessBoard()
 {
 
-    initBoardRects();
-    setAndPushCurrentDescription(STR_CB_INIT_DESCR,
+    InitBoardRects();
+    SetAndPushCurrentDescription(STR_CB_INIT_DESCR,
                           STR_CB_INIT_FEN,
                           "0.0",
                           std::to_string(32 - m_piecesToRemove));
@@ -37,119 +37,119 @@ ChessBoard::~ChessBoard()
     }
 }
 
-auto ChessBoard::isSimulating() const -> bool
+auto ChessBoard::IsSimulating() const -> bool
 {
     return ChessBoard::m_simulating;
 }
 
-auto ChessBoard::isViewing() const -> bool
+auto ChessBoard::IsViewing() const -> bool
 {
     return ChessBoard::m_viewing;
 }
 
-void ChessBoard::setViewing(const bool state)
+void ChessBoard::SetViewing(const bool state)
 {
     ChessBoard::m_viewing = state;
 }
 
-void ChessBoard::toggleSimulating()
+void ChessBoard::ToggleSimulating()
 {
-    setSimulating(!isSimulating());
+    SetSimulating(!IsSimulating());
 }
-void ChessBoard::toggleViewing()
+void ChessBoard::ToggleViewing()
 {
-    setViewing(!isViewing());
+    SetViewing(!IsViewing());
 }
 
-void ChessBoard::setSimulating(const bool state)
+void ChessBoard::SetSimulating(const bool state)
 {
     ChessBoard::m_simulating = state;
 }
 
-void ChessBoard::setPiecesToRemove(int amount)
+void ChessBoard::SetPiecesToRemove(int amount)
 {
     m_piecesToRemove = (amount < 0 || amount > 29) ? DIM_CP_TO_REMOVE : amount;
 }
 
-auto ChessBoard::getPiecesToRemove() -> int
+auto ChessBoard::GetPiecesToRemove() -> int
 {
     return m_piecesToRemove;
 }
 
 /*
-Update references to custom and FEN annotation description strings with
+Update references to custom and m_fenDescription annotation description strings with
 random chess board description
 _shuff - bool to shuffle (1) or keep ordered chess set
 _&custDescription - string reference to write the chess board description to
-_&fenDescription - string reference to write the FEN notation of the chess board description
+_&fenDescription - string reference to write the m_fenDescription notation of the chess board description
 */
-void ChessBoard::runChessBoardSimulator(const bool isSimulation,
-                               std::string& custDescription,
+void ChessBoard::RunChessBoardSimulator(const bool isSimulation,
+                               std::string& customDescription,
                                std::string& fenDescription)
 {
     if(isSimulation)
     {
-        m_timer.markStart();
+        m_timer.MarkStart();
 
-        generateRandomChessBoard(m_piecesToRemove, custDescription, fenDescription);
+        GenerateRandomChessBoard(m_piecesToRemove, customDescription, fenDescription);
 
-        m_timer.markEnd();
+        m_timer.MarkEnd();
 
-        updateStatistics();
+        UpdateStatistics();
 
-        setAndPushCurrentDescription(custDescription,
+        SetAndPushCurrentDescription(customDescription,
                               fenDescription,
-                              std::to_string(m_timer.getDuration()),
+                                     std::to_string(m_timer.GetDuration()),
                               std::to_string(32 - m_piecesToRemove));
     }
     else
     {
-        if(!isViewing()){
-            custDescription = m_cbDescriptions.back().Custom;
-            fenDescription = m_cbDescriptions.back().FEN;
+        if(!IsViewing()){
+            customDescription = m_cbDescriptions.back().m_customDescription;
+            fenDescription = m_cbDescriptions.back().m_fenDescription;
         }
         else
         {
-            setBoardDescriptionFromVector();
-            custDescription = getCurrentDescription().Custom;
-            fenDescription = getCurrentDescription().FEN;
+            SetBoardDescriptionFromVector();
+            customDescription = GetCurrentDescription().m_customDescription;
+            fenDescription = GetCurrentDescription().m_fenDescription;
         }
     }
 }
 
-void ChessBoard::generateRandomChessBoard(int removePcs,
-                                          std::string& custDescription,
+void ChessBoard::GenerateRandomChessBoard(int removePcs,
+                                          std::string& customDescription,
                                           std::string& fenDescription)
 {
-    char chess_set[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
+    char chessSet[] = "rnbqkbnrpppppppp--------------------------------PPPPPPPPRNBQKBNR";
     bool repeatSimulation = true;
 
     while(repeatSimulation == true)
     {
-        shuffleChessSet(chess_set);
+        ShuffleChessSet(chessSet);
 
-        if(isIllegalBishops(chess_set))
+        if(IsIllegalBishops(chessSet))
             continue;
 
-        int pieces_to_remove = removePcs;
+        int piecesToRemove = removePcs;
 
-        while(pieces_to_remove >= 0)
+        while(piecesToRemove >= 0)
         {
-            removeIllegalPawnsAndKings(chess_set, pieces_to_remove);
+            RemoveIllegalPawnsAndKings(chessSet, piecesToRemove);
 
-            if(!isExtraPiecesToRemove(chess_set, pieces_to_remove))
+            if(!isExtraPiecesToRemove(chessSet, piecesToRemove))
                 break;
         }
 
-        if (pieces_to_remove < 0 || isIllegalPawn(chess_set))
+        if (piecesToRemove < 0 || IsIllegalPawn(chessSet))
         {
             continue;
         }
 
-        addKingsToBoard(chess_set);
+        AddKingsToBoard(chessSet);
 
-        custDescription = chess_set;
-        fenDescription = parseFEN(chess_set);
+        customDescription = chessSet;
+        fenDescription = ParseToFENDescription(chessSet);
 
         repeatSimulation = false;
     }
@@ -158,7 +158,7 @@ void ChessBoard::generateRandomChessBoard(int removePcs,
 /*
 Parse custom chess board description to FEN notation
 */
-std::string ChessBoard::parseFEN(const char chess_set[65])
+std::string ChessBoard::ParseToFENDescription(const char chessSet[65])
 {
     //char array to hold the positions including separators '/' (64+7)
     char FEN[71] {};
@@ -168,7 +168,7 @@ std::string ChessBoard::parseFEN(const char chess_set[65])
 
     for (int i = 0; i < 64; i++)
     {
-        tempFEN[j] = chess_set[i];
+        tempFEN[j] = chessSet[i];
         if ((i + 1) % 8 == 0 && ((i + 1) > 0 && (i + 1) < 64))
         {
             j += 1;
@@ -177,7 +177,7 @@ std::string ChessBoard::parseFEN(const char chess_set[65])
         j += 1;
     }
 
-    int empty_space = 0;
+    int emptySpace = 0;
 
     j = 0;
 
@@ -185,7 +185,7 @@ std::string ChessBoard::parseFEN(const char chess_set[65])
 
     while (count < 71)
     {
-        if (tempFEN[count] != '-' && empty_space == 0)
+        if (tempFEN[count] != '-' && emptySpace == 0)
         {
 
             FEN[j] = tempFEN[count];
@@ -194,60 +194,60 @@ std::string ChessBoard::parseFEN(const char chess_set[65])
         }
         else if (tempFEN[count] == '-')
         {
-            empty_space += 1;
-            FEN[j] = ('0' + empty_space);
+            emptySpace += 1;
+            FEN[j] = ('0' + emptySpace);
             count += 1;
         }
         else
         {
             j += 1;
-            empty_space = 0;
+            emptySpace = 0;
         }
     }
     return std::string(FEN);
 }
 
-void ChessBoard::setBoardDescriptionFromQueueBack()
+void ChessBoard::SetBoardDescriptionFromQueueBack()
 {
-    m_currentCBDescription.Custom = m_cbDescriptions.back().Custom;
-    m_currentCBDescription.chess_pieces = m_cbDescriptions.back().chess_pieces;
+    m_currentCBDescription.m_customDescription = m_cbDescriptions.back().m_customDescription;
+    m_currentCBDescription.m_chessPieces = m_cbDescriptions.back().m_chessPieces;
 }
 
-void ChessBoard::setBoardDescriptionFromVector()
+void ChessBoard::SetBoardDescriptionFromVector()
 {
     int idx = m_cbDescriptionsVecSeek % m_cbDescriptionsVec.size();
-    m_currentCBDescription.Custom = m_cbDescriptionsVec.at(idx).Custom;
-    m_currentCBDescription.FEN = m_cbDescriptionsVec.at(idx).FEN;
-    m_currentCBDescription.simulationTime = m_cbDescriptionsVec.at(idx).simulationTime;
-    m_currentCBDescription.chess_pieces = m_cbDescriptionsVec.at(idx).chess_pieces;
+    m_currentCBDescription.m_customDescription = m_cbDescriptionsVec.at(idx).m_customDescription;
+    m_currentCBDescription.m_fenDescription = m_cbDescriptionsVec.at(idx).m_fenDescription;
+    m_currentCBDescription.m_simulationTime = m_cbDescriptionsVec.at(idx).m_simulationTime;
+    m_currentCBDescription.m_chessPieces = m_cbDescriptionsVec.at(idx).m_chessPieces;
 }
 
-auto ChessBoard::getMutableCBDescriptionsVecSeek() -> int&
+auto ChessBoard::GetMutableCBDescriptionsVecSeek() -> int&
 {
     return m_cbDescriptionsVecSeek;
 }
 
-auto ChessBoard::getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&
+auto ChessBoard::GetMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&
 {
     return m_cbDescriptions;
 }
 
-auto ChessBoard::getMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&
+auto ChessBoard::GetMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&
 {
     return m_cbDescriptionsVec;
 }
 
-auto ChessBoard::getCurrentDescription() const -> ChessBoardDescriptions
+auto ChessBoard::GetCurrentDescription() const -> ChessBoardDescriptions
 {
     return m_currentCBDescription;
 }
 
-void ChessBoard::setAndPushCurrentDescription(std::string cd,
+void ChessBoard::SetAndPushCurrentDescription(std::string cd,
                                        std::string fen,
-                                       std::string sim_time,
-                                       std::string n_pieces)
+                                       std::string simulationTime,
+                                       std::string numberOfPieces)
 {
-    m_currentCBDescription = {cd, fen, sim_time, n_pieces};
+    m_currentCBDescription = {cd, fen, simulationTime, numberOfPieces};
 
     m_cbDescriptions.push(m_currentCBDescription);
 
@@ -257,11 +257,11 @@ void ChessBoard::setAndPushCurrentDescription(std::string cd,
     }
 }
 
-void ChessBoard::setChessPieceIdx(int idx){
+void ChessBoard::SetChessPieceIdx(int idx){
     m_chessPieceIdx = idx;
 }
 
-auto ChessBoard::getRectChessBoardTile(int idx) const -> SDL_Rect*
+auto ChessBoard::GetRectChessBoardTile(int idx) const -> SDL_Rect*
 {
     return m_rectPtrChessBoardTile[idx];
 }
@@ -270,19 +270,19 @@ auto ChessBoard::getRectChessBoardTile(int idx) const -> SDL_Rect*
 
 
 
-auto ChessBoard::getSimulationSummary() const -> std::string
+auto ChessBoard::GetSimulationSummary() const -> std::string
 {
     std::string timeStatsString {};
-    if(!isViewing())
+    if(!IsViewing())
     {
         timeStatsString.append("Chess pieces: ");
-        timeStatsString.append(m_currentCBDescription.chess_pieces);
+        timeStatsString.append(m_currentCBDescription.m_chessPieces);
         timeStatsString.append("\n");
         timeStatsString.append("Number of simulations: ");
         timeStatsString.append(std::to_string(m_numberOfSimulations));
         timeStatsString.append("\n");
         timeStatsString.append("Last Simulation Time: ");
-        timeStatsString.append(std::to_string(m_timer.getDuration()));
+        timeStatsString.append(std::to_string(m_timer.GetDuration()));
         timeStatsString.append(" ns\n");
         timeStatsString.append("Total Simulation Time: ");
         timeStatsString.append(std::to_string(m_totalSimulationTime));
@@ -299,31 +299,31 @@ auto ChessBoard::getSimulationSummary() const -> std::string
         timeStatsString.append(std::to_string(m_cbDescriptionsVec.size()));
         timeStatsString.append("\n");
         timeStatsString.append("Simulation Time: ");
-        timeStatsString.append(m_currentCBDescription.simulationTime);
+        timeStatsString.append(m_currentCBDescription.m_simulationTime);
         timeStatsString.append("\n");
         timeStatsString.append("Number of pieces: ");
-        timeStatsString.append(m_currentCBDescription.chess_pieces);
+        timeStatsString.append(m_currentCBDescription.m_chessPieces);
         timeStatsString.append("\n\n");
     }
 
     return timeStatsString;
 }
 
-void ChessBoard::updateStatistics()
+void ChessBoard::UpdateStatistics()
 {
     m_numberOfSimulations += 1;
-    m_totalSimulationTime += m_timer.getDuration();
+    m_totalSimulationTime += m_timer.GetDuration();
     m_averageSimulationTime = m_totalSimulationTime / m_numberOfSimulations;
 }
 
-void ChessBoard::resetSimulationStatistics()
+void ChessBoard::ResetSimulationStatistics()
 {
     m_numberOfSimulations = 0;
     m_totalSimulationTime = 0;
     m_averageSimulationTime = 0;
 }
 
-void ChessBoard::initBoardRects()
+void ChessBoard::InitBoardRects()
 {
     //init and position squares rects
     for (int i = 0; i < 64; i++)
@@ -352,20 +352,20 @@ void ChessBoard::initBoardRects()
     m_rectFloatingChessTile = {0, 0, 64, 64};
 }
 
-void ChessBoard::drawBoard()
+void ChessBoard::DrawBoard()
 {
-    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(), SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(TextureFactory::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
     for (int i = 0; i < 64; i++)
     {
 		SDL_SetRenderDrawColor(
-            TextureFactory::instance()->getRenderer(),
+            TextureFactory::Instance()->GetRenderer(),
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].r,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].g,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].b,
             m_colorChessBoard[(i + ( i / 8 ) % 2 ) %2].a
             );
 
-        SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+        SDL_RenderFillRect(TextureFactory::Instance()->GetRenderer(),
                            m_rectPtrChessBoardTile[i]);
 
         srand (i);
@@ -373,59 +373,59 @@ void ChessBoard::drawBoard()
         m_rectFloatingChessTile.x = rand()%(640-64);
         m_rectFloatingChessTile.y = rand()%(640-64);
 
-        TextureFactory::instance()->setTextureAlpha(ID_CHESS_TILE, 55);
-        TextureFactory::instance()->drawTexture(ID_CHESS_TILE, &m_rectFloatingChessTile, m_rectPtrChessBoardTile[i]);
+        TextureFactory::Instance()->SetTextureAlpha(ID_CHESS_TILE, 55);
+        TextureFactory::Instance()->DrawTexture(ID_CHESS_TILE, &m_rectFloatingChessTile, m_rectPtrChessBoardTile[i]);
 	}
 
     // label textures
 
-    SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(), SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(TextureFactory::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
 
     for(int i = 0; i < 8 ; i++)
     {
-        TextureFactory::instance()->drawTexture(std::string(1, ('a' + i)),
+        TextureFactory::Instance()->DrawTexture(std::string(1, ('a' + i)),
                                                 NULL, m_rectPtrBoardLabelsH[i]);
 
-        TextureFactory::instance()->drawTexture(std::string(1, ('8' - i)),
+        TextureFactory::Instance()->DrawTexture(std::string(1, ('8' - i)),
                                                 NULL, m_rectPtrBoardLabelsV[i]);
     }
 }
 
-void ChessBoard::drawBoardOverlay()
+void ChessBoard::DrawBoardOverlay()
 {
     if (!m_simulating && m_chessPieceIdx > -1)
     {
         int x = m_chessPieceIdx % 8;
         int y = m_chessPieceIdx / 8;
 
-        std::string overlay = attackSquares(m_currentCBDescription.Custom, x, y, '\0' );
+        std::string overlay = AttackSquares(m_currentCBDescription.m_customDescription, x, y, '\0' );
 
         for (int i = 0; i < 64; i++)
         {
-            SDL_SetRenderDrawBlendMode(TextureFactory::instance()->getRenderer(),
+            SDL_SetRenderDrawBlendMode(TextureFactory::Instance()->GetRenderer(),
                                        SDL_BLENDMODE_BLEND);
 
             //hide unused rectangles with 0 alpha value
-            SDL_SetRenderDrawColor(TextureFactory::instance()->getRenderer(),
+            SDL_SetRenderDrawColor(TextureFactory::Instance()->GetRenderer(),
                                    m_colorChessBoard[2].r,
                                    m_colorChessBoard[2].g,
                                    m_colorChessBoard[2].b,
                                    ((overlay[i]!='-') ? 100 : 0));
 
-            SDL_RenderFillRect(TextureFactory::instance()->getRenderer(),
+            SDL_RenderFillRect(TextureFactory::Instance()->GetRenderer(),
                                m_rectPtrChessBoardTile[i]);
 		}
 
     }
 }
 
-void ChessBoard::drawPieces()
+void ChessBoard::DrawPieces()
 {
     std::string chessBoardShuffle {};
     std::string fenChessBoard {};
 
     //init descriptions
-    runChessBoardSimulator(isSimulating(), chessBoardShuffle, fenChessBoard);
+    RunChessBoardSimulator(IsSimulating(), chessBoardShuffle, fenChessBoard);
 
     for (int i = 0; i < 64; i++)
     {
@@ -437,7 +437,7 @@ void ChessBoard::drawPieces()
         {
             if (chessBoardShuffle[i] == STR_CB_LOOKUPREF[j])
             {
-                TextureFactory::instance()->drawTexture(std::to_string(STR_CB_LOOKUPREF[j]),
+                TextureFactory::Instance()->DrawTexture(std::to_string(STR_CB_LOOKUPREF[j]),
                                                         NULL,
                                                         m_rectPtrChessBoardTile[i]);
                 //Variant 2 get from texture pack with index number
@@ -451,74 +451,74 @@ void ChessBoard::drawPieces()
     }
 }
 
-void ChessBoard::viewDescriptionNext()
+void ChessBoard::ViewDescriptionNext()
 {
-    if(!isViewing())
+    if(!IsViewing())
     {
         std::string tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs;
-        tempCustDescr = getMutableDescriptionsQueue().front().Custom;
-        tempFENDescr = getMutableDescriptionsQueue().front().FEN;
-        tempSimTime = getMutableDescriptionsQueue().front().simulationTime;
-        tempChessPcs = getMutableDescriptionsQueue().front().chess_pieces;
-        getMutableDescriptionsQueue().pop();
-        getMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs});
-        setBoardDescriptionFromQueueBack();
+        tempCustDescr = GetMutableDescriptionsQueue().front().m_customDescription;
+        tempFENDescr = GetMutableDescriptionsQueue().front().m_fenDescription;
+        tempSimTime = GetMutableDescriptionsQueue().front().m_simulationTime;
+        tempChessPcs = GetMutableDescriptionsQueue().front().m_chessPieces;
+        GetMutableDescriptionsQueue().pop();
+        GetMutableDescriptionsQueue().push({tempCustDescr, tempFENDescr, tempSimTime, tempChessPcs});
+        SetBoardDescriptionFromQueueBack();
     }
     else
     {
-        getMutableCBDescriptionsVecSeek() += 1;
-        getMutableCBDescriptionsVecSeek() %= getMutableDescriptionsVector().size();
-        setBoardDescriptionFromVector();
+        GetMutableCBDescriptionsVecSeek() += 1;
+        GetMutableCBDescriptionsVecSeek() %= GetMutableDescriptionsVector().size();
+        SetBoardDescriptionFromVector();
     }
 }
 
-void ChessBoard::viewDescriptionPrevious()
+void ChessBoard::ViewDescriptionPrevious()
 {
-    if(!isViewing())
+    if(!IsViewing())
     {
-        for (int i = 0; i < getMutableDescriptionsQueue().size()-1; i++)
+        for (int i = 0; i < GetMutableDescriptionsQueue().size()-1; i++)
         {
-            ChessBoardDescriptions temp = getMutableDescriptionsQueue().front();
-            getMutableDescriptionsQueue().pop();
-            getMutableDescriptionsQueue().push(temp);
+            ChessBoardDescriptions temp = GetMutableDescriptionsQueue().front();
+            GetMutableDescriptionsQueue().pop();
+            GetMutableDescriptionsQueue().push(temp);
         }
     }
     else
     {
-        if (getMutableCBDescriptionsVecSeek() - 1 < 0)
-            getMutableCBDescriptionsVecSeek() = getMutableDescriptionsVector().size()-1;
+        if (GetMutableCBDescriptionsVecSeek() - 1 < 0)
+            GetMutableCBDescriptionsVecSeek() = GetMutableDescriptionsVector().size()-1;
         else
-            getMutableCBDescriptionsVecSeek() -= 1;
-        setBoardDescriptionFromVector();
+            GetMutableCBDescriptionsVecSeek() -= 1;
+        SetBoardDescriptionFromVector();
     }
 }
 
-void ChessBoard::copyFENtoClipboard()
+void ChessBoard::CopyFENtoClipboard()
 {
-    std::string clipboard_text{};
+    std::string clipboardText{};
 
-    if(!isViewing())
-        clipboard_text = getMutableDescriptionsQueue().back().FEN;
+    if(!IsViewing())
+        clipboardText = GetMutableDescriptionsQueue().back().m_fenDescription;
     else
-        clipboard_text = getCurrentDescription().FEN;
+        clipboardText = GetCurrentDescription().m_fenDescription;
 
-    SDL_SetClipboardText(clipboard_text.c_str());
+    SDL_SetClipboardText(clipboardText.c_str());
 }
 
 
 
-void ChessBoard::shuffleChessSet(char (&char_array)[65])
+void ChessBoard::ShuffleChessSet(char (&chessSet)[65])
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine rand_en;
-    rand_en.seed(seed);
+    std::default_random_engine randEngine;
+    randEngine.seed(seed);
     //random chess board with all pieces
-    std::shuffle(char_array, char_array+64, rand_en);
+    std::shuffle(chessSet, chessSet+64, randEngine);
 
     srand(time(NULL));
 }
 
-bool ChessBoard::isIllegalBishops(char (&char_array)[65])
+bool ChessBoard::IsIllegalBishops(char (&chessSet)[65])
 {
     int blackBishopOnBlack = 0;
     int blackBishopOnWhite = 0;
@@ -527,7 +527,7 @@ bool ChessBoard::isIllegalBishops(char (&char_array)[65])
 
     for (int i = 0; i < 64; i++)
     {
-        if(char_array[i]=='b'){ // black bishop found
+        if(chessSet[i]=='b'){ // black bishop found
             if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
                 (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
             { // check if color of square is black
@@ -536,7 +536,7 @@ bool ChessBoard::isIllegalBishops(char (&char_array)[65])
                 blackBishopOnWhite += 1;
             }
         }
-        if(char_array[i]=='B')
+        if(chessSet[i]=='B')
         { // white bishop found
             if ((( i / 8 ) % 2 == 0 && ( i % 8 ) % 2 == 1) ||
                 (( i / 8 ) % 2 == 1 && ( i % 8 ) % 2 == 0))
@@ -556,37 +556,37 @@ bool ChessBoard::isIllegalBishops(char (&char_array)[65])
 
 }
 
-void ChessBoard::removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable_int)
+void ChessBoard::RemoveIllegalPawnsAndKings(char (&chessSet)[65], int& removePscCount)
 {
     for(int i = 0; i < 64; i++)
     {
         if(i < 8 || i > (64 - 9))
         {
-            if(char_array[i] == 'p' || char_array[i] == 'P')
+            if(chessSet[i] == 'p' || chessSet[i] == 'P')
             {
-                if (mutable_int - 1 < 0)
+                if (removePscCount - 1 < 0)
                     continue;
-                char_array[i] = '-';
-                mutable_int -= 1;
+                chessSet[i] = '-';
+                removePscCount -= 1;
             }
         }
 
         //Remove both Kings to reintroduce back when board is processed
-        if((char_array[i] == 'k' || char_array[i] == 'K'))
+        if((chessSet[i] == 'k' || chessSet[i] == 'K'))
         {
-            char_array[i] = '-';
+            chessSet[i] = '-';
         }
     }
 }
 
-bool ChessBoard::isIllegalPawn(char (&char_array)[65]){
+bool ChessBoard::IsIllegalPawn(char (&chessSet)[65]){
 
     bool illegal_pawn = false;
     for(int i = 0; i < 64; i++)
     {
         if(i < 8 || i > (64 - 9))
         {
-            if(char_array[i] == 'p' || char_array[i] == 'P')
+            if(chessSet[i] == 'p' || chessSet[i] == 'P')
             {
                 illegal_pawn = true;
                 break;
@@ -596,16 +596,16 @@ bool ChessBoard::isIllegalPawn(char (&char_array)[65]){
     return illegal_pawn;
 }
 
-bool ChessBoard::isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int)
+bool ChessBoard::isExtraPiecesToRemove(char (&chessSet)[65], int& removePscCount)
 {
-    if(mutable_int > 0)
+    if(removePscCount > 0)
     {
         int rand_index = rand()%64;
 
-        if(char_array[rand_index]!= '-')
+        if(chessSet[rand_index]!= '-')
         {
-            char_array[rand_index] = '-';
-            mutable_int -= 1;
+            chessSet[rand_index] = '-';
+            removePscCount -= 1;
         }
 
         return true;
@@ -616,13 +616,13 @@ bool ChessBoard::isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int)
     }
 }
 
-void ChessBoard::addKingsToBoard(char (&char_arr)[65])
+void ChessBoard::AddKingsToBoard(char (&chessSet)[65])
 {
     // Reintroduce Kings
     // Add  Black King
     bool isSafeSquare = false;
 
-    std::string emptySquaresLookup(char_arr);
+    std::string emptySquaresLookup(chessSet);
 
     //while isSafeSquare is false
     while(!isSafeSquare)
@@ -631,22 +631,22 @@ void ChessBoard::addKingsToBoard(char (&char_arr)[65])
         int rand_index = rand()%64;
 
         //if not empty start new cycle
-        if (char_arr[rand_index] != '-')
+        if (chessSet[rand_index] != '-')
         {
             continue;
         }
-        for (int b_p = 0; b_p < 6; b_p++)
+        for (int blackPiece = 0; blackPiece < 6; blackPiece++)
         { //test each black piece
-            std::string attackedPieces = attackSquares(emptySquaresLookup,
+            std::string attackedPieces = AttackSquares(emptySquaresLookup,
                                                        rand_index % 8,
                                                        rand_index / 8,
-                                                       CP_LABELS_BLACK[b_p]);
+                                                       CP_LABELS_BLACK[blackPiece]);
 
             //for cell in attack board
             for (char piece : attackedPieces)
             {
                 //if white piece is oposite of current black piece
-                if (piece == CP_LABELS_WHITE[b_p])
+                if (piece == CP_LABELS_WHITE[blackPiece])
                 {
                     isSafeSquare = false;
                     break;
@@ -665,39 +665,39 @@ void ChessBoard::addKingsToBoard(char (&char_arr)[65])
         }
         if (isSafeSquare == true)
         {
-            char_arr[rand_index] = 'k';
+            chessSet[rand_index] = 'k';
         }
     }
 
     // Add  White King
     isSafeSquare = false;
 
-    emptySquaresLookup = std::string(char_arr);
+    emptySquaresLookup = std::string(chessSet);
 
     //while isSafeSquare is false
     while(!isSafeSquare)
     {
         // random index
-        int rand_index = rand()%64;
+        int randIdx = rand()%64;
 
         //if not empty start new cycle
-        if (char_arr[rand_index] != '-')
+        if (chessSet[randIdx] != '-')
         {
             continue;
         }
 
         //test each black piece
-        for (int w_p = 0; w_p < 6; w_p++)
+        for (int whitePiece = 0; whitePiece < 6; whitePiece++)
         {
-            std::string attackedPieces = attackSquares(emptySquaresLookup,
-                                                       rand_index % 8,
-                                                       rand_index / 8,
-                                                       CP_LABELS_WHITE[w_p]);
+            std::string attackedPieces = AttackSquares(emptySquaresLookup,
+                                                       randIdx % 8,
+                                                       randIdx / 8,
+                                                       CP_LABELS_WHITE[whitePiece]);
             //for cell in attack board
             for (char piece : attackedPieces)
             {
                 //if white piece is oposite of current black piece
-                if (piece == CP_LABELS_BLACK[w_p])
+                if (piece == CP_LABELS_BLACK[whitePiece])
                 {
 
                     isSafeSquare = false;
@@ -717,33 +717,33 @@ void ChessBoard::addKingsToBoard(char (&char_arr)[65])
         }
         if (isSafeSquare == true)
         {
-            char_arr[rand_index] = 'K';
+            chessSet[randIdx] = 'K';
         }
     }
 }
 
 
-void ChessBoard::readDescriptionFile(std::fstream& dataStream)
+void ChessBoard::ReadDescriptionFile(std::fstream& dataStream)
 {
-    if (!isViewing())
+    if (!IsViewing())
     {
-        getMutableDescriptionsVector().clear();
+        GetMutableDescriptionsVector().clear();
 
         dataStream.open(Constants::FILE_DESCRIPTIONS, std::ios::in);
 
-        ChessBoardDescriptions temp_cb_descr;
+        ChessBoardDescriptions tempCBDescription;
 
-        while(dataStream >> temp_cb_descr)
+        while(dataStream >> tempCBDescription)
         {
-            getMutableDescriptionsVector().push_back(temp_cb_descr);
+            GetMutableDescriptionsVector().push_back(tempCBDescription);
         }
         dataStream.close();
     }
 }
 
-void ChessBoard::openDescriptionFileForWriting(std::fstream& dataStream)
+void ChessBoard::OpenDescriptionFileForWriting(std::fstream& dataStream)
 {
-    if (isSimulating())
+    if (IsSimulating())
     {
         dataStream.close();
     }
@@ -755,14 +755,14 @@ void ChessBoard::openDescriptionFileForWriting(std::fstream& dataStream)
     }
 }
 
-void ChessBoard::setCurrentBoardDescriptionSrc()
+void ChessBoard::SetCurrentBoardDescriptionSrc()
 {
-    if(!isViewing())
+    if(!IsViewing())
     {
-        setBoardDescriptionFromQueueBack();
+        SetBoardDescriptionFromQueueBack();
     }
     else
     {
-        setBoardDescriptionFromVector();
+        SetBoardDescriptionFromVector();
     }
 }

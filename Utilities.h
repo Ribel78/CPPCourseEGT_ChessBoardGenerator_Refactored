@@ -2,44 +2,44 @@
 
 #include <string>
 
-void rookAttack(const std::string& boardDescription,
+void RookAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
                 const char (&blackPieces)[6],
                 const char (&whitePieces)[6]);
 
-void bishopAttack(const std::string& boardDescription,
+void BishopAttack(const std::string& boardDescription,
                   std::string& boardOverlay,
                   const char attackingPiece,
                   int x, int y,
                   const char (&blackPieces)[6],
                   const char (&whitePieces)[6]);
 
-void queenAttack(const std::string& boardDescription,
+void QueenAttack(const std::string& boardDescription,
                  std::string& boardOverlay,
                  const char attackingPiece,
                  int x, int y,
                  const char (&blackPieces)[6],
                  const char (&whitePieces)[6]);
 
-void kingAttack(const std::string& boardDescription,
+void KingAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
                 const char (&blackPieces)[6],
                 const char (&whitePieces)[6]);
 
-void pawnAttack(const std::string& boardDescription,
+void PawnAttack(const std::string& boardDescription,
                 std::string& boardOverlay,
                 const char attackingPiece,
                 int x, int y,
                 const char (&blackPieces)[6],
                 const char (&whitePieces)[6]);
 
-std::string attackSquares(const std::string& boardDescription,
+std::string AttackSquares(const std::string& boardDescription,
                           int x, int y,
                           char piece = '\0' );
 
-void openURL(const char* url);
+void OpenURL(const char* url);
 

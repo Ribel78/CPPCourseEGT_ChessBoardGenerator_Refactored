@@ -10,16 +10,16 @@ public:
 	Game();
 	~Game();
 
-    auto init(const char* title,
+    auto Init(const char* title,
               int xpos, int ypos,
               int width, int height,
               int flags) -> bool;
-    void prepTextures();
-    void update();
-    void handleEvents();
-    void clean();
-    auto isRunning() const -> bool;
-    void draw();
+    void PrepareTextures();
+    void Update();
+    void HandleEvents();
+    void Clean();
+    auto IsRunning() const -> bool;
+    void Draw();
 
 private:
     bool m_running;

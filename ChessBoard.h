@@ -10,19 +10,19 @@
 using namespace Constants;
 
 struct ChessBoardDescriptions {
-    std::string Custom {};
-    std::string FEN {};
-    std::string simulationTime {};
-    std::string chess_pieces {};
+    std::string m_customDescription {};
+    std::string m_fenDescription {};
+    std::string m_simulationTime {};
+    std::string m_chessPieces {};
 
-    friend auto operator >>(std::istream& input_stream, ChessBoardDescriptions& rhs) -> std::istream&
+    friend auto operator >>(std::istream& inputStream, ChessBoardDescriptions& rhs) -> std::istream&
     {
-        input_stream    >> rhs.Custom
-                        >> rhs.FEN
-                        >> rhs.simulationTime
-                        >> rhs.chess_pieces;
+        inputStream >> rhs.m_customDescription
+                    >> rhs.m_fenDescription
+                    >> rhs.m_simulationTime
+                    >> rhs.m_chessPieces;
 
-        return input_stream;
+        return inputStream;
     }
 };
 
@@ -32,75 +32,75 @@ public:
     ChessBoard();
     ~ChessBoard();
 
-    auto isSimulating() const -> bool;
-    auto isViewing() const -> bool;
+    auto IsSimulating() const -> bool;
+    auto IsViewing() const -> bool;
 
-    void setSimulating(const bool state);
-    void setViewing(const bool state);
+    void SetSimulating(const bool state);
+    void SetViewing(const bool state);
 
-    void toggleSimulating();
-    void toggleViewing();
+    void ToggleSimulating();
+    void ToggleViewing();
 
-    void setPiecesToRemove(int amount);
-    auto getPiecesToRemove() -> int;
+    void SetPiecesToRemove(int amount);
+    auto GetPiecesToRemove() -> int;
 
-    void runChessBoardSimulator(const bool isSimulation,
-                       std::string& custDescription,
+    void RunChessBoardSimulator(const bool isSimulation,
+                       std::string& customDescription,
                        std::string& fenDescription);
 
-    void generateRandomChessBoard(int removePcs,
-                                  std::string& custDescription,
+    void GenerateRandomChessBoard(int removePcs,
+                                  std::string& customDescription,
                                   std::string& fenDescription);
 
-    void setBoardDescriptionFromQueueBack();
-    void setBoardDescriptionFromVector();
+    void SetBoardDescriptionFromQueueBack();
+    void SetBoardDescriptionFromVector();
 
-    auto getMutableCBDescriptionsVecSeek() -> int&;
+    auto GetMutableCBDescriptionsVecSeek() -> int&;
 
-    auto getMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&;
+    auto GetMutableDescriptionsQueue() -> std::queue<ChessBoardDescriptions>&;
 
-    auto getMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&;
+    auto GetMutableDescriptionsVector() -> std::vector<ChessBoardDescriptions>&;
 
-    auto getCurrentDescription() const -> ChessBoardDescriptions;
-    void setAndPushCurrentDescription(std::string cd,
+    auto GetCurrentDescription() const -> ChessBoardDescriptions;
+    void SetAndPushCurrentDescription(std::string cd,
                                std::string fen,
-                               std::string sim_time,
-                               std::string n_pieces);
+                               std::string simulationTime,
+                               std::string numberOfPieces);
 
-    void setChessPieceIdx(int idx);
+    void SetChessPieceIdx(int idx);
 
-    auto getRectChessBoardTile(int idx) const -> SDL_Rect*;
+    auto GetRectChessBoardTile(int idx) const -> SDL_Rect*;
 
-    auto getSimulationSummary() const -> std::string;
-    void updateStatistics();
-    void resetSimulationStatistics();
+    auto GetSimulationSummary() const -> std::string;
+    void UpdateStatistics();
+    void ResetSimulationStatistics();
 
-    void initBoardRects();
+    void InitBoardRects();
 
-    void drawBoard();
-	void drawBoardOverlay();
-    void drawPieces();
+    void DrawBoard();
+    void DrawBoardOverlay();
+    void DrawPieces();
 
-    void viewDescriptionNext();
-    void viewDescriptionPrevious();
-    void copyFENtoClipboard();
+    void ViewDescriptionNext();
+    void ViewDescriptionPrevious();
+    void CopyFENtoClipboard();
 
-    void readDescriptionFile(std::fstream& dataStream);
-    void openDescriptionFileForWriting(std::fstream& dataStream);
-    void setCurrentBoardDescriptionSrc();
+    void ReadDescriptionFile(std::fstream& dataStream);
+    void OpenDescriptionFileForWriting(std::fstream& dataStream);
+    void SetCurrentBoardDescriptionSrc();
 
 
 private:
 
     //shifflePieces helper functions
-    void shuffleChessSet(char (&char_array)[65]);
-    auto isIllegalBishops(char (&char_array)[65]) -> bool;
-    void removeIllegalPawnsAndKings(char (&char_array)[65], int& mutable_int);
-    bool isIllegalPawn(char (&char_array)[65]);
-    auto isExtraPiecesToRemove(char (&char_array)[65], int& mutable_int) -> bool;
-    void addKingsToBoard(char (&char_arr)[65]);
+    void ShuffleChessSet(char (&chessSet)[65]);
+    auto IsIllegalBishops(char (&chessSet)[65]) -> bool;
+    void RemoveIllegalPawnsAndKings(char (&chessSet)[65], int& removePscCount);
+    bool IsIllegalPawn(char (&chessSet)[65]);
+    auto isExtraPiecesToRemove(char (&chessSet)[65], int& removePscCount) -> bool;
+    void AddKingsToBoard(char (&chessSet)[65]);
 
-    std::string parseFEN(const char chess_set[65]);
+    std::string ParseToFENDescription(const char chessSet[65]);
 
     bool m_simulating = false; //simulating mode
     bool m_viewing = false; //viewing mode
@@ -117,7 +117,6 @@ private:
     SDL_Rect* m_rectPtrChessBoardTile[64];   
     SDL_Rect* m_rectPtrBoardLabelsV[8];
     SDL_Rect* m_rectPtrBoardLabelsH[8];
-
 
     SDL_Rect m_rectFloatingChessTile;
 
