@@ -87,7 +87,7 @@ void ChessBoard::runChessBoardSimulator(const bool isSimulation,
                                std::string& custDescription,
                                std::string& fenDescription)
 {
-    if (isSimulation)
+    if(isSimulation)
     {
         m_timer.markStart();
 

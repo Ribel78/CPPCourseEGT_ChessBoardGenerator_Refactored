@@ -60,7 +60,9 @@ void prepChessPieceTextures(bool use_texture)
         {
             std::string filepath{};
             filepath.append(IMG_CHESS_FIGURES);
-            filepath += STR_CB_LOOKUPREF[i];
+            filepath += std::to_string(i);
+
+            // filepath += STR_CB_LOOKUPREF[i];
             filepath.append(".png");
             TextureFactory::instance()->textureFromImage(filepath.c_str(), std::to_string(STR_CB_LOOKUPREF[i]));
 
