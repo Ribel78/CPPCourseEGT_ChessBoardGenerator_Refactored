@@ -55,7 +55,7 @@ public:
 
 private:
 
-    SDL_Renderer* m_renderer = NULL;
+    SDL_Renderer* m_renderer = nullptr;
     static TextureFactory* m_instance;
     std::map<std::string, TTF_Font*> m_fonts;
     std::map<std::string, SDL_Texture*> m_textures;

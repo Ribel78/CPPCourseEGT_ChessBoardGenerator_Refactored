@@ -384,10 +384,10 @@ void ChessBoard::DrawBoard()
     for(int i = 0; i < 8 ; i++)
     {
         TextureFactory::Instance()->DrawTexture(std::string(1, ('a' + i)),
-                                                NULL, m_rectPtrBoardLabelsH[i]);
+                                                nullptr, m_rectPtrBoardLabelsH[i]);
 
         TextureFactory::Instance()->DrawTexture(std::string(1, ('8' - i)),
-                                                NULL, m_rectPtrBoardLabelsV[i]);
+                                                nullptr, m_rectPtrBoardLabelsV[i]);
     }
 }
 
@@ -438,7 +438,7 @@ void ChessBoard::DrawPieces()
             if (chessBoardShuffle[i] == STR_CB_LOOKUPREF[j])
             {
                 TextureFactory::Instance()->DrawTexture(std::to_string(STR_CB_LOOKUPREF[j]),
-                                                        NULL,
+                                                        nullptr,
                                                         m_rectPtrChessBoardTile[i]);
                 //Variant 2 get from texture pack with index number
                 // SDL_RenderCopy(TextureFactory::instance()->getRenderer(),
@@ -515,7 +515,7 @@ void ChessBoard::ShuffleChessSet(char (&chessSet)[65])
     //random chess board with all pieces
     std::shuffle(chessSet, chessSet+64, randEngine);
 
-    srand(time(NULL));
+    srand(time(nullptr));
 }
 
 bool ChessBoard::IsIllegalBishops(char (&chessSet)[65])

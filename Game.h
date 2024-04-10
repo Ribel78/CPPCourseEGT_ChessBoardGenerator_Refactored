@@ -23,7 +23,7 @@ public:
 
 private:
     bool m_running;
-    SDL_Window* m_window = NULL;
+    SDL_Window* m_window = nullptr;
     ChessBoard m_chessBoard;
     Interface m_interface;
     std::fstream m_dataStream;

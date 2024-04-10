@@ -11,7 +11,7 @@
 
 Game::Game(): m_interface(m_chessBoard)
 {
-    Game::m_window = NULL;
+    Game::m_window = nullptr;
     Game::m_running = true;
 }
 

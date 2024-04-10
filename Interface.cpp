@@ -77,9 +77,9 @@ auto Interface::GetRectWindow() -> SDL_Rect*
 void Interface::DrawTitle()
 {
     if(m_chessBoard.IsViewing())
-        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_VIEWER, NULL, &m_rectTextTitle);
+        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_VIEWER, nullptr, &m_rectTextTitle);
     else
-        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_SIMULATOR, NULL, &m_rectTextTitle);
+        TextureFactory::Instance()->DrawTexture(ID_TXT_TITLE_SIMULATOR, nullptr, &m_rectTextTitle);
 
 }
 
@@ -89,25 +89,25 @@ void Interface::DrawModeToggleButtons()
     {
         if (m_chessBoard.IsSimulating())
         {
-            TextureFactory::Instance()->DrawTexture(m_buttonStopTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::Instance()->DrawTexture(ID_BTN_VIEWER_DISABLED, NULL, &m_rectButtonViewer);
+            TextureFactory::Instance()->DrawTexture(m_buttonStopTexID, nullptr, &m_rectButtonSimulator);
+            TextureFactory::Instance()->DrawTexture(ID_BTN_VIEWER_DISABLED, nullptr, &m_rectButtonViewer);
         }
         else
         {
-            TextureFactory::Instance()->DrawTexture(m_buttonStartTexID, NULL, &m_rectButtonSimulator);
-            TextureFactory::Instance()->DrawTexture(m_buttonViewerTexID, NULL, &m_rectButtonViewer);
+            TextureFactory::Instance()->DrawTexture(m_buttonStartTexID, nullptr, &m_rectButtonSimulator);
+            TextureFactory::Instance()->DrawTexture(m_buttonViewerTexID, nullptr, &m_rectButtonViewer);
         }
     }
     else
     {
-        TextureFactory::Instance()->DrawTexture(m_buttonSimulatorTexID, NULL, &m_rectButtonViewer);
+        TextureFactory::Instance()->DrawTexture(m_buttonSimulatorTexID, nullptr, &m_rectButtonViewer);
     }
 
 }
 
 void Interface::DrawWindowBackground()
 {
-    TextureFactory::Instance()->DrawTexture(ID_BACKGROUND, NULL, &m_rectWindow);
+    TextureFactory::Instance()->DrawTexture(ID_BACKGROUND, nullptr, &m_rectWindow);
 }
 
 void Interface::DrawFENDescription()
@@ -129,7 +129,7 @@ void Interface::DrawFENDescription()
                                                 DIM_WINDOW_WIDTH, 0);
 
     TextureFactory::Instance()->DrawTexture(ID_TXT_FEN,
-                                            NULL, &m_rectTextFEN);
+                                            nullptr, &m_rectTextFEN);
 
     TextureFactory::Instance()->DestroyTexture(ID_TXT_FEN);
 
@@ -147,7 +147,7 @@ void Interface::DrawStatistics()
                                                 DIM_WINDOW_WIDTH / 2, 0);
 
     TextureFactory::Instance()->DrawTexture(ID_TXT_STATS,
-                                            NULL, &m_rectTextStats);
+                                            nullptr, &m_rectTextStats);
 
     TextureFactory::Instance()->DestroyTexture(ID_TXT_STATS);
 }
@@ -156,8 +156,8 @@ void Interface::DrawSlider()
 {
     if(!m_chessBoard.IsViewing())
     {
-        TextureFactory::Instance()->DrawTexture(ID_SLIDER_SLIT, NULL, &m_rectSliderSlit);
-        TextureFactory::Instance()->DrawTexture(ID_SLIDER_KNOB, NULL, &m_rectSliderKnob);
+        TextureFactory::Instance()->DrawTexture(ID_SLIDER_SLIT, nullptr, &m_rectSliderSlit);
+        TextureFactory::Instance()->DrawTexture(ID_SLIDER_KNOB, nullptr, &m_rectSliderKnob);
         if (m_offsetX >= 0)
         {
             int mouseX, mouseY;
@@ -194,7 +194,7 @@ void Interface::DrawSlider()
             "label", Constants::ID_FONT_SEGOE,
             labelText.c_str(),
             Constants::COL_TXT_LIGHT, 1280, 0);
-        TextureFactory::Instance()->DrawTexture("label", NULL, &label);
+        TextureFactory::Instance()->DrawTexture("label", nullptr, &label);
         TextureFactory::Instance()->DestroyTexture("label");
     }
 }

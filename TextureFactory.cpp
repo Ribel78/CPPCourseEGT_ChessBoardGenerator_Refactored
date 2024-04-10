@@ -46,7 +46,7 @@ auto TextureFactory::LoadFont(const char* fileName,
 
     TTF_Font* font = TTF_OpenFont(fileName, fontSize);
 
-    if(font == NULL)
+    if(font == nullptr)
     {
 		return false;
     } else
@@ -71,8 +71,7 @@ auto TextureFactory::GetFont(const std::string& fontId) const -> TTF_Font*
 auto TextureFactory::TextureFromImage(const char* fileName,
                                       const std::string& textureId) -> bool
 {
-
-    SDL_Texture* tex = NULL;
+    SDL_Texture* tex = nullptr;
 
     //Init SDL_Image library
     // load support for PNG and JPG image formats
@@ -81,7 +80,7 @@ auto TextureFactory::TextureFromImage(const char* fileName,
 
     tex = IMG_LoadTexture(m_renderer, fileName);
 
-    if(tex == NULL)
+    if(tex == nullptr)
     {
         std::cout
             << "Cant' load texture from "
@@ -114,11 +113,13 @@ bool TextureFactory::TextureFromFont(const std::string& textureId,
                                      Uint32 wrapLength,
                                      int fontSize = 0)
 {
-	SDL_Surface* tempSurfaceText = NULL;
+    SDL_Surface* tempSurfaceText = nullptr;
 
     TTF_Font* font = m_fonts[fontId];
 
     tempSurfaceText = TTF_RenderText_Blended_Wrapped(font, text, fg, wrapLength);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
 
@@ -138,9 +139,11 @@ auto TextureFactory::TextureFromUnicode(const std::string& textureId,
 {
     TTF_Font* font = GetFont(fontId);
 
-    SDL_Surface* tempSurfaceText = NULL;
+    SDL_Surface* tempSurfaceText = nullptr;
 
     tempSurfaceText = TTF_RenderUTF8_Blended(font, unicode, fg);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(m_renderer, tempSurfaceText);
 
@@ -163,7 +166,7 @@ auto TextureFactory::GetTextureFromPack(const std::string& packId, int texIdx) -
     if (texIdx < m_texturePack[packId].size())
         return m_texturePack[packId][texIdx];
     else
-        return NULL;
+        return nullptr;
 }
 
 void TextureFactory::DrawTexture(const std::string& textureId,

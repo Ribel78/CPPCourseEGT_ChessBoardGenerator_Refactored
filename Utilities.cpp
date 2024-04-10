@@ -800,6 +800,14 @@ void OpenURL(const char* url)
         system(command.c_str());
 
     } catch (...) {
-        std::cout << "Error opening URL in browser." << std::endl;
+        std::cout << "Error opening URL in browser on Linux." << std::endl;
+    }
+    try {
+        std::string command = "start " + std::string(url);
+        //Ubuntu only - open URL in the default browser
+        system(command.c_str());
+
+    } catch (...) {
+        std::cout << "Error opening URL in browser on Windows" << std::endl;
     }
 }
