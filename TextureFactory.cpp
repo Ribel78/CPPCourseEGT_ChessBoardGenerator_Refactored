@@ -78,6 +78,8 @@ auto TextureFactory::TextureFromImage(const char* fileName,
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
     //std::cout << "IMG_Init flags " << img_init <<std::endl;
 
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
     tex = IMG_LoadTexture(m_renderer, fileName);
 
     if(tex == nullptr)
