@@ -139,6 +139,36 @@ void Game::HandleEvents()
 
                 m_interface.UpdateBtnTexturesOnFocus();
 			}
+            //Experimental: Delete Pieces from Board by clicking with Middle Mouse in Viewer Mode
+            if (event.button.button == SDL_BUTTON_MIDDLE)
+            {
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+                m_interface.SetMouseDownCoords(mouseX, mouseY);
+
+                for (int i = 0; i < 64; i++)
+                {
+                    if(m_interface.IsButtonClicked(m_chessBoard.GetRectChessBoardTile(i), mouseX, mouseY))
+                    {
+                        m_chessBoard.SetChessPieceIdx(i);
+                        m_chessBoard.SetBoardDescriptionFromQueueBack(); // if Simulator
+                        std::cout << i << " - idx : cpIdx - " << m_chessBoard.GetChessPieceIdx() << " : cp-" <<
+                        m_chessBoard.GetCurrentDescription().m_customDescription.at(i)<< std::endl;
+
+                        std::string tempCD = m_chessBoard.GetCurrentDescription().m_customDescription.replace(i, 1, 1, '-');
+                        m_chessBoard.SetAndPushCurrentDescription(
+                            tempCD,
+                            m_chessBoard.ParseToFENDescription(tempCD.c_str()),
+                            "0.00000",
+                            m_chessBoard.GetCurrentDescription().m_chessPieces
+                            );
+                        std::cout << m_chessBoard.GetCurrentDescription().m_customDescription << std::endl;
+                        break;
+                    }
+                }
+                m_chessBoard.SetChessPieceIdx(-1);
+            }
+
 		}; break;
         case SDL_MOUSEBUTTONUP:
         {

@@ -54,6 +54,7 @@ public:
 
     void SetBoardDescriptionFromQueueBack();
     void SetBoardDescriptionFromVector();
+    void SetBoardDescriptionFromEdit(std::string descr);
 
     auto GetMutableCBDescriptionsVecSeek() -> int&;
 
@@ -68,6 +69,7 @@ public:
                                std::string numberOfPieces);
 
     void SetChessPieceIdx(int idx);
+    auto GetChessPieceIdx() const -> int;
 
     auto GetRectChessBoardTile(int idx) const -> SDL_Rect*;
 
@@ -89,6 +91,7 @@ public:
     void OpenDescriptionFileForWriting(std::fstream& dataStream);
     void SetCurrentBoardDescriptionSrc();
 
+    std::string ParseToFENDescription(const char chessSet[65]);
 
 private:
 
@@ -100,7 +103,6 @@ private:
     auto isExtraPiecesToRemove(char (&chessSet)[65], int& removePscCount) -> bool;
     void AddKingsToBoard(char (&chessSet)[65]);
 
-    std::string ParseToFENDescription(const char chessSet[65]);
 
     bool m_simulating = false; //simulating mode
     bool m_viewing = false; //viewing mode

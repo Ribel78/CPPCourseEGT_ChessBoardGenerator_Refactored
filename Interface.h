@@ -32,6 +32,7 @@ public:
     void DrawSlider();
 
     auto IsButtonClicked(const SDL_Rect* rect, int xUp, int yUp) const -> bool;
+
     auto IsButtonOnFocus(const SDL_Rect* rect) const -> bool;
     void SetMouseDownCoords(int x, int y);
     void UpdateBtnTexturesOnFocus();

@@ -213,6 +213,11 @@ void ChessBoard::SetBoardDescriptionFromQueueBack()
     m_currentCBDescription.m_chessPieces = m_cbDescriptions.back().m_chessPieces;
 }
 
+void ChessBoard::SetBoardDescriptionFromEdit(std::string descr)
+{
+    m_currentCBDescription.m_customDescription = descr;
+}
+
 void ChessBoard::SetBoardDescriptionFromVector()
 {
     int idx = m_cbDescriptionsVecSeek % m_cbDescriptionsVec.size();
@@ -257,8 +262,14 @@ void ChessBoard::SetAndPushCurrentDescription(std::string cd,
     }
 }
 
-void ChessBoard::SetChessPieceIdx(int idx){
+void ChessBoard::SetChessPieceIdx(int idx)
+{
     m_chessPieceIdx = idx;
+}
+
+auto ChessBoard::GetChessPieceIdx() const -> int
+{
+    return m_chessPieceIdx;
 }
 
 auto ChessBoard::GetRectChessBoardTile(int idx) const -> SDL_Rect*
